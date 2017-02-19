@@ -1,0 +1,26 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    testCompile {
+        exclude module: 'share'
+    }
+}
+
+dependencies {
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'ch.qos.logback:logback-core:1.1.2'
+    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'org.slf4j:slf4j-ext:1.7.7'
+
+    compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-core:1+'
+}

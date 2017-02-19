@@ -1,0 +1,11 @@
+Contains code from the Maven project for performing versioned dependency resolution.
+Apache License, Version 2.0
+https://github.com/apache/maven/tree/master/maven-artifact/src/main/java/org/apache/maven/artifact/versioning
+
+Contains topological sort code by Keith Schwarz.
+Public domain: http://www.keithschwarz.com/interesting/
+http://keithschwarz.com/interesting/code/?dir=topological-sort
+
+Uses lib minimal-json published at:
+MIT License
+https://github.com/ralfstx/minimal-json
