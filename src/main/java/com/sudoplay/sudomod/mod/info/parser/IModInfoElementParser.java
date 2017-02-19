@@ -5,7 +5,7 @@ import com.sudoplay.sudomod.mod.info.InvalidModInfoException;
 import com.sudoplay.sudomod.mod.info.ModInfo;
 
 /**
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public interface IModInfoElementParser {
 

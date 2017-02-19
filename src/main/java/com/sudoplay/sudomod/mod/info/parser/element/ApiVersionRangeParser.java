@@ -7,7 +7,7 @@ import com.sudoplay.sudomod.mod.info.parser.AbstractModInfoElementParser;
 import com.sudoplay.sudomod.versioning.VersionRange;
 
 /**
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public class ApiVersionRangeParser extends
     AbstractModInfoElementParser {

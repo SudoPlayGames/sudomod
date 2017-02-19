@@ -3,7 +3,7 @@ package com.sudoplay.sudomod.mod.info;
 import com.sudoplay.sudomod.versioning.VersionRange;
 
 /**
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public class ModDependency {
 

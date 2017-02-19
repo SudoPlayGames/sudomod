@@ -7,7 +7,7 @@ import com.sudoplay.sudomod.versioning.InvalidVersionSpecificationException;
 import com.sudoplay.sudomod.versioning.VersionRange;
 
 /**
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public abstract class AbstractModInfoElementParser implements
     IModInfoElementParser {

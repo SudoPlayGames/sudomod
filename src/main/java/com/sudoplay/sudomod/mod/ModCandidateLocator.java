@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public class ModCandidateLocator implements
     IModCandidateLocator {

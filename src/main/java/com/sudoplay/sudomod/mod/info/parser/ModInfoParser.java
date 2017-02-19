@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Validates the mod-info.json file.
  * <p>
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public class ModInfoParser implements
     IModInfoParser {

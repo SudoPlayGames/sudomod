@@ -9,7 +9,7 @@ import java.io.File;
 /**
  * Checks if the location exists and is a directory.
  * <p>
- * Created by sk3lls on 2/18/2017.
+ * Created by codetaylor on 2/18/2017.
  */
 public class FolderValidator implements
     IFolderValidator {
