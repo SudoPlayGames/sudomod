@@ -18,9 +18,9 @@ public class ModInfoParser implements
 
   private static final Logger LOG = LoggerFactory.getLogger(ModInfoParser.class);
 
-  private IModInfoElementParser[] elementParsers;
+  private IElementParser[] elementParsers;
 
-  public ModInfoParser(IModInfoElementParser[] elementParsers) {
+  public ModInfoParser(IElementParser[] elementParsers) {
     this.elementParsers = elementParsers;
   }
 
@@ -45,7 +45,7 @@ public class ModInfoParser implements
 
     jsonObject = jsonValue.asObject();
 
-    for (IModInfoElementParser parser : this.elementParsers) {
+    for (IElementParser parser : this.elementParsers) {
       parser.parse(jsonObject, store);
     }
 
@@ -53,13 +53,4 @@ public class ModInfoParser implements
 
     return store;
   }
-
-  private String validateId(String id) throws InvalidModInfoException {
-
-    if (id.replaceAll("[a-zA-Z0-9-_]", "").length() > 0) {
-      throw new InvalidModInfoException(String.format("Mod info [id] contains invalid characters: %s", id));
-    }
-    return id;
-  }
-
 }

@@ -1,12 +1,12 @@
 package com.sudoplay.sudomod.mod.info;
 
-import com.sudoplay.sudomod.mod.ModLoadException;
+import com.sudoplay.sudomod.mod.container.ModContainer;
 import com.sudoplay.sudomod.mod.info.parser.IModInfoParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -18,38 +18,38 @@ public class ModInfoListLoader implements IModInfoListLoader {
 
   private IModInfoParser modInfoParser;
   private IModInfoFactory modInfoFactory;
+  private String modInfoFilename;
 
-  public ModInfoListLoader(IModInfoParser modInfoParser, IModInfoFactory modInfoFactory) {
+  public ModInfoListLoader(IModInfoParser modInfoParser, IModInfoFactory modInfoFactory, String modInfoFilename) {
     this.modInfoParser = modInfoParser;
     this.modInfoFactory = modInfoFactory;
+    this.modInfoFilename = modInfoFilename;
   }
 
   @Override
-  public List<ModInfo> load(
-      List<File> modCandidateList,
-      String modInfoFilename,
-      List<ModInfo> store
-  ) throws ModLoadException {
+  public List<ModContainer> load(
+      List<ModContainer> modContainerList
+  ) {
 
-    LOG.debug("Entering load(modCandidateList=[{}], modInfoFilename=[{}], store=[{}])", modCandidateList,
-        modInfoFilename, store);
+    LOG.debug("Entering load(modCandidateList=[{}])", modContainerList);
 
-    for (File modLocation : modCandidateList) {
-      File modInfoFile = new File(modLocation, modInfoFilename);
+    for (ModContainer modContainer : modContainerList) {
+      Path modLocation = modContainer.getPath();
+      Path modInfoFilePath = modLocation.resolve(this.modInfoFilename);
 
       try {
-        String modInfoJsonString = new String(Files.readAllBytes(modInfoFile.toPath()));
+        String modInfoJsonString = new String(Files.readAllBytes(modInfoFilePath));
         ModInfo modInfo = this.modInfoParser.parseModInfoFile(modInfoJsonString, this.modInfoFactory.create());
-        store.add(modInfo);
+        modContainer.setModInfo(modInfo);
 
       } catch (Exception e) {
-        LOG.error(String.format("Unable to parse mod info file: %s, skipped loading mod %s", modInfoFile,
+        LOG.error(String.format("Unable to parse mod info file: %s, skipped loading mod %s", modInfoFilePath,
             modLocation), e);
       }
     }
 
-    LOG.debug("Leaving load(): {}", store);
+    LOG.debug("Leaving load(): {}", modContainerList);
 
-    return store;
+    return modContainerList;
   }
 }

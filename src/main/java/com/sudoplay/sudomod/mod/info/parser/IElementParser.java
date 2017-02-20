@@ -7,7 +7,7 @@ import com.sudoplay.sudomod.mod.info.ModInfo;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public interface IModInfoElementParser {
+public interface IElementParser {
 
   void parse(JsonObject jsonObject, ModInfo store) throws InvalidModInfoException;
 

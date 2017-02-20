@@ -3,7 +3,6 @@ package com.sudoplay.sudomod.mod.info;
 import com.sudoplay.sudomod.versioning.ArtifactVersion;
 import com.sudoplay.sudomod.versioning.VersionRange;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -16,12 +15,12 @@ public class ModInfo {
   private String author;
   private ArtifactVersion version;
   private String description;
-  private File image;
+  private String image;
   private String modPlugin;
   private VersionRange apiVersionRange;
   private String repo;
   private ModDependencyContainer modDependencyContainer;
-  private List<File> jarFileList;
+  private List<String> jarFileList;
 
   public void setId(String id) {
     this.id = id;
@@ -43,7 +42,7 @@ public class ModInfo {
     this.description = description;
   }
 
-  public void setImage(File image) {
+  public void setImage(String image) {
     this.image = image;
   }
 
@@ -63,7 +62,7 @@ public class ModInfo {
     this.modDependencyContainer = modDependencyContainer;
   }
 
-  public void setJarFileList(List<File> jarFileList) {
+  public void setJarFileList(List<String> jarFileList) {
     this.jarFileList = jarFileList;
   }
 
@@ -87,7 +86,7 @@ public class ModInfo {
     return this.description;
   }
 
-  public File getImage() {
+  public String getImage() {
     return this.image;
   }
 
@@ -107,7 +106,7 @@ public class ModInfo {
     return this.modDependencyContainer;
   }
 
-  public List<File> getJarFileList() {
+  public List<String> getJarFileList() {
     return this.jarFileList;
   }
 

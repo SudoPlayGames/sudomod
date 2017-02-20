@@ -1,6 +1,8 @@
 package com.sudoplay.sudomod.config;
 
-import java.io.File;
+import com.sudoplay.sudomod.versioning.ArtifactVersion;
+
+import java.nio.file.Path;
 
 /**
  * Configuration context.
@@ -9,44 +11,48 @@ import java.io.File;
  */
 public class Config {
 
-  private File modDataLocation;
-  private File modLocation;
-  private String modInfoFilename;
-  private String defaultApiVersionString;
+  /* package */ Path modDataLocation;
+  /* package */ Path modLocation;
+  /* package */ String modInfoFilename;
+  /* package */ String defaultModInfoApiVersionString;
+  /* package */ boolean followLinks;
+  /* package */ Path modTempLocation;
+  /* package */ String compressedModFileExtension;
+  /* package */ ArtifactVersion apiVersion;
 
   /* package */ Config() {
-    this.defaultApiVersionString = "[0,)";
+    this.defaultModInfoApiVersionString = "[0,)";
   }
 
-  public File getModDataLocation() {
-    return modDataLocation;
+  public Path getModDataLocation() {
+    return this.modDataLocation;
   }
 
-  /* package */ void setModDataLocation(File modDataLocation) {
-    this.modDataLocation = modDataLocation;
-  }
-
-  public File getModLocation() {
-    return modLocation;
-  }
-
-  /* package */ void setModLocation(File modLocation) {
-    this.modLocation = modLocation;
+  public Path getModLocation() {
+    return this.modLocation;
   }
 
   public String getModInfoFilename() {
-    return modInfoFilename;
+    return this.modInfoFilename;
   }
 
-  /* package */ void setModInfoFilename(String modInfoFilename) {
-    this.modInfoFilename = modInfoFilename;
+  public String getDefaultModInfoApiVersionString() {
+    return this.defaultModInfoApiVersionString;
   }
 
-  public String getDefaultApiVersionString() {
-    return defaultApiVersionString;
+  public boolean isFollowLinks() {
+    return this.followLinks;
   }
 
-  /* package */ void setDefaultApiVersionString(String defaultApiVersionString) {
-    this.defaultApiVersionString = defaultApiVersionString;
+  public Path getModTempLocation() {
+    return this.modTempLocation;
+  }
+
+  public String getCompressedModFileExtension() {
+    return this.compressedModFileExtension;
+  }
+
+  public ArtifactVersion getApiVersion() {
+    return this.apiVersion;
   }
 }

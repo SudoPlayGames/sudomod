@@ -3,14 +3,14 @@ package com.sudoplay.sudomod.mod.info.parser.element;
 import com.eclipsesource.json.JsonObject;
 import com.sudoplay.sudomod.mod.info.InvalidModInfoException;
 import com.sudoplay.sudomod.mod.info.ModInfo;
-import com.sudoplay.sudomod.mod.info.parser.AbstractModInfoElementParser;
+import com.sudoplay.sudomod.mod.info.parser.AbstractElementParser;
 import com.sudoplay.sudomod.versioning.VersionRange;
 
 /**
  * Created by codetaylor on 2/18/2017.
  */
 public class ApiVersionRangeParser extends
-    AbstractModInfoElementParser {
+    AbstractElementParser {
 
   private String defaultApiVersionString;
 

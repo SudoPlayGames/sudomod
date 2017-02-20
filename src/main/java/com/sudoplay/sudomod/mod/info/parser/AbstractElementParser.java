@@ -9,8 +9,8 @@ import com.sudoplay.sudomod.versioning.VersionRange;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public abstract class AbstractModInfoElementParser implements
-    IModInfoElementParser {
+public abstract class AbstractElementParser implements
+    IElementParser {
 
   protected String readString(String key, JsonObject jsonObject) throws InvalidModInfoException {
     JsonValue jsonValue = jsonObject.get(key);

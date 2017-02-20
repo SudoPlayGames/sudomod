@@ -4,9 +4,8 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.sudoplay.sudomod.mod.info.InvalidModInfoException;
 import com.sudoplay.sudomod.mod.info.ModInfo;
-import com.sudoplay.sudomod.mod.info.parser.AbstractModInfoElementParser;
+import com.sudoplay.sudomod.mod.info.parser.AbstractElementParser;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +13,14 @@ import java.util.List;
  * Created by codetaylor on 2/18/2017.
  */
 public class JarParser extends
-    AbstractModInfoElementParser {
+    AbstractElementParser {
 
   @Override
   public void parse(JsonObject jsonObject, ModInfo store) throws InvalidModInfoException {
     store.setJarFileList(this.readJarFileList("jars", jsonObject, new ArrayList<>()));
   }
 
-  private List<File> readJarFileList(String key, JsonObject jsonObject, List<File> store) throws
+  private List<String> readJarFileList(String key, JsonObject jsonObject, List<String> store) throws
       InvalidModInfoException {
 
     JsonValue jsonValue = jsonObject.get(key);
@@ -48,7 +47,7 @@ public class JarParser extends
             key, jarFileString));
       }
 
-      store.add(new File(jarFileString));
+      store.add(jarFileString);
     }
 
     return store;

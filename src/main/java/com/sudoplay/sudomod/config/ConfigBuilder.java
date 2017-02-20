@@ -1,6 +1,8 @@
 package com.sudoplay.sudomod.config;
 
-import java.io.File;
+import com.sudoplay.sudomod.versioning.DefaultArtifactVersion;
+
+import java.nio.file.Path;
 
 /**
  * Configuration context builder.
@@ -15,23 +17,49 @@ public class ConfigBuilder {
     this.config = new Config();
   }
 
-  public ConfigBuilder setModDataLocation(File modDataLocation) {
-    this.config.setModDataLocation(modDataLocation);
+  public ConfigBuilder setModDataLocation(Path modDataLocation) {
+    this.config.modDataLocation = modDataLocation;
     return this;
   }
 
-  public ConfigBuilder setModLocation(File modLocation) {
-    this.config.setModLocation(modLocation);
+  public ConfigBuilder setModLocation(Path modLocation) {
+    this.config.modLocation = modLocation;
     return this;
   }
 
   public ConfigBuilder setModInfoFilename(String modInfoFilename) {
-    this.config.setModInfoFilename(modInfoFilename);
+    this.config.modInfoFilename = modInfoFilename;
     return this;
   }
 
-  public ConfigBuilder setDefaultApiVersionString(String defaultApiVersionString) {
-    this.config.setDefaultApiVersionString(defaultApiVersionString);
+  /**
+   * This is the default version string used when one isn't supplied in the mod info file.
+   *
+   * @param defaultApiVersionString the default api version string
+   * @return this builder
+   */
+  public ConfigBuilder setDefaultModInfoApiVersionString(String defaultApiVersionString) {
+    this.config.defaultModInfoApiVersionString = defaultApiVersionString;
+    return this;
+  }
+
+  public ConfigBuilder setFollowLinks(boolean followLinks) {
+    this.config.followLinks = followLinks;
+    return this;
+  }
+
+  public ConfigBuilder setModTempLocation(Path modTempLocation) {
+    this.config.modTempLocation = modTempLocation;
+    return this;
+  }
+
+  public ConfigBuilder setCompressedModFileExtension(String compressedModFileExtension) {
+    this.config.compressedModFileExtension = compressedModFileExtension;
+    return this;
+  }
+
+  public ConfigBuilder setApiVersion(String apiVersionString) {
+    this.config.apiVersion = new DefaultArtifactVersion(apiVersionString);
     return this;
   }
 

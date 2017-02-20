@@ -11,13 +11,13 @@ import java.util.Set;
 public class ModDependencyContainer {
 
   private Set<ModDependency> required;
-  private List<ModDependency> before;
-  private List<ModDependency> after;
+  private List<ModDependency> dependencyList;
+  private List<ModDependency> dependentList;
 
   public ModDependencyContainer() {
     this.required = new HashSet<>();
-    this.before = new ArrayList<>();
-    this.after = new ArrayList<>();
+    this.dependencyList = new ArrayList<>();
+    this.dependentList = new ArrayList<>();
   }
 
   public void addModDependency(ModDependency modDependency, LoadOrder loadOrder) {
@@ -29,11 +29,11 @@ public class ModDependencyContainer {
         break;
 
       case Before:
-        this.before.add(modDependency);
+        this.dependentList.add(modDependency);
         break;
 
       case After:
-        this.after.add(modDependency);
+        this.dependencyList.add(modDependency);
         break;
 
       default:
@@ -46,20 +46,20 @@ public class ModDependencyContainer {
     return this.required;
   }
 
-  public List<ModDependency> getBefore() {
-    return this.before;
+  public List<ModDependency> getDependencyList() {
+    return this.dependencyList;
   }
 
-  public List<ModDependency> getAfter() {
-    return this.after;
+  public List<ModDependency> getDependentList() {
+    return this.dependentList;
   }
 
   @Override
   public String toString() {
     return "ModDependencyContainer{" +
         "required=" + this.required +
-        ", before=" + this.before +
-        ", after=" + this.after +
+        ", dependencyList=" + this.dependencyList +
+        ", dependentList=" + this.dependentList +
         '}';
   }
 }
