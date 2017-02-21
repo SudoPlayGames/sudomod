@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,23 +30,16 @@ public class ModCandidateListExtractor implements IModCandidateListExtractor {
   }
 
   @Override
-  public List<ModCandidate> extract(List<ModCandidate> modCandidateList) {
+  public List<ModCandidate> extract(List<ModCandidate> modCandidateList, List<ModCandidate> store) {
     LOG.debug("Entering extract(modCandidateList=[{}])", modCandidateList);
 
     Path temporaryModPath;
     ModCandidateTemporaryFolder modCandidateTemporaryFolder;
-    ModCandidate modCandidate;
     ModCandidateCompressed modCandidateCompressed;
-    List<ModCandidate> toAdd;
 
-    toAdd = new ArrayList<>();
-
-    for (Iterator<ModCandidate> it = modCandidateList.iterator(); it.hasNext(); ) {
-      modCandidate = it.next();
+    for (ModCandidate modCandidate : modCandidateList) {
 
       if (modCandidate instanceof ModCandidateCompressed) {
-        it.remove();
-
         modCandidateCompressed = (ModCandidateCompressed) modCandidate;
 
         temporaryModPath = this.temporaryModPathProvider
@@ -65,12 +57,8 @@ public class ModCandidateListExtractor implements IModCandidateListExtractor {
               modCandidate.getPath(),
               modCandidateTemporaryFolder.getExtractionError()
           );
-
-          try {
-            FileUtils.deleteRecursively(modCandidateTemporaryFolder.getPath());
-          } catch (IOException e) {
-            LOG.error("Failed to remove temporary folder [{}]", modCandidateTemporaryFolder.getPath(), e);
-          }
+          // cleanup any lingering artifacts from the failed extraction
+          this.deleteRecursively(modCandidateTemporaryFolder);
 
         } else {
           LOG.info(
@@ -78,15 +66,33 @@ public class ModCandidateListExtractor implements IModCandidateListExtractor {
               modCandidate.getPath(),
               modCandidateTemporaryFolder.getPath()
           );
-          toAdd.add(modCandidateTemporaryFolder);
+          // add the temporary folder candidate if it doesn't have an extraction error
+          store.add(modCandidateTemporaryFolder);
         }
+
+      } else {
+        // make sure folder candidates get back into the new list
+        store.add(modCandidate);
       }
     }
 
-    modCandidateList.addAll(toAdd);
+    LOG.debug("Leaving extract(): {}", store);
+    return store;
+  }
 
-    LOG.debug("Leaving extract(): {}", modCandidateList);
-    return modCandidateList;
+  private void deleteRecursively(ModCandidateTemporaryFolder modCandidateTemporaryFolder) {
+    Path path = modCandidateTemporaryFolder.getPath();
+
+    if (!Files.exists(path)) {
+      return;
+    }
+
+    try {
+      FileUtils.deleteRecursively(path);
+
+    } catch (IOException e) {
+      LOG.error("Failed to remove temporary folder [{}]", path, e);
+    }
   }
 
 }

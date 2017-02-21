@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public interface IModInfoListLoader {
+public interface IModContainerListInfoLoader {
 
   List<ModContainer> load(
       List<ModContainer> modContainerList

@@ -1,10 +1,10 @@
 package com.sudoplay.sudomod.mod.candidate;
 
-import com.sudoplay.sudomod.mod.ModLoadException;
 import com.sudoplay.sudomod.mod.candidate.locator.IModCandidateLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class ModCandidateListProvider implements
       try {
         locator.locateModCandidates(this.modLocation, store);
 
-      } catch (ModLoadException e) {
+      } catch (IOException e) {
         LOG.error("Error locating mod candidates with [{}]", locator, e);
       }
     }

@@ -12,15 +12,15 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public class ModInfoListLoader implements IModInfoListLoader {
+public class ModContainerListInfoLoader implements IModContainerListInfoLoader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ModInfoListLoader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ModContainerListInfoLoader.class);
 
   private IModInfoParser modInfoParser;
   private IModInfoFactory modInfoFactory;
   private String modInfoFilename;
 
-  public ModInfoListLoader(IModInfoParser modInfoParser, IModInfoFactory modInfoFactory, String modInfoFilename) {
+  public ModContainerListInfoLoader(IModInfoParser modInfoParser, IModInfoFactory modInfoFactory, String modInfoFilename) {
     this.modInfoParser = modInfoParser;
     this.modInfoFactory = modInfoFactory;
     this.modInfoFilename = modInfoFilename;

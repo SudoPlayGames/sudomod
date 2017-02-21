@@ -2,6 +2,10 @@ package com.sudoplay.sudomod;
 
 import com.sudoplay.sudomod.config.Config;
 import com.sudoplay.sudomod.config.ConfigBuilder;
+import com.sudoplay.sudomod.service.ModService;
+import com.sudoplay.sudomod.service.ModServiceFactory;
+import com.sudoplay.sudomod.service.ModServiceInitializationException;
+import com.sudoplay.sudomod.service.ModServiceLocator;
 
 import java.nio.file.Paths;
 
@@ -10,7 +14,7 @@ import java.nio.file.Paths;
  */
 public class Main {
 
-  public static void main(String... args) throws ModServiceException {
+  public static void main(String... args) throws ModServiceInitializationException {
 
     Config config = new ConfigBuilder()
         .setFollowLinks(false)
@@ -26,6 +30,13 @@ public class Main {
     ModService modService = ModServiceFactory.create(config);
     ModServiceLocator.registerModService("default", modService);
 
-    ModServiceLocator.locate("default").initialize();
+    try {
+      ModServiceLocator.locate("default").get("lss-core:test");
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    ModServiceLocator.locate("default").dispose();
   }
 }

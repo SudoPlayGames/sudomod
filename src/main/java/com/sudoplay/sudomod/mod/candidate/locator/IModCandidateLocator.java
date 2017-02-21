@@ -1,8 +1,8 @@
 package com.sudoplay.sudomod.mod.candidate.locator;
 
-import com.sudoplay.sudomod.mod.ModLoadException;
 import com.sudoplay.sudomod.mod.candidate.ModCandidate;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -14,6 +14,6 @@ public interface IModCandidateLocator {
   List<ModCandidate> locateModCandidates(
       Path modLocation,
       List<ModCandidate> store
-  ) throws ModLoadException;
+  ) throws IOException;
 
 }

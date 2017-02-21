@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -154,6 +155,18 @@ public class ModInfoValidator implements IModInfoValidator {
       if (!Files.exists(path)) {
         LOG.error("Missing declared jar file [{}]", path);
         isValid = false;
+      }
+
+      if (isValid) {
+
+        try {
+          //noinspection ResultOfMethodCallIgnored
+          path.toUri().toURL();
+
+        } catch (MalformedURLException e) {
+          LOG.error("Error converting path [{}] to URL", path, e);
+          isValid = false;
+        }
       }
     }
     return isValid;

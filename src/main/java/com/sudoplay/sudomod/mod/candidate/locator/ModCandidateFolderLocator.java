@@ -1,6 +1,5 @@
 package com.sudoplay.sudomod.mod.candidate.locator;
 
-import com.sudoplay.sudomod.mod.ModLoadException;
 import com.sudoplay.sudomod.mod.candidate.ModCandidate;
 import com.sudoplay.sudomod.mod.candidate.ModCandidateFolder;
 import org.slf4j.Logger;
@@ -31,12 +30,14 @@ public class ModCandidateFolderLocator extends
   public List<ModCandidate> locateModCandidates(
       Path modLocation,
       List<ModCandidate> store
-  ) throws ModLoadException {
+  ) throws IOException {
     LOG.debug("Entering locateModCandidates(modLocation=[{}])", modLocation);
 
     try {
-      DirectoryStream<Path> folders = Files.newDirectoryStream(modLocation, entry -> Files.isDirectory(entry,
-          this.linkOptions));
+      DirectoryStream<Path> folders = Files.newDirectoryStream(
+          modLocation,
+          entry -> Files.isDirectory(entry, this.linkOptions)
+      );
 
       for (Path modCandidateFolder : folders) {
         Path modInfoPath = modCandidateFolder.resolve(this.modInfoFilename);
@@ -53,7 +54,7 @@ public class ModCandidateFolderLocator extends
 
     } catch (IOException e) {
       LOG.error("Error checking path [{}] for mod folders", modLocation);
-      throw new ModLoadException(e);
+      throw e;
     }
 
     LOG.debug("Leaving locateModCandidates(): [{}]", store);

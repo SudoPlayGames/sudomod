@@ -20,7 +20,8 @@ dependencies {
     compile 'org.slf4j:slf4j-ext:1.7.7'
 
     compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
+    compile 'org.codehaus.janino:janino:3.0.6'
 
     testCompile 'junit:junit:4.11'
-    testCompile 'org.mockito:mockito-core:1+'
+    testCompile 'org.mockito:mockito-core:2+'
 }

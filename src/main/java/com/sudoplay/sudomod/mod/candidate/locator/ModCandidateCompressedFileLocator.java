@@ -1,6 +1,5 @@
 package com.sudoplay.sudomod.mod.candidate.locator;
 
-import com.sudoplay.sudomod.mod.ModLoadException;
 import com.sudoplay.sudomod.mod.candidate.ModCandidate;
 import com.sudoplay.sudomod.mod.candidate.ModCandidateCompressed;
 import org.slf4j.Logger;
@@ -12,8 +11,8 @@ import java.nio.file.*;
 import java.util.List;
 
 /**
- * Locates mod candidates that are compressed files, verifies that they are a .zip file and that they contain a
- * mod-info.json file.
+ * Locates mod candidates that are compressed files, verifies that they are a compressed .zip file and that they
+ * contain a mod-info.json file.
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
@@ -41,14 +40,28 @@ public class ModCandidateCompressedFileLocator extends
   public List<ModCandidate> locateModCandidates(
       Path modLocation,
       List<ModCandidate> store
-  ) throws ModLoadException {
+  ) throws IOException {
     LOG.debug("Entering locateModCandidates(modLocation=[{}])", modLocation);
 
+    for (Path file : this.getCompressedModFilePaths(modLocation)) {
+
+      if (this.isValidFile(file)) {
+        store.add(new ModCandidateCompressed(file));
+      }
+    }
+
+    LOG.debug("Leaving locateModCandidates(): [{}]", store);
+    return store;
+  }
+
+  private DirectoryStream<Path> getCompressedModFilePaths(Path modLocation) throws IOException {
     DirectoryStream<Path> files;
 
     try {
-      // find all .mod files
-      PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:**" + this.compressedModFileExtension);
+      // find all compressed mod files
+      PathMatcher matcher = FileSystems.getDefault()
+          .getPathMatcher("glob:**" + this.compressedModFileExtension);
+
       files = Files.newDirectoryStream(
           modLocation,
           entry -> Files.isRegularFile(entry, this.linkOptions) && matcher.matches(entry)
@@ -56,37 +69,52 @@ public class ModCandidateCompressedFileLocator extends
 
     } catch (IOException e) {
       LOG.error("Error checking path [{}] for mod files", modLocation);
-      throw new ModLoadException(e);
+      throw e;
     }
+    return files;
+  }
 
-    for (Path file : files) {
+  private boolean isValidFile(Path file) {
 
-      try {
-        // check if .zip compressed file
-        RandomAccessFile randomAccessFile = new RandomAccessFile(file.toFile(), "r");
-        long n = randomAccessFile.readInt();
-        randomAccessFile.close();
+    try {
 
-        if (n == MAGIC_BYTES) {
-          // check for mod-info.json
-          FileSystem compressedFileSystem = FileSystems.newFileSystem(file, null);
-          Path modInfoPath = compressedFileSystem.getPath(this.modInfoFilename);
+      // check if .zip compressed file
+      if (this.isZipFile(file)) {
 
-          if (Files.exists(modInfoPath, this.linkOptions)) {
-            store.add(new ModCandidateCompressed(file));
-            LOG.debug("Found compressed mod candidate file [{}]", file);
-          }
-
-        } else {
-          LOG.error("Mod candidate [{}] is not a zip file, skipping", file);
+        if (this.hasModInfoFile(file)) {
+          LOG.debug("Found compressed mod candidate file [{}]", file);
+          return true;
         }
 
-      } catch (IOException e) {
-        LOG.error("Error checking mod candidate [{}], skipping", file, e);
+      } else {
+        LOG.error("Mod candidate [{}] is not a zip file, skipping", file);
       }
+
+    } catch (IOException e) {
+      LOG.error("Error checking mod candidate [{}], skipping", file, e);
     }
 
-    LOG.debug("Leaving locateModCandidates(): [{}]", store);
-    return store;
+    return false;
   }
+
+  private boolean isZipFile(Path file) throws IOException {
+    RandomAccessFile randomAccessFile;
+    long magicBytes;
+
+    randomAccessFile = new RandomAccessFile(file.toFile(), "r");
+    magicBytes = randomAccessFile.readInt();
+    randomAccessFile.close();
+    return magicBytes == MAGIC_BYTES;
+  }
+
+  private boolean hasModInfoFile(Path file) throws IOException {
+    FileSystem compressedFileSystem;
+    Path modInfoPath;
+
+    // check for mod-info.json
+    compressedFileSystem = FileSystems.newFileSystem(file, null);
+    modInfoPath = compressedFileSystem.getPath(this.modInfoFilename);
+    return Files.exists(modInfoPath, this.linkOptions);
+  }
+
 }

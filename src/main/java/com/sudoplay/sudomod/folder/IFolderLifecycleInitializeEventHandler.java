@@ -1,6 +1,6 @@
 package com.sudoplay.sudomod.folder;
 
-import com.sudoplay.sudomod.ModServiceException;
+import com.sudoplay.sudomod.service.ModServiceInitializationException;
 
 /**
  * Created by codetaylor on 2/20/2017.
@@ -8,5 +8,5 @@ import com.sudoplay.sudomod.ModServiceException;
 public interface IFolderLifecycleInitializeEventHandler extends
     IFolderLifecycleEventHandler {
 
-  void onInitialize() throws ModServiceException;
+  void onInitialize() throws ModServiceInitializationException;
 }

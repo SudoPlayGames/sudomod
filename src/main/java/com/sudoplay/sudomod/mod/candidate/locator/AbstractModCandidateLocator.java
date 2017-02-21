@@ -5,15 +5,18 @@ import java.nio.file.LinkOption;
 /**
  * Created by codetaylor on 2/20/2017.
  */
-public abstract class AbstractModCandidateLocator implements
+/* package */ abstract class AbstractModCandidateLocator implements
     IModCandidateLocator {
 
-  protected LinkOption[] linkOptions;
+  /* package */ LinkOption[] linkOptions;
 
-  public AbstractModCandidateLocator(boolean followLinks) {
+  /* package */ AbstractModCandidateLocator(boolean followLinks) {
 
     if (!followLinks) {
       this.linkOptions = new LinkOption[]{LinkOption.NOFOLLOW_LINKS};
+
+    } else {
+      this.linkOptions = new LinkOption[0];
     }
   }
 }

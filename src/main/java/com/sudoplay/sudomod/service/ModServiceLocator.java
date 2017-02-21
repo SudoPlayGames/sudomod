@@ -1,4 +1,4 @@
-package com.sudoplay.sudomod;
+package com.sudoplay.sudomod.service;
 
 import java.util.HashMap;
 import java.util.Map;

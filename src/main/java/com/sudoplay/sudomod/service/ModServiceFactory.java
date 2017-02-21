@@ -1,4 +1,4 @@
-package com.sudoplay.sudomod;
+package com.sudoplay.sudomod.service;
 
 import com.sudoplay.sudomod.config.Config;
 import com.sudoplay.sudomod.folder.DefaultFolderLifecycleInitializeEventHandler;
@@ -14,8 +14,9 @@ import com.sudoplay.sudomod.mod.candidate.locator.ModCandidateCompressedFileLoca
 import com.sudoplay.sudomod.mod.candidate.locator.ModCandidateFolderLocator;
 import com.sudoplay.sudomod.mod.container.ModContainerListProvider;
 import com.sudoplay.sudomod.mod.container.ModContainerListValidator;
+import com.sudoplay.sudomod.mod.container.ModContainerSorter;
 import com.sudoplay.sudomod.mod.info.DefaultModInfoFactory;
-import com.sudoplay.sudomod.mod.info.ModInfoListLoader;
+import com.sudoplay.sudomod.mod.info.ModContainerListInfoLoader;
 import com.sudoplay.sudomod.mod.info.parser.IElementParser;
 import com.sudoplay.sudomod.mod.info.parser.ModInfoParser;
 import com.sudoplay.sudomod.mod.info.parser.element.*;
@@ -34,7 +35,7 @@ public class ModServiceFactory {
    * @param config config
    * @return default ModService implementation
    */
-  public static ModService create(Config config) {
+  public static ModService create(Config config) throws ModServiceInitializationException {
 
     return new ModService(
         new FolderLifecycleEventPlugin(
@@ -73,7 +74,7 @@ public class ModServiceFactory {
             )
         ),
         new ModContainerListProvider(),
-        new ModInfoListLoader(
+        new ModContainerListInfoLoader(
             new ModInfoParser(
                 new IElementParser[]{
                     new ApiVersionRangeParser(
@@ -98,8 +99,8 @@ public class ModServiceFactory {
             new ModInfoValidator(
                 config.getApiVersion()
             )
-        )
-    );
+        ),
+        new ModContainerSorter());
   }
 
   private ModServiceFactory() {

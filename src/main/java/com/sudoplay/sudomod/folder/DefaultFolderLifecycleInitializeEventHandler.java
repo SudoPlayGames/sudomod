@@ -1,6 +1,6 @@
 package com.sudoplay.sudomod.folder;
 
-import com.sudoplay.sudomod.ModServiceException;
+import com.sudoplay.sudomod.service.ModServiceInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public class DefaultFolderLifecycleInitializeEventHandler implements
   }
 
   @Override
-  public void onInitialize() throws ModServiceException {
+  public void onInitialize() throws ModServiceInitializationException {
 
     try {
       Files.createDirectories(this.folder);
@@ -33,7 +33,7 @@ public class DefaultFolderLifecycleInitializeEventHandler implements
     }
 
     if (!Files.exists(this.folder)) {
-      ModServiceException e = new ModServiceException(String.format(
+      ModServiceInitializationException e = new ModServiceInitializationException(String.format(
           "Folder doesn't exist [%s]",
           this.folder
       ));
