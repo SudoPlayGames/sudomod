@@ -1,5 +1,6 @@
 package com.sudoplay.sudomod.config;
 
+import com.sudoplay.sudomod.mod.security.IClassFilter;
 import com.sudoplay.sudomod.versioning.ArtifactVersion;
 
 import java.nio.file.Path;
@@ -19,9 +20,11 @@ public class Config {
   /* package */ Path modTempLocation;
   /* package */ String compressedModFileExtension;
   /* package */ ArtifactVersion apiVersion;
+  /* package */ IClassFilter[] classFilters;
 
   /* package */ Config() {
     this.defaultModInfoApiVersionString = "[0,)";
+    this.classFilters = new IClassFilter[0];
   }
 
   public Path getModDataLocation() {
@@ -50,6 +53,10 @@ public class Config {
 
   public String getCompressedModFileExtension() {
     return this.compressedModFileExtension;
+  }
+
+  public IClassFilter[] getClassFilters() {
+    return this.classFilters;
   }
 
   public ArtifactVersion getApiVersion() {

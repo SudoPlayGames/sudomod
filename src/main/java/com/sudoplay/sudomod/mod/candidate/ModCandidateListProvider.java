@@ -18,24 +18,24 @@ public class ModCandidateListProvider implements
 
   private IModCandidateLocator[] modCandidateLocators;
   private Path modLocation;
-  private String modInfoFilename;
 
   public ModCandidateListProvider(
       IModCandidateLocator[] modCandidateLocators,
-      Path modLocation,
-      String modInfoFilename
+      Path modLocation
   ) {
     this.modCandidateLocators = modCandidateLocators;
     this.modLocation = modLocation;
-    this.modInfoFilename = modInfoFilename;
   }
 
   @Override
   public List<ModCandidate> getModCandidateList(
       List<ModCandidate> store
   ) {
-    LOG.debug("Entering getModCandidateList(modLocation=[{}], modInfoFilename=[{}], store=[{}])", this.modLocation,
-        this.modInfoFilename, store);
+    LOG.debug("Entering getModCandidateList(store)");
+    LOG.debug("Looking for mod candidates in [{}] using [{}] locators", this.modLocation, this.modCandidateLocators
+        .length);
+    LOG.trace("...store=[{}]", store);
+    LOG.trace("...modCandidateLocators=[{}]", this.modCandidateLocators);
 
     for (IModCandidateLocator locator : this.modCandidateLocators) {
 
@@ -48,7 +48,8 @@ public class ModCandidateListProvider implements
     }
 
     LOG.info("Found a total of [{}] mod candidates in [{}]", store.size(), this.modLocation);
-    LOG.debug("Leaving getModCandidateList(): {}", store);
+    LOG.debug("Leaving getModCandidateList()");
+    LOG.trace("...[{}]", store);
     return store;
   }
 }

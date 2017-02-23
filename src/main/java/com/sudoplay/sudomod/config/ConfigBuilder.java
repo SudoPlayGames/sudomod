@@ -1,5 +1,6 @@
 package com.sudoplay.sudomod.config;
 
+import com.sudoplay.sudomod.mod.security.IClassFilter;
 import com.sudoplay.sudomod.versioning.DefaultArtifactVersion;
 
 import java.nio.file.Path;
@@ -60,6 +61,11 @@ public class ConfigBuilder {
 
   public ConfigBuilder setApiVersion(String apiVersionString) {
     this.config.apiVersion = new DefaultArtifactVersion(apiVersionString);
+    return this;
+  }
+
+  public ConfigBuilder setClassFilters(IClassFilter[] classFilters) {
+    this.config.classFilters = classFilters;
     return this;
   }
 

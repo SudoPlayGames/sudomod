@@ -41,16 +41,20 @@ public class ModCandidateCompressedFileLocator extends
       Path modLocation,
       List<ModCandidate> store
   ) throws IOException {
-    LOG.debug("Entering locateModCandidates(modLocation=[{}])", modLocation);
+    LOG.debug("Entering locateModCandidates(modLocation, store)");
+    LOG.trace("...modLocation=[{}]", modLocation);
+    LOG.trace("...store=[{}]", store);
 
     for (Path file : this.getCompressedModFilePaths(modLocation)) {
 
       if (this.isValidFile(file)) {
+        LOG.debug("Found compressed mod candidate file [{}]", file);
         store.add(new ModCandidateCompressed(file));
       }
     }
 
-    LOG.debug("Leaving locateModCandidates(): [{}]", store);
+    LOG.debug("Leaving locateModCandidates()");
+    LOG.trace("...[{}]", store);
     return store;
   }
 
@@ -82,16 +86,18 @@ public class ModCandidateCompressedFileLocator extends
       if (this.isZipFile(file)) {
 
         if (this.hasModInfoFile(file)) {
-          LOG.debug("Found compressed mod candidate file [{}]", file);
           return true;
+
+        } else {
+          LOG.error("Mod candidate [{}] is missing a mod info file", file);
         }
 
       } else {
-        LOG.error("Mod candidate [{}] is not a zip file, skipping", file);
+        LOG.error("Mod candidate [{}] is not a zip file", file);
       }
 
     } catch (IOException e) {
-      LOG.error("Error checking mod candidate [{}], skipping", file, e);
+      LOG.error("Error checking mod candidate [{}]", file, e);
     }
 
     return false;

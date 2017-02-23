@@ -24,8 +24,13 @@ public class ModDependencyContainer {
 
     switch (loadOrder) {
       case RequiredBefore:
+        this.required.add(modDependency);
+        this.dependentList.add(modDependency);
+        break;
+
       case RequiredAfter:
         this.required.add(modDependency);
+        this.dependencyList.add(modDependency);
         break;
 
       case Before:

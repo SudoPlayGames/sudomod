@@ -2,6 +2,7 @@ package com.sudoplay.sudomod.mod.info;
 
 import com.sudoplay.sudomod.mod.container.ModContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,6 +11,7 @@ import java.util.List;
 public interface IModContainerListInfoLoader {
 
   List<ModContainer> load(
-      List<ModContainer> modContainerList
+      List<ModContainer> modContainerList,
+      ArrayList<ModContainer> store
   );
 }

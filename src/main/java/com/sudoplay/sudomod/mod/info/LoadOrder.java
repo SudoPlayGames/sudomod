@@ -1,5 +1,7 @@
 package com.sudoplay.sudomod.mod.info;
 
+import java.util.Arrays;
+
 /**
  * Created by codetaylor on 2/18/2017.
  */
@@ -21,13 +23,22 @@ public enum LoadOrder {
   }
 
   public static LoadOrder from(String key) {
+    LoadOrder[] values = LoadOrder.values();
 
-    for (LoadOrder value : LoadOrder.values()) {
+    for (LoadOrder value : values) {
 
       if (value.key.equals(key)) {
         return value;
       }
     }
-    throw new IllegalArgumentException(String.format("Unrecognized load order key: %s", key));
+
+    String[] acceptedValues = new String[values.length];
+
+    for (int i = 0; i < values.length; i++) {
+      acceptedValues[i] = values[i].getKey();
+    }
+
+    throw new IllegalArgumentException(String.format("Unrecognized load order key: %s - accepted values are %s", key,
+        Arrays.toString(acceptedValues)));
   }
 }

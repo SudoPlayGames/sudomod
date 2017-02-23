@@ -19,4 +19,9 @@ public class SortObjectWrapper {
     //noinspection unchecked
     return (T) this.wrappedObject;
   }
+
+  @Override
+  public String toString() {
+    return this.wrappedObject != null ? this.wrappedObject.toString() : "null";
+  }
 }

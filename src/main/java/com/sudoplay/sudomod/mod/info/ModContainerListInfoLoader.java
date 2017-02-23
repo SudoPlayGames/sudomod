@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +21,11 @@ public class ModContainerListInfoLoader implements IModContainerListInfoLoader {
   private IModInfoFactory modInfoFactory;
   private String modInfoFilename;
 
-  public ModContainerListInfoLoader(IModInfoParser modInfoParser, IModInfoFactory modInfoFactory, String modInfoFilename) {
+  public ModContainerListInfoLoader(
+      IModInfoParser modInfoParser,
+      IModInfoFactory modInfoFactory,
+      String modInfoFilename
+  ) {
     this.modInfoParser = modInfoParser;
     this.modInfoFactory = modInfoFactory;
     this.modInfoFilename = modInfoFilename;
@@ -28,10 +33,14 @@ public class ModContainerListInfoLoader implements IModContainerListInfoLoader {
 
   @Override
   public List<ModContainer> load(
-      List<ModContainer> modContainerList
+      List<ModContainer> modContainerList,
+      ArrayList<ModContainer> store
   ) {
+    LOG.debug("Entering load(modContainerList, store)");
+    LOG.trace("...modContainerList=[{}]", modContainerList);
+    LOG.trace("...store=[{}]", store);
 
-    LOG.debug("Entering load(modCandidateList=[{}])", modContainerList);
+    int count = 0;
 
     for (ModContainer modContainer : modContainerList) {
       Path modLocation = modContainer.getPath();
@@ -41,6 +50,8 @@ public class ModContainerListInfoLoader implements IModContainerListInfoLoader {
         String modInfoJsonString = new String(Files.readAllBytes(modInfoFilePath));
         ModInfo modInfo = this.modInfoParser.parseModInfoFile(modInfoJsonString, this.modInfoFactory.create());
         modContainer.setModInfo(modInfo);
+        store.add(modContainer);
+        count += 1;
 
       } catch (Exception e) {
         LOG.error(String.format("Unable to parse mod info file: %s, skipped loading mod %s", modInfoFilePath,
@@ -48,8 +59,9 @@ public class ModContainerListInfoLoader implements IModContainerListInfoLoader {
       }
     }
 
-    LOG.debug("Leaving load(): {}", modContainerList);
-
-    return modContainerList;
+    LOG.info("Loaded [{}] mod info files", count);
+    LOG.debug("Leaving load()");
+    LOG.trace("...[{}]", store);
+    return store;
   }
 }

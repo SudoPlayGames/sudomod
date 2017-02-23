@@ -1,17 +1,16 @@
 package com.sudoplay.sudomod.service;
 
+import com.sudoplay.sudomod.PluginWrapper;
 import com.sudoplay.sudomod.folder.IFolderLifecycleEventPlugin;
-import com.sudoplay.sudomod.mod.ModClassLoaderFactory;
 import com.sudoplay.sudomod.mod.candidate.IModCandidateListExtractor;
 import com.sudoplay.sudomod.mod.candidate.IModCandidateListProvider;
 import com.sudoplay.sudomod.mod.candidate.ModCandidate;
-import com.sudoplay.sudomod.mod.container.IModContainerListProvider;
-import com.sudoplay.sudomod.mod.container.IModContainerListValidator;
-import com.sudoplay.sudomod.mod.container.IModContainerSorter;
-import com.sudoplay.sudomod.mod.container.ModContainer;
+import com.sudoplay.sudomod.mod.classloader.ModClassLoaderFactory;
+import com.sudoplay.sudomod.mod.container.*;
 import com.sudoplay.sudomod.mod.info.IModContainerListInfoLoader;
 import com.sudoplay.sudomod.mod.info.ModDependency;
 import com.sudoplay.sudomod.mod.info.ModInfo;
+import com.sudoplay.sudomod.mod.security.IClassFilter;
 import com.sudoplay.sudomod.sort.CyclicGraphException;
 
 import java.util.*;
@@ -25,15 +24,17 @@ public class ModService {
 
   private Map<String, ModContainer> modContainerMap;
   private List<ModContainer> modContainerList;
+  private ResourceStringParser resourceStringParser;
 
   public ModService(
       IFolderLifecycleEventPlugin folderLifecycleEventPlugin,
       IModCandidateListProvider modCandidateListProvider,
       IModCandidateListExtractor modCandidateListExtractor,
-      IModContainerListProvider modContainerListProvider,
+      IModCandidateListConverter modCandidateListConverter,
       IModContainerListInfoLoader modContainerListInfoLoader,
       IModContainerListValidator modContainerListValidator,
-      IModContainerSorter modContainerSorter
+      IModContainerSorter modContainerSorter,
+      IClassFilter[] classFilters
   ) throws ModServiceInitializationException {
 
     this.folderLifecycleEventPlugin = folderLifecycleEventPlugin;
@@ -51,10 +52,10 @@ public class ModService {
     modCandidateList = modCandidateListExtractor.extract(modCandidateList, new ArrayList<>());
 
     // create mod container list from mod candidate list
-    modContainerList = modContainerListProvider.getModContainerList(modCandidateList, new ArrayList<>());
+    modContainerList = modCandidateListConverter.convert(modCandidateList, new ArrayList<>());
 
     // load each mod's info file
-    modContainerList = modContainerListInfoLoader.load(modContainerList);
+    modContainerList = modContainerListInfoLoader.load(modContainerList, new ArrayList<>());
 
     // validate each mod's mod-info, remove mods that don't validate
     modContainerList = modContainerListValidator.validate(modContainerList, new ArrayList<>());
@@ -68,25 +69,47 @@ public class ModService {
       throw new ModServiceInitializationException("Error initializing mod service", e);
     }
 
-    // initialize mod containers
+    // initialize mod container collections
     this.modContainerList = new ArrayList<>(modContainerList);
     this.modContainerMap = new HashMap<>();
 
     for (ModContainer modContainer : modContainerList) {
-
-      modContainer.setModClassLoaderFactory(
-          new ModClassLoaderFactory(
-              modContainer.getPath(),
-              modContainer.getModInfo().getJarFileList()
-          )
-      );
-
+      // build the container map
       this.modContainerMap.put(
           modContainer.getModInfo().getId(),
           modContainer
       );
     }
 
+    // initialize mod containers
+    for (ModContainer modContainer : modContainerList) {
+      ModInfo modInfo = modContainer.getModInfo();
+
+      // build the dependency list
+      List<ModContainer> modDependencyList = new ArrayList<>();
+
+      for (ModDependency modDependency : modInfo.getModDependencyContainer().getDependencyList()) {
+        String modDependencyId = modDependency.getId();
+        ModContainer dependency = this.modContainerMap.get(modDependencyId);
+
+        if (dependency != null) {
+          modDependencyList.add(dependency);
+        }
+      }
+
+      // init the mod container's mod class loader factory
+      modContainer.setModClassLoaderFactory(
+          new ModClassLoaderFactory(
+              modContainer.getPath(),
+              modInfo.getJarFileList(),
+              modDependencyList,
+              classFilters
+          )
+      );
+
+    }
+
+    this.resourceStringParser = new ResourceStringParser();
   }
 
   public void dispose() {
@@ -128,31 +151,33 @@ public class ModService {
     }
   }
 
-  public List<ResourceLocation> getModPluginResourceLocationList(List<ResourceLocation> store) {
+  public <T extends ModPlugin> List<PluginWrapper<T>> getModPluginList(
+      Class<T> tClass,
+      List<PluginWrapper<T>> store
+  ) {
 
     for (ModContainer modContainer : this.modContainerList) {
-      String id = modContainer.getModInfo().getId();
       String modPlugin = modContainer.getModInfo().getModPlugin();
-      ResourceLocation resourceLocation = new ResourceLocation(id, modPlugin);
-
-      store.add(resourceLocation);
+      store.add(new PluginWrapper<>(tClass, modPlugin, modContainer));
     }
     return store;
   }
 
-  public <T> T get(String resourceString) throws IllegalAccessException, InstantiationException,
-      ClassNotFoundException {
+  public <T extends ModPlugin> PluginWrapper<T> getModPlugin(String modId, Class<T> tClass) {
+    ModContainer modContainer = this.getModContainer(modId);
+    return new PluginWrapper<>(tClass, modContainer.getModInfo().getModPlugin(), modContainer);
+  }
+
+  public <T> PluginWrapper<T> get(String resourceString, Class<T> tClass) {
 
     // resource location looks like this:
     // <mod-id>:<path>
     // ie. lss-core:com.sudoplay.lss.mod.core.ModPlugin
 
-    return get(this.createResourceLocation(resourceString));
+    return this.get(this.createResourceLocation(resourceString), tClass);
   }
 
-  private <T> T get(ResourceLocation resourceLocation) throws ClassNotFoundException, IllegalAccessException,
-      InstantiationException {
-
+  private <T> PluginWrapper<T> get(ResourceLocation resourceLocation, Class<T> tClass) {
     ModContainer modContainer;
 
     // TODO: swap out modId if overridden
@@ -160,15 +185,14 @@ public class ModService {
     // lookup the container by modId
     modContainer = this.getModContainer(resourceLocation.getModId());
 
-    return modContainer.get(resourceLocation.getResourceString());
+    return new PluginWrapper<>(tClass, resourceLocation.getResourceString(), modContainer);
   }
 
   private ResourceLocation createResourceLocation(String resourceString) {
     ResourceLocation resourceLocation;
 
     try {
-      // TODO: add resource string parser to constructor
-      resourceLocation = new ResourceStringParser().parse(resourceString);
+      resourceLocation = this.resourceStringParser.parse(resourceString);
 
     } catch (ResourceStringParseException e) {
       throw new IllegalArgumentException(String.format("Invalid resource string: %s", resourceString));

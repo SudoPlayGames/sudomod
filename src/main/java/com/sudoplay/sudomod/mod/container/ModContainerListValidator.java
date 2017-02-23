@@ -28,6 +28,9 @@ public class ModContainerListValidator implements
 
   @Override
   public List<ModContainer> validate(List<ModContainer> modContainerList, List<ModContainer> store) {
+    LOG.debug("Entering validate(modContainerList, store)");
+    LOG.trace("...modContainerList=[{}]", modContainerList);
+    LOG.trace("...store=[{}]", store);
 
     Map<String, ModContainer> validatedModContainerMap = new HashMap<>();
     List<ModContainer> invalidModContainers = new ArrayList<>();
@@ -38,6 +41,7 @@ public class ModContainerListValidator implements
 
       if (this.modInfoValidator.isValid(modInfo, path, modContainerList)) {
         validatedModContainerMap.put(modInfo.getId(), modContainer);
+        LOG.debug("Validated mod info file for mod [{}]", modInfo.getId());
 
       } else {
         invalidModContainers.add(modContainer);
@@ -52,6 +56,9 @@ public class ModContainerListValidator implements
 
     store.addAll(validatedModContainerMap.values());
 
+    LOG.info("Validated mod info files for [{}] mods", validatedModContainerMap.size());
+    LOG.debug("Leaving validate()");
+    LOG.trace("...[{}]", store);
     return store;
   }
 

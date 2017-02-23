@@ -31,7 +31,9 @@ public class ModCandidateFolderLocator extends
       Path modLocation,
       List<ModCandidate> store
   ) throws IOException {
-    LOG.debug("Entering locateModCandidates(modLocation=[{}])", modLocation);
+    LOG.debug("Entering locateModCandidates(modLocation, store)");
+    LOG.trace("...modLocation=[{}]", modLocation);
+    LOG.trace("...store=[{}]", store);
 
     try {
       DirectoryStream<Path> folders = Files.newDirectoryStream(
@@ -57,7 +59,8 @@ public class ModCandidateFolderLocator extends
       throw e;
     }
 
-    LOG.debug("Leaving locateModCandidates(): [{}]", store);
+    LOG.debug("Leaving locateModCandidates()");
+    LOG.trace("...[{}]", store);
     return store;
   }
 }

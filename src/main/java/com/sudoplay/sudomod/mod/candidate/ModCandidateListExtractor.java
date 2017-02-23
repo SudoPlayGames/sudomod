@@ -31,7 +31,9 @@ public class ModCandidateListExtractor implements IModCandidateListExtractor {
 
   @Override
   public List<ModCandidate> extract(List<ModCandidate> modCandidateList, List<ModCandidate> store) {
-    LOG.debug("Entering extract(modCandidateList=[{}])", modCandidateList);
+    LOG.debug("Entering extract(modCandidateList, store)");
+    LOG.trace("...modCandidateList=[{}]", modCandidateList);
+    LOG.trace("...store=[{}]", store);
 
     Path temporaryModPath;
     ModCandidateTemporaryFolder modCandidateTemporaryFolder;
@@ -76,7 +78,8 @@ public class ModCandidateListExtractor implements IModCandidateListExtractor {
       }
     }
 
-    LOG.debug("Leaving extract(): {}", store);
+    LOG.debug("Leaving extract()");
+    LOG.trace("...[{}]", store);
     return store;
   }
 

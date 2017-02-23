@@ -1,5 +1,6 @@
 package com.sudoplay.sudomod.service;
 
+import com.sudoplay.sudomod.api.core.impl.Slf4jLoggingAPIProviderFactory_Impl;
 import com.sudoplay.sudomod.config.Config;
 import com.sudoplay.sudomod.folder.DefaultFolderLifecycleInitializeEventHandler;
 import com.sudoplay.sudomod.folder.FolderLifecycleEventPlugin;
@@ -12,9 +13,7 @@ import com.sudoplay.sudomod.mod.candidate.extractor.TemporaryModPathProvider;
 import com.sudoplay.sudomod.mod.candidate.locator.IModCandidateLocator;
 import com.sudoplay.sudomod.mod.candidate.locator.ModCandidateCompressedFileLocator;
 import com.sudoplay.sudomod.mod.candidate.locator.ModCandidateFolderLocator;
-import com.sudoplay.sudomod.mod.container.ModContainerListProvider;
-import com.sudoplay.sudomod.mod.container.ModContainerListValidator;
-import com.sudoplay.sudomod.mod.container.ModContainerSorter;
+import com.sudoplay.sudomod.mod.container.*;
 import com.sudoplay.sudomod.mod.info.DefaultModInfoFactory;
 import com.sudoplay.sudomod.mod.info.ModContainerListInfoLoader;
 import com.sudoplay.sudomod.mod.info.parser.IElementParser;
@@ -63,8 +62,7 @@ public class ModServiceFactory {
                     config.isFollowLinks()
                 )
             },
-            config.getModLocation(),
-            config.getModInfoFilename()
+            config.getModLocation()
         ),
         new ModCandidateListExtractor(
             new CompressedModCandidateExtractor(),
@@ -73,7 +71,12 @@ public class ModServiceFactory {
                 config.getCompressedModFileExtension()
             )
         ),
-        new ModContainerListProvider(),
+        new ModCandidateListConverter(
+            new ModContainerFactory(
+                new LRUModContainerCacheFactory(64),
+                new Slf4jLoggingAPIProviderFactory_Impl()
+            )
+        ),
         new ModContainerListInfoLoader(
             new ModInfoParser(
                 new IElementParser[]{
@@ -100,7 +103,9 @@ public class ModServiceFactory {
                 config.getApiVersion()
             )
         ),
-        new ModContainerSorter());
+        new ModContainerSorter(),
+        config.getClassFilters()
+    );
   }
 
   private ModServiceFactory() {

@@ -112,7 +112,7 @@ public final class TopologicalSort {
       LOG.error("Cyclic dependency detected while sorting the dependency graph");
       Set<T> differenceSet = new HashSet<>(visited);
       differenceSet.removeAll(expanded);
-      LOG.error("Cyclic dependency is probably within: %s", differenceSet);
+      LOG.error("Cyclic dependency is probably within: {}", differenceSet);
       throw new CyclicGraphException("Graph contains a cycle.");
     }
 

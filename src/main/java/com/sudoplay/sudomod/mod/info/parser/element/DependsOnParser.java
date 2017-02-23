@@ -6,6 +6,8 @@ import com.sudoplay.sudomod.mod.info.*;
 import com.sudoplay.sudomod.mod.info.parser.AbstractElementParser;
 import com.sudoplay.sudomod.versioning.VersionRange;
 
+import java.util.Arrays;
+
 /**
  * Created by codetaylor on 2/18/2017.
  */
@@ -61,28 +63,13 @@ public class DependsOnParser extends
 
     if (split.length == 1) {
       // the dependency string doesn't contain a version
-      ModDependency modDependency = this.parseModDependency(dependency, split[0]);
+      ModDependency modDependency = this.parseModDependency(dependency, split[0], "[0.0,)");
       store.addModDependency(modDependency, modDependency.getLoadOrder());
 
     } else { // two parts: order/id and version
       ModDependency modDependency = this.parseModDependency(dependency, split[0], split[1]);
       store.addModDependency(modDependency, modDependency.getLoadOrder());
     }
-  }
-
-  private ModDependency parseModDependency(
-      String dependency,
-      String idString
-  ) throws InvalidModInfoException {
-
-    String[] idSplit = splitIdString(dependency, idString);
-
-    String id = idSplit[0];
-    LoadOrder loadOrder;
-
-    loadOrder = readLoadOrder(dependency, idSplit[1]);
-
-    return new ModDependency(id, loadOrder);
   }
 
   private ModDependency parseModDependency(

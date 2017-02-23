@@ -7,8 +7,9 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/20/2017.
  */
-public interface IModContainerListProvider {
-  List<ModContainer> getModContainerList(
+public interface IModCandidateListConverter {
+
+  List<ModContainer> convert(
       List<ModCandidate> modCandidateList,
       List<ModContainer> store
   );

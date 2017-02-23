@@ -35,7 +35,7 @@ public class ModInfoValidator implements IModInfoValidator {
 
     boolean isValid;
 
-    isValid = validateId(modInfo.getId());
+    isValid = validateId(modInfo.getId(), modContainerList);
 
     if (!validateModPlugin(modPath, modInfo.getModPlugin(), modInfo.getJarFileList())) {
       isValid = false;
@@ -65,24 +65,24 @@ public class ModInfoValidator implements IModInfoValidator {
       ModDependencyContainer modDependencyContainer,
       List<ModContainer> modContainerList
   ) {
-    boolean isValid = false;
+    boolean isValid = true;
 
     for (ModDependency modDependency : modDependencyContainer.getRequired()) {
       String id = modDependency.getId();
       VersionRange versionRange = modDependency.getVersionRange();
-      isValid = validateRequiredDependency(modId, modContainerList, id, versionRange);
+      isValid = validateRequiredDependency(modId, modContainerList, id, versionRange) && isValid;
     }
 
     for (ModDependency modDependency : modDependencyContainer.getDependencyList()) {
       String id = modDependency.getId();
       VersionRange versionRange = modDependency.getVersionRange();
-      isValid = validateSoftDependency(modId, modContainerList, id, versionRange);
+      isValid = validateSoftDependency(modId, modContainerList, id, versionRange) && isValid;
     }
 
     for (ModDependency modDependency : modDependencyContainer.getDependentList()) {
       String id = modDependency.getId();
       VersionRange versionRange = modDependency.getVersionRange();
-      isValid = validateSoftDependency(modId, modContainerList, id, versionRange);
+      isValid = validateSoftDependency(modId, modContainerList, id, versionRange) && isValid;
     }
 
     return isValid;
@@ -175,7 +175,7 @@ public class ModInfoValidator implements IModInfoValidator {
   private boolean validateModPlugin(Path modPath, String modPlugin, List<String> jarFileList) {
     boolean found = false;
 
-    if (Files.exists(modPath.resolve(modPlugin + ".java"))) {
+    if (Files.exists(modPath.resolve(modPlugin.replace(".", "/") + ".java"))) {
       found = true;
 
     } else {
@@ -238,13 +238,34 @@ public class ModInfoValidator implements IModInfoValidator {
     return true;
   }
 
-  private boolean validateId(String id) {
+  private boolean validateId(String id, List<ModContainer> modContainerList) {
 
-    if (id != null && !id.isEmpty() && id.replaceAll("[a-z0-9-_]", "").length() > 0) {
+    if (id == null || id.isEmpty()) {
       LOG.error("Mod info [id] is invalid: %s; must not be empty or null, valid characters are a-z 0-9 - _", id);
       return false;
     }
-    return true;
+
+    if (id.replaceAll("[a-z0-9-_]", "").length() > 0) {
+      LOG.error("Mod info [id] is invalid: %s; must not be empty or null, valid characters are a-z 0-9 - _", id);
+      return false;
+    }
+
+    int modIdCount = 0;
+
+    for (ModContainer modContainer : modContainerList) {
+
+      if (id.equals(modContainer.getModInfo().getId())) {
+        modIdCount += 1;
+      }
+    }
+
+    boolean uniqueModId = modIdCount == 1;
+
+    if (!uniqueModId) {
+      LOG.error("Duplicate mod id found [{}], mod id's must be unique", id);
+    }
+
+    return uniqueModId;
   }
 
 }

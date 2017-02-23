@@ -27,7 +27,9 @@ public class ModInfoParser implements
   @Override
   public ModInfo parseModInfoFile(String modInfoJson, ModInfo store) throws InvalidModInfoException {
 
-    LOG.debug("Entering parseModInfoFile(modInfoJson=[{}], store=[{}])", modInfoJson, store);
+    LOG.debug("Entering parseModInfoFile(modInfoJson, store)");
+    LOG.trace("...modInfoJson=[{}]", modInfoJson);
+    LOG.trace("...store=[{}]", store);
 
     JsonValue jsonValue;
     JsonObject jsonObject;
@@ -49,7 +51,8 @@ public class ModInfoParser implements
       parser.parse(jsonObject, store);
     }
 
-    LOG.debug("Leaving parseModInfoFile(): {}", store);
+    LOG.debug("Leaving parseModInfoFile()");
+    LOG.trace("...[{}]", store);
 
     return store;
   }
