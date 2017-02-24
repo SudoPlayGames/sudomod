@@ -9,7 +9,6 @@ import com.sudoplay.sudoext.folder.IFolderLifecycleEventPlugin;
 import com.sudoplay.sudoext.meta.Dependency;
 import com.sudoplay.sudoext.meta.IContainerListMetaLoader;
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.security.IClassFilter;
 import com.sudoplay.sudoext.sort.CyclicGraphException;
 
 import java.util.*;
@@ -134,24 +133,24 @@ public class SEService {
     }
   }
 
-  public <T extends Plugin> List<ObjectReference<T>> getPluginList(
+  public <T extends Plugin> List<PluginReference<T>> getPluginList(
       Class<T> tClass,
-      List<ObjectReference<T>> store
+      List<PluginReference<T>> store
   ) {
 
     for (Container container : this.containerList) {
       String plugin = container.getMeta().getPlugin();
-      store.add(new ObjectReference<>(tClass, plugin, container));
+      store.add(new PluginReference<>(tClass, plugin, container));
     }
     return store;
   }
 
-  public <T extends Plugin> ObjectReference<T> getPlugin(String id, Class<T> tClass) {
+  public <T extends Plugin> PluginReference<T> getPlugin(String id, Class<T> tClass) {
     Container container = this.getContainer(id);
-    return new ObjectReference<>(tClass, container.getMeta().getPlugin(), container);
+    return new PluginReference<>(tClass, container.getMeta().getPlugin(), container);
   }
 
-  public <T extends Plugin> ObjectReference<T> get(String resourceString, Class<T> tClass) {
+  public <T extends Plugin> PluginReference<T> get(String resourceString, Class<T> tClass) {
 
     // resource location looks like this:
     // <id>:<path>
@@ -160,7 +159,7 @@ public class SEService {
     return this.get(this.createResourceLocation(resourceString), tClass);
   }
 
-  private <T extends Plugin> ObjectReference<T> get(ResourceLocation resourceLocation, Class<T> tClass) {
+  private <T extends Plugin> PluginReference<T> get(ResourceLocation resourceLocation, Class<T> tClass) {
     Container container;
 
     // TODO: swap out id if overridden
@@ -168,7 +167,7 @@ public class SEService {
     // lookup the container by id
     container = this.getContainer(resourceLocation.getId());
 
-    return new ObjectReference<>(tClass, resourceLocation.getResourceString(), container);
+    return new PluginReference<>(tClass, resourceLocation.getResourceString(), container);
   }
 
   private ResourceLocation createResourceLocation(String resourceString) {

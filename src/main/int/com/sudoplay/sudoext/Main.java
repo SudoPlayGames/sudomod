@@ -6,14 +6,15 @@ import com.sudoplay.sudoext.api.TestModPlugin;
 import com.sudoplay.sudoext.api.logging.LoggerFactoryAPI;
 import com.sudoplay.sudoext.api.logging.Slf4jLoggerAPIProvider;
 import com.sudoplay.sudoext.classloader.intercept.ClassIntercept;
+import com.sudoplay.sudoext.classloader.intercept.StaticFieldClassInterceptProcessor;
 import com.sudoplay.sudoext.config.Config;
 import com.sudoplay.sudoext.config.ConfigBuilder;
+import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.security.Policy;
 import com.sudoplay.sudoext.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.nio.file.Paths;
 import java.security.AllPermission;
 import java.security.Permissions;
@@ -57,26 +58,20 @@ public class Main {
           }
           return true;
         })
-        .addClassIntercept(new ClassIntercept(LoggerFactoryAPI.class, (interceptedClass, container) -> {
-          try {
-            Field field = interceptedClass.getDeclaredField("LOGGING_API_PROVIDER");
-            field.setAccessible(true);
-            field.set(null, new Slf4jLoggerAPIProvider(container.getMeta().getId()));
-
-          } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-          }
-        }))
-        .addClassIntercept(new ClassIntercept(MetaAPI.class, (interceptedClass, container) -> {
-          try {
-            Field field = interceptedClass.getDeclaredField("META");
-            field.setAccessible(true);
-            field.set(null, container.getMeta());
-
-          } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-          }
-        }))
+        .addClassIntercept(new ClassIntercept(
+            LoggerFactoryAPI.class,
+            new StaticFieldClassInterceptProcessor(
+                "LOGGING_API_PROVIDER",
+                container -> new Slf4jLoggerAPIProvider(container.getMeta().getId())
+            )
+        ))
+        .addClassIntercept(new ClassIntercept(
+            MetaAPI.class,
+            new StaticFieldClassInterceptProcessor(
+                "META",
+                Container::getMeta
+            )
+        ))
         .getConfig();
 
     SEService SEService = SEServiceFactory.create(config);
@@ -85,11 +80,11 @@ public class Main {
     SEService service = SEServiceLocator.locate("default");
 
     try {
-      ObjectReference<TestModPlugin> pluginA = service.getPlugin("test-mod-a", TestModPlugin.class);
-      ObjectReference<TestModPlugin> pluginB = service.getPlugin("test-mod-b", TestModPlugin.class);
-      ObjectReference<TestModPlugin> pluginC = service.getPlugin("test-mod-c", TestModPlugin.class);
+      PluginReference<TestModPlugin> pluginA = service.getPlugin("test-mod-a", TestModPlugin.class);
+      PluginReference<TestModPlugin> pluginB = service.getPlugin("test-mod-b", TestModPlugin.class);
+      PluginReference<TestModPlugin> pluginC = service.getPlugin("test-mod-c", TestModPlugin.class);
 
-      ObjectReference<AncillaryPlugin> wrapper = service.get(
+      PluginReference<AncillaryPlugin> wrapper = service.get(
           "test-mod-b:scripts.BlueAncillaryPlugin",
           AncillaryPlugin.class
       );
@@ -107,7 +102,7 @@ public class Main {
     }
 
     // TODO: file access
-    // TODO: dependency chain testing: C -> B -> A
+    // TODO: container level event system
 
     service.dispose();
   }

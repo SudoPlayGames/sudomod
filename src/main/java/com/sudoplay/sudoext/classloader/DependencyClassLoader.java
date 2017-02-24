@@ -22,7 +22,7 @@ public class DependencyClassLoader extends
   }
 
   @Override
-  public Class<?> loadClass(String name) throws ClassNotFoundException {
+  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
 
       Class<?> c = null;
@@ -60,6 +60,10 @@ public class DependencyClassLoader extends
 
       if (c == null) {
         throw new ClassNotFoundException(name);
+      }
+
+      if (resolve) {
+        this.resolveClass(c);
       }
 
       return c;
