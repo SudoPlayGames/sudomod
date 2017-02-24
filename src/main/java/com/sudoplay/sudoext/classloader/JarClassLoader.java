@@ -1,5 +1,7 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.security.ISecureClassLoader;
+
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -8,7 +10,8 @@ import java.net.URLClassLoader;
  */
 public class JarClassLoader extends
     URLClassLoader implements
-    IClassLoader {
+    IClassLoader,
+    ISecureClassLoader {
 
   public JarClassLoader(URL[] urls, ClassLoader parent) {
     super(urls, parent);

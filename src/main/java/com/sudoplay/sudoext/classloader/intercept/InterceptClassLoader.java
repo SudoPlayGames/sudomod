@@ -1,5 +1,6 @@
 package com.sudoplay.sudoext.classloader.intercept;
 
+import com.sudoplay.sudoext.security.ISecureClassLoader;
 import com.sudoplay.sudoext.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,8 @@ import java.io.InputStream;
  * Created by codetaylor on 2/23/2017.
  */
 public class InterceptClassLoader extends
-    ClassLoader {
+    ClassLoader implements
+    ISecureClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(InterceptClassLoader.class);
 

@@ -12,7 +12,7 @@ public class PluginReference<P extends Plugin> {
   private String resourceString;
   private Container container;
 
-  public PluginReference(Class<P> pClass, String resourceString, Container container) {
+  /* package */ PluginReference(Class<P> pClass, String resourceString, Container container) {
     this.pClass = pClass;
     this.resourceString = resourceString;
     this.container = container;

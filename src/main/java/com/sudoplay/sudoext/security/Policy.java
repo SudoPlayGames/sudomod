@@ -1,7 +1,5 @@
 package com.sudoplay.sudoext.security;
 
-import com.sudoplay.sudoext.classloader.IClassLoader;
-
 import java.security.PermissionCollection;
 import java.security.ProtectionDomain;
 
@@ -25,7 +23,7 @@ public class Policy extends
   @Override
   public PermissionCollection getPermissions(ProtectionDomain domain) {
 
-    if (domain.getClassLoader() instanceof IClassLoader) {
+    if (domain.getClassLoader() instanceof ISecureClassLoader) {
       return this.pluginPermissionsProvider.getPermissionCollection();
 
     } else {

@@ -1,6 +1,7 @@
 package com.sudoplay.sudoext.classloader;
 
 import com.sudoplay.sudoext.container.Container;
+import com.sudoplay.sudoext.security.ISecureClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,8 @@ import java.util.List;
  */
 public class DependencyClassLoader extends
     ClassLoader implements
-    IClassLoader {
+    IClassLoader,
+    ISecureClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(DependencyClassLoader.class);
   private List<Container> containerList;

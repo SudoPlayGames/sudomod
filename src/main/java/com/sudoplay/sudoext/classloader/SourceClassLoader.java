@@ -1,5 +1,6 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.security.ISecureClassLoader;
 import org.codehaus.janino.JavaSourceClassLoader;
 import org.codehaus.janino.JavaSourceIClassLoader;
 import org.slf4j.Logger;
@@ -10,7 +11,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SourceClassLoader extends
     JavaSourceClassLoader implements
-    IClassLoader {
+    IClassLoader,
+    ISecureClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(SourceClassLoader.class);
 

@@ -17,4 +17,7 @@ Configuration:
   ✔ Change remove default methods to say removeAll... @done (17-02-24 11:33)
 
 Events:
-  ☐ Provide a container level event system
+  ☐ Provide a self-contained, service level event system:
+    Do we even need events?
+    ☐ ContainerReloadedEvent
+    ☐ 
