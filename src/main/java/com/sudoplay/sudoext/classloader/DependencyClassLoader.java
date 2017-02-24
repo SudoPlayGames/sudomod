@@ -23,57 +23,43 @@ public class DependencyClassLoader extends
 
   @Override
   public Class<?> loadClass(String name) throws ClassNotFoundException {
-    return this.loadClass(name, false);
-  }
-
-  @Override
-  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
 
-      // First, check if the class has already been loaded
-      Class<?> c = findLoadedClass(name);
+      Class<?> c = null;
+
+      ClassLoader parent = this.getParent();
+
+      try {
+
+        if (parent != null) {
+          c = parent.loadClass(name);
+        }
+
+      } catch (ClassNotFoundException e) {
+        LOG.trace("Class [{}] not found by [{}]", name, parent.getClass());
+      }
 
       if (c == null) {
-        ClassLoader parent = this.getParent();
 
-        try {
+        // invoke dependency class loaders
+        for (Container container : this.containerList) {
+          IClassLoader classLoader = container.getClassLoader();
 
-          if (parent != null) {
-            c = parent.loadClass(name);
+          try {
+            c = classLoader.loadClassWithoutDependencyCheck(name);
+
+          } catch (ClassNotFoundException e) {
+            LOG.trace("Class [{}] not found by [{}]", name, classLoader.getClass());
           }
 
-        } catch (ClassNotFoundException e) {
-          // swallow
-          LOG.trace("Class [{}] not found by [{}]", name, parent.getClass());
-        }
-
-        if (c == null) {
-
-          // invoke dependency class loaders
-          for (Container container : this.containerList) {
-            IClassLoader classLoader = container.getClassLoader();
-
-            try {
-              c = classLoader.loadClassWithoutDependencyCheck(name);
-
-            } catch (ClassNotFoundException e) {
-              // swallow
-              LOG.trace("Class [{}] not found by [{}]", name, classLoader.getClass());
-            }
-
-            if (c != null) {
-              break;
-            }
+          if (c != null) {
+            break;
           }
-        }
-
-        if (c == null) {
-          throw new ClassNotFoundException(name);
         }
       }
 
-      if (resolve) {
-        resolveClass(c);
+      if (c == null) {
+        throw new ClassNotFoundException(name);
       }
 
       return c;
@@ -84,27 +70,23 @@ public class DependencyClassLoader extends
   public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
 
-      // First, check if the class has already been loaded
-      Class<?> c = findLoadedClass(name);
+      Class<?> c = null;
 
-      if (c == null) {
-        ClassLoader parent = this.getParent();
+      ClassLoader parent = this.getParent();
 
-        try {
+      try {
 
-          if (parent != null) {
+        if (parent != null) {
 
-            if (parent instanceof IClassLoader) {
-              c = ((IClassLoader) parent).loadClassWithoutDependencyCheck(name);
+          if (parent instanceof IClassLoader) {
+            c = ((IClassLoader) parent).loadClassWithoutDependencyCheck(name);
 
-            } else {
-              c = parent.loadClass(name);
-            }
+          } else {
+            c = parent.loadClass(name);
           }
-        } catch (ClassNotFoundException e) {
-          // swallow
-          LOG.debug("Class [{}] not found by [{}]", name, parent.getClass());
         }
+      } catch (ClassNotFoundException e) {
+        LOG.trace("Class [{}] not found by [{}]", name, parent.getClass());
       }
 
       // skip dependency check

@@ -19,15 +19,9 @@ public class SourceClassLoader extends
   }
 
   @Override
-  public Class<?> loadClass(String name) throws ClassNotFoundException {
-    return this.loadClass(name, false);
-  }
-
-  @Override
   public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
 
-      // First, check if the class has already been loaded
       Class<?> c = findLoadedClass(name);
 
       if (c == null) {
@@ -49,8 +43,6 @@ public class SourceClassLoader extends
         }
 
         if (c == null) {
-          // If still not found, then invoke findClass in order
-          // to find the class.
           c = findClass(name);
         }
       }

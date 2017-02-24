@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.classloader.intercept;
 
-import com.sudoplay.sudoext.classloader.IClassLoader;
 import com.sudoplay.sudoext.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,7 @@ import java.io.InputStream;
  * Created by codetaylor on 2/23/2017.
  */
 public class InterceptClassLoader extends
-    ClassLoader implements
-    IClassLoader {
+    ClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(InterceptClassLoader.class);
 
@@ -26,25 +24,7 @@ public class InterceptClassLoader extends
   }
 
   @Override
-  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-    synchronized (getClassLoadingLock(name)) {
-
-      Class<?> c = this.findLoadedClass(name);
-
-      if (c == null && this.classInterceptor.canIntercept(name)) {
-        c = this.interceptClass(name);
-
-        if (c != null) {
-          return c;
-        }
-      }
-
-      return super.loadClass(name, resolve);
-    }
-  }
-
-  @Override
-  public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
+  public Class<?> loadClass(String name) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
 
       Class<?> c = this.findLoadedClass(name);
@@ -53,30 +33,11 @@ public class InterceptClassLoader extends
         c = this.interceptClass(name);
       }
 
-      if (c == null) {
-        ClassLoader parent = this.getParent();
-
-        try {
-
-          if (parent != null) {
-
-            if (parent instanceof IClassLoader) {
-              c = ((IClassLoader) parent).loadClassWithoutDependencyCheck(name);
-
-            } else {
-              c = parent.loadClass(name);
-            }
-          }
-        } catch (ClassNotFoundException e) {
-          LOG.trace("Class [{}] not found by [{}]", name, parent.getClass());
-        }
-
-        if (c == null) {
-          throw new ClassNotFoundException(name);
-        }
+      if (c != null) {
+        return c;
       }
 
-      return c;
+      return super.loadClass(name);
     }
   }
 

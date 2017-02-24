@@ -17,7 +17,7 @@ public class Slf4jLoggerAPIProvider implements
 
   @Override
   public LoggerAPI getLoggerAPI(Class<?> aClass) {
-    String name = this.id + ":" + aClass.getName();
+    String name = "mod." + this.id + ":" + aClass.getName();
     Logger logger = LoggerFactory.getLogger(name);
     return new Slf4JLoggerAPI(logger);
   }

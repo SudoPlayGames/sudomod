@@ -5,6 +5,8 @@ package com.sudoplay.sudoext.api.logging;
  */
 public class LoggerFactoryAPI {
 
+  // injected
+  @SuppressWarnings("unused")
   private static ILoggerAPIProvider LOGGING_API_PROVIDER;
 
   public static LoggerAPI getLoggerAPI(Class<?> aClass) {
