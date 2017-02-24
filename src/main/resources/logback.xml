@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.sudoplay.sudomod.mod.classloader" level="INFO"/>
+    <logger name="com.sudoplay.sudoext.ext.classloader" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
