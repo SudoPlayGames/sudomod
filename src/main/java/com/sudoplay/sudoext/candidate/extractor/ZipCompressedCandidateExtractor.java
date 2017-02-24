@@ -16,10 +16,10 @@ import java.util.zip.ZipInputStream;
 /**
  * Created by codetaylor on 2/20/2017.
  */
-public class CompressedCandidateExtractor implements
+public class ZipCompressedCandidateExtractor implements
     ICompressedCandidateExtractor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CompressedCandidateExtractor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ZipCompressedCandidateExtractor.class);
   private static final int BUFFER_SIZE = 4096;
 
   @Override

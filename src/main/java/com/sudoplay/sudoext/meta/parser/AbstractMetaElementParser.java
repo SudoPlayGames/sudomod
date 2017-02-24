@@ -9,8 +9,8 @@ import com.sudoplay.sudoext.versioning.VersionRange;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public abstract class AbstractElementParser implements
-    IElementParser {
+public abstract class AbstractMetaElementParser implements
+    IMetaElementParser {
 
   protected String readString(String key, JsonObject jsonObject) throws InvalidMetaException {
     JsonValue jsonValue = jsonObject.get(key);

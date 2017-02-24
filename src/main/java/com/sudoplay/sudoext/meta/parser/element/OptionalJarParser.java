@@ -4,7 +4,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.sudoplay.sudoext.meta.InvalidMetaException;
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.parser.AbstractElementParser;
+import com.sudoplay.sudoext.meta.parser.AbstractMetaElementParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public class JarParser extends
-    AbstractElementParser {
+public class OptionalJarParser extends
+    AbstractMetaElementParser {
 
   @Override
   public void parse(JsonObject jsonObject, Meta store) throws InvalidMetaException {

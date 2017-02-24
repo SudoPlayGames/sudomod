@@ -3,7 +3,7 @@ package com.sudoplay.sudoext.meta.parser.element;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.sudoplay.sudoext.meta.*;
-import com.sudoplay.sudoext.meta.parser.AbstractElementParser;
+import com.sudoplay.sudoext.meta.parser.AbstractMetaElementParser;
 import com.sudoplay.sudoext.versioning.VersionRange;
 
 import java.util.ArrayList;
@@ -14,8 +14,8 @@ import java.util.Set;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public class DependsOnParser extends
-    AbstractElementParser {
+public class OptionalDependsOnParser extends
+    AbstractMetaElementParser {
 
   private static final String VERSION_RANGE_ANY = "[0,)";
   private static final String VERSION_STRING_TEMPLATE = "<instruction>:<id>[@<version>]";

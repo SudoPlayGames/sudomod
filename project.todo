@@ -1,0 +1,20 @@
+Naming Conventions:
+  * Extension - a group of plugins, like a 'mod'
+  * Plugin - an abstract class in the API, extended by a class in the extension
+  * API - an interface implemented by the system and provided to a plugin
+
+File Access:
+  ☐ Sandbox mod file access into the data folder
+
+Configuration:
+  ✔ Move "mod-plugin" @done (17-02-24 11:34)
+    A mod-plugin is simply an extension of plugin and should be treated as such.
+  ✔ Split Config and builder into (SEConfig / SEConfigBuilder) and SEServiceBuilder @done (17-02-24 11:34)
+    Set values in the config and component objects in the service builder
+  ✔ Pass SEConfig into the SEService and pass values down into subsequent methods @done (17-02-24 11:33)
+    Fixed with the two-stage builder process, one builder for the config and one builder for the service
+  ✔ Add single remove methods to remove listed defaults by class @done (17-02-24 11:33)
+  ✔ Change remove default methods to say removeAll... @done (17-02-24 11:33)
+
+Events:
+  ☐ Provide a container level event system

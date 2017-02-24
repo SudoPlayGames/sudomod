@@ -28,10 +28,9 @@ public class CandidateCompressedFileLocator extends
 
   public CandidateCompressedFileLocator(
       String metaFilename,
-      String compressedFileExtension,
-      boolean followLinks
+      String compressedFileExtension
   ) {
-    super(followLinks);
+    super(false);
     this.metaFilename = metaFilename;
     this.compressedFileExtension = compressedFileExtension;
   }

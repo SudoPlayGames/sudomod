@@ -7,7 +7,7 @@ import com.sudoplay.sudoext.meta.Meta;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public interface IElementParser {
+public interface IMetaElementParser {
 
   void parse(JsonObject jsonObject, Meta store) throws InvalidMetaException;
 

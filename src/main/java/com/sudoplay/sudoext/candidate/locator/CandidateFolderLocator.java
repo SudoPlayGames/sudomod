@@ -21,8 +21,8 @@ public class CandidateFolderLocator extends
 
   private String metaFilename;
 
-  public CandidateFolderLocator(String metaFilename, boolean followLinks) {
-    super(followLinks);
+  public CandidateFolderLocator(String metaFilename) {
+    super(false);
     this.metaFilename = metaFilename;
   }
 

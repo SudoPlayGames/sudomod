@@ -15,10 +15,8 @@ public class Meta {
   private String author;
   private ArtifactVersion version;
   private String description;
-  private String image;
-  private String plugin;
+  private String website;
   private VersionRange apiVersionRange;
-  private String repo;
   private DependencyContainer dependencyContainer;
   private List<String> jarFileList;
 
@@ -42,20 +40,12 @@ public class Meta {
     this.description = description;
   }
 
-  public void setImage(String image) {
-    this.image = image;
-  }
-
-  public void setPlugin(String plugin) {
-    this.plugin = plugin;
-  }
-
   public void setApiVersionRange(VersionRange apiVersionRange) {
     this.apiVersionRange = apiVersionRange;
   }
 
-  public void setRepo(String repo) {
-    this.repo = repo;
+  public void setWebsite(String website) {
+    this.website = website;
   }
 
   public void setDependencyContainer(DependencyContainer dependencyContainer) {
@@ -86,20 +76,12 @@ public class Meta {
     return this.description;
   }
 
-  public String getImage() {
-    return this.image;
-  }
-
-  public String getPlugin() {
-    return this.plugin;
-  }
-
   public VersionRange getApiVersionRange() {
     return this.apiVersionRange;
   }
 
-  public String getRepo() {
-    return this.repo;
+  public String getWebsite() {
+    return this.website;
   }
 
   public DependencyContainer getDependencyContainer() {
@@ -118,10 +100,8 @@ public class Meta {
         ", author='" + this.author + '\'' +
         ", version=" + this.version +
         ", description='" + this.description + '\'' +
-        ", image=" + this.image +
-        ", plugin='" + this.plugin + '\'' +
         ", apiVersionRange=" + this.apiVersionRange +
-        ", repo='" + this.repo + '\'' +
+        ", website='" + this.website + '\'' +
         ", dependencyContainer=" + this.dependencyContainer +
         ", jarFileList=" + this.jarFileList +
         '}';

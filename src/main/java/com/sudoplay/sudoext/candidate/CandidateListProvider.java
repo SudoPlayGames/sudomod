@@ -29,8 +29,7 @@ public class CandidateListProvider implements
 
   @Override
   public List<Candidate> getCandidateList(
-      List<Candidate> store
-  ) {
+      List<Candidate> store) {
     LOG.debug("Entering getCandidateList(store)");
     LOG.debug("Looking for candidates in [{}] using [{}] locators", this.location, this.candidateLocators
         .length);

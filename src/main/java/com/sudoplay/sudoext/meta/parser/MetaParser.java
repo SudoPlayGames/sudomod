@@ -18,9 +18,9 @@ public class MetaParser implements
 
   private static final Logger LOG = LoggerFactory.getLogger(MetaParser.class);
 
-  private IElementParser[] elementParsers;
+  private IMetaElementParser[] elementParsers;
 
-  public MetaParser(IElementParser[] elementParsers) {
+  public MetaParser(IMetaElementParser[] elementParsers) {
     this.elementParsers = elementParsers;
   }
 
@@ -47,7 +47,7 @@ public class MetaParser implements
 
     jsonObject = jsonValue.asObject();
 
-    for (IElementParser parser : this.elementParsers) {
+    for (IMetaElementParser parser : this.elementParsers) {
       parser.parse(jsonObject, store);
     }
 

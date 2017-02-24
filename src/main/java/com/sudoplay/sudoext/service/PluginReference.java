@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.service;
 
+import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.container.Container;
-import com.sudoplay.sudoext.container.Plugin;
 
 /**
  * Created by codetaylor on 2/22/2017.

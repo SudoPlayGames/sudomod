@@ -1,5 +1,6 @@
 package com.sudoplay.sudoext.container;
 
+import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.classloader.IClassLoader;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactory;
 import com.sudoplay.sudoext.meta.Meta;

@@ -1,10 +1,14 @@
 package com.sudoplay.sudoext.service;
 
+import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.candidate.Candidate;
 import com.sudoplay.sudoext.candidate.ICandidateListExtractor;
 import com.sudoplay.sudoext.candidate.ICandidateListProvider;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactoryProvider;
-import com.sudoplay.sudoext.container.*;
+import com.sudoplay.sudoext.container.Container;
+import com.sudoplay.sudoext.container.ICandidateListConverter;
+import com.sudoplay.sudoext.container.IContainerListValidator;
+import com.sudoplay.sudoext.container.IContainerSorter;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventPlugin;
 import com.sudoplay.sudoext.meta.Dependency;
 import com.sudoplay.sudoext.meta.IContainerListMetaLoader;
@@ -24,6 +28,7 @@ public class SEService {
   private List<Container> containerList;
   private ResourceStringParser resourceStringParser;
 
+  @SuppressWarnings("WeakerAccess")
   public SEService(
       IFolderLifecycleEventPlugin folderLifecycleEventPlugin,
       ICandidateListProvider candidateListProvider,
@@ -133,40 +138,20 @@ public class SEService {
     }
   }
 
-  public <T extends Plugin> List<PluginReference<T>> getPluginList(
-      Class<T> tClass,
-      List<PluginReference<T>> store
-  ) {
-
-    for (Container container : this.containerList) {
-      String plugin = container.getMeta().getPlugin();
-      store.add(new PluginReference<>(tClass, plugin, container));
-    }
-    return store;
+  public <M extends Meta> M getMeta(String containerId, Class<M> metaClass) {
+    return metaClass.cast(this.getContainer(containerId).getMeta());
   }
 
-  public <T extends Plugin> PluginReference<T> getPlugin(String id, Class<T> tClass) {
-    Container container = this.getContainer(id);
-    return new PluginReference<>(tClass, container.getMeta().getPlugin(), container);
+  public <T extends Plugin> PluginReference<T> getPlugin(String resourceString, Class<T> tClass) {
+    return this.getPlugin(this.createResourceLocation(resourceString), tClass);
   }
 
-  public <T extends Plugin> PluginReference<T> get(String resourceString, Class<T> tClass) {
-
-    // resource location looks like this:
-    // <id>:<path>
-    // ie. lss-core:com.sudoplay.lss.core.SomePlugin
-
-    return this.get(this.createResourceLocation(resourceString), tClass);
-  }
-
-  private <T extends Plugin> PluginReference<T> get(ResourceLocation resourceLocation, Class<T> tClass) {
+  private <T extends Plugin> PluginReference<T> getPlugin(ResourceLocation resourceLocation, Class<T> tClass) {
     Container container;
 
     // TODO: swap out id if overridden
 
-    // lookup the container by id
     container = this.getContainer(resourceLocation.getId());
-
     return new PluginReference<>(tClass, resourceLocation.getResourceString(), container);
   }
 
@@ -182,13 +167,13 @@ public class SEService {
     return resourceLocation;
   }
 
-  private Container getContainer(String id) {
+  private Container getContainer(String containerId) {
     Container container;
 
-    container = this.containerMap.get(id);
+    container = this.containerMap.get(containerId);
 
     if (container == null) {
-      throw new IllegalArgumentException(String.format("Unrecognized id: %s", id));
+      throw new IllegalArgumentException(String.format("Unrecognized containerId: %s", containerId));
     }
     return container;
   }
