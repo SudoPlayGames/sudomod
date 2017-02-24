@@ -23,7 +23,7 @@ public class TemporaryPathProvider implements ITemporaryPathProvider {
         .getPath()
         .getFileName()
         .toString()
-        .replace(this.compressedFileExtension, "");
+        .replace("." + this.compressedFileExtension, "");
 
     return this.temporaryPath.resolve(folderName);
   }

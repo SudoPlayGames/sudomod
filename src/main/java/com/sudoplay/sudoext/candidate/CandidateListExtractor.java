@@ -49,7 +49,7 @@ public class CandidateListExtractor implements ICandidateListExtractor {
 
         candidateTemporaryFolder = this.compressedCandidateExtractor
             .extract(
-                candidateCompressed,
+                candidateCompressed.getPath(),
                 temporaryPath
             );
 

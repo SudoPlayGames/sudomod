@@ -14,15 +14,14 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/18/2017.
  */
-public class CandidateFolderLocator extends
-    AbstractCandidateLocator {
+public class CandidateFolderLocator implements
+    ICandidateLocator {
 
   private static final Logger LOG = LoggerFactory.getLogger(CandidateFolderLocator.class);
 
   private String metaFilename;
 
   public CandidateFolderLocator(String metaFilename) {
-    super(false);
     this.metaFilename = metaFilename;
   }
 
@@ -38,14 +37,14 @@ public class CandidateFolderLocator extends
     try {
       DirectoryStream<Path> folders = Files.newDirectoryStream(
           location,
-          entry -> Files.isDirectory(entry, this.linkOptions)
+          entry -> Files.isDirectory(entry)
       );
 
       for (Path candidateFolder : folders) {
         Path path = candidateFolder.resolve(this.metaFilename);
 
-        if (Files.exists(path, this.linkOptions)
-            && Files.isRegularFile(path, this.linkOptions)) {
+        if (Files.exists(path)
+            && Files.isRegularFile(path)) {
           store.add(new CandidateFolder(candidateFolder));
           LOG.debug("Found candidate folder [{}]", candidateFolder);
 

@@ -3,6 +3,9 @@ Naming Conventions:
   * Plugin - an abstract class in the API, extended by a class in the extension
   * API - an interface implemented by the system and provided to a plugin
 
+Test:
+  ✔ Setup for integration tests @done (17-02-24 13:31)
+
 File Access:
   ☐ Sandbox mod file access into the data folder
 
@@ -19,5 +22,3 @@ Configuration:
 Events:
   ☐ Provide a self-contained, service level event system:
     Do we even need events?
-    ☐ ContainerReloadedEvent
-    ☐ 

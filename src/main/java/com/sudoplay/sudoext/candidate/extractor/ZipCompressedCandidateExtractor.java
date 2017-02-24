@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.candidate.extractor;
 
-import com.sudoplay.sudoext.candidate.CandidateCompressed;
 import com.sudoplay.sudoext.candidate.CandidateTemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,12 +23,13 @@ public class ZipCompressedCandidateExtractor implements
 
   @Override
   public CandidateTemporaryFolder extract(
-      CandidateCompressed candidate,
+      Path compressedFilePath,
       Path temporaryPath
   ) {
-    LOG.debug("Entering extract(candidate=[{}])", candidate);
+    LOG.debug("Entering extract(compressedFilePath, temporaryPath)");
+    LOG.trace("...compressedFilePath=[{}]", compressedFilePath);
+    LOG.trace("...temporaryPath=[{}]", temporaryPath);
 
-    Path compressedFilePath;
     InputStream inputStream;
     ZipInputStream zipInputStream;
     ZipEntry zipEntry;
@@ -38,7 +38,6 @@ public class ZipCompressedCandidateExtractor implements
 
     zipInputStream = null;
     extractionError = null;
-    compressedFilePath = candidate.getPath();
 
     try {
       inputStream = Files.newInputStream(compressedFilePath);
@@ -52,6 +51,12 @@ public class ZipCompressedCandidateExtractor implements
           Files.createDirectories(extractedFilePath);
 
         } else {
+          Path parent = extractedFilePath.getParent();
+
+          if (parent != null) {
+            Files.createDirectories(parent);
+          }
+
           extract(zipInputStream, extractedFilePath);
         }
 

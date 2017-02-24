@@ -12,12 +12,12 @@ import java.util.List;
 
 /**
  * Locates candidates that are compressed files, verifies that they are a compressed .zip file and that they
- * contain an meta json file.
+ * contain a meta json file.
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class CandidateCompressedFileLocator extends
-    AbstractCandidateLocator {
+public class CandidateCompressedFileLocator implements
+    ICandidateLocator {
 
   private static final Logger LOG = LoggerFactory.getLogger(CandidateCompressedFileLocator.class);
 
@@ -30,7 +30,6 @@ public class CandidateCompressedFileLocator extends
       String metaFilename,
       String compressedFileExtension
   ) {
-    super(false);
     this.metaFilename = metaFilename;
     this.compressedFileExtension = compressedFileExtension;
   }
@@ -63,11 +62,11 @@ public class CandidateCompressedFileLocator extends
     try {
       // find all compressed files
       PathMatcher matcher = FileSystems.getDefault()
-          .getPathMatcher("glob:**" + this.compressedFileExtension);
+          .getPathMatcher("glob:**." + this.compressedFileExtension);
 
       files = Files.newDirectoryStream(
           location,
-          entry -> Files.isRegularFile(entry, this.linkOptions) && matcher.matches(entry)
+          entry -> Files.isRegularFile(entry) && matcher.matches(entry)
       );
 
     } catch (IOException e) {
@@ -118,7 +117,7 @@ public class CandidateCompressedFileLocator extends
 
     compressedFileSystem = FileSystems.newFileSystem(file, null);
     path = compressedFileSystem.getPath(this.metaFilename);
-    return Files.exists(path, this.linkOptions);
+    return Files.exists(path);
   }
 
 }
