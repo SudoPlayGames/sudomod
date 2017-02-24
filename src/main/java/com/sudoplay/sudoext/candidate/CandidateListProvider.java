@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class CandidateListProvider implements
     LOG.debug("Looking for candidates in [{}] using [{}] locators", this.location, this.candidateLocators
         .length);
     LOG.trace("...store=[{}]", store);
-    LOG.trace("...candidateLocators=[{}]", this.candidateLocators);
+    LOG.trace("...candidateLocators=[{}]", Arrays.toString(this.candidateLocators));
 
     for (ICandidateLocator locator : this.candidateLocators) {
 
