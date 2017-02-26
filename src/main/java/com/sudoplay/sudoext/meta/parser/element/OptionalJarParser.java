@@ -1,10 +1,11 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
-import com.sudoplay.sudoext.meta.InvalidMetaException;
 import com.sudoplay.sudoext.meta.Meta;
+import com.sudoplay.sudoext.meta.MetaParseException;
 import com.sudoplay.sudoext.meta.parser.AbstractMetaElementParser;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,38 +17,35 @@ public class OptionalJarParser extends
     AbstractMetaElementParser {
 
   @Override
-  public void parse(JsonObject jsonObject, Meta store) throws InvalidMetaException {
+  public void parse(JSONObject jsonObject, Meta store) throws MetaParseException {
     store.setJarFileList(this.readJarFileList("jars", jsonObject, new ArrayList<>()));
   }
 
-  private List<String> readJarFileList(String key, JsonObject jsonObject, List<String> store) throws
-      InvalidMetaException {
+  private List<String> readJarFileList(String key, JSONObject jsonObject, List<String> store) throws
+      MetaParseException {
 
-    JsonValue jsonValue = jsonObject.get(key);
-
-    if (jsonValue == null) {
+    if (!jsonObject.has(key)) {
       return store;
     }
 
-    if (!jsonValue.isArray()) {
-      throw new InvalidMetaException(String.format("Expected [%s] to be an array, got: %s", key, jsonValue));
+    JSONArray jsonArray;
+
+    try {
+      jsonArray = jsonObject.getJSONArray(key);
+
+    } catch (JSONException e) {
+      throw new MetaParseException(String.format("Expected [%s] to be an array, got: %s", key, jsonObject.get(key)), e);
     }
 
-    for (JsonValue value : jsonValue.asArray()) {
+    for (Object value : jsonArray.toList()) {
 
-      if (!value.isString()) {
-        throw new InvalidMetaException(String.format("Array [%s] must contain non-empty strings only, got: %s",
-            key, value));
+      if (!(value instanceof String) || ((String) value).isEmpty()) {
+        throw new MetaParseException(String.format(
+            "Array [%s] must contain non-empty strings only, got: %s", key, value
+        ));
       }
 
-      String jarFileString = value.asString();
-
-      if (jarFileString == null || jarFileString.isEmpty()) {
-        throw new InvalidMetaException(String.format("Array [%s] must contain non-empty strings only, got: %s",
-            key, jarFileString));
-      }
-
-      store.add(jarFileString);
+      store.add((String) value);
     }
 
     return store;

@@ -1,10 +1,11 @@
 package com.sudoplay.sudoext.meta.parser;
 
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
-import com.sudoplay.sudoext.meta.InvalidMetaException;
+import com.sudoplay.sudoext.meta.MetaParseException;
 import com.sudoplay.sudoext.versioning.InvalidVersionSpecificationException;
 import com.sudoplay.sudoext.versioning.VersionRange;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by codetaylor on 2/18/2017.
@@ -12,50 +13,28 @@ import com.sudoplay.sudoext.versioning.VersionRange;
 public abstract class AbstractMetaElementParser implements
     IMetaElementParser {
 
-  protected String readString(String key, JsonObject jsonObject) throws InvalidMetaException {
-    JsonValue jsonValue = jsonObject.get(key);
+  @NotNull
+  protected String readString(
+      @NotNull String key,
+      @NotNull JSONObject jsonObject
+  ) throws MetaParseException {
 
-    if (jsonValue == null) {
-      throw new InvalidMetaException(String.format("Meta json missing [%s]", key));
+    try {
+      return jsonObject.getString(key);
+
+    } catch (JSONException e) {
+      throw new MetaParseException(String.format("JSON missing string for key [%s]", key), e);
     }
-
-    if (!jsonValue.isString()) {
-      throw new InvalidMetaException(String.format("Expected meta json [%s] to be a string, got %s", key,
-          jsonValue));
-    }
-
-    return jsonValue.asString();
   }
 
-  /**
-   * @param key        the string key
-   * @param jsonObject the object to read from
-   * @return the string or an empty string if it doesn't exist
-   * @throws InvalidMetaException
-   */
-  protected String readOptionalString(String key, JsonObject jsonObject) throws InvalidMetaException {
-    JsonValue jsonValue = jsonObject.get(key);
-
-    if (jsonValue == null) {
-      return "";
-    }
-
-    if (!jsonValue.isString()) {
-      throw new InvalidMetaException(String.format("Expected meta json [%s] to be a string, got %s", key,
-          jsonValue));
-    }
-
-    return jsonValue.asString();
-  }
-
-  protected VersionRange parseVersionRange(String versionString, String errorMessage) throws InvalidMetaException {
+  protected VersionRange parseVersionRange(String versionString, String errorMessage) throws MetaParseException {
     VersionRange versionRange;
 
     try {
       versionRange = VersionRange.createFromVersionSpec(versionString);
 
     } catch (InvalidVersionSpecificationException e) {
-      throw new InvalidMetaException(errorMessage, e);
+      throw new MetaParseException(errorMessage, e);
     }
     return versionRange;
   }

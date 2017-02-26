@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.meta.parser;
 
-import com.sudoplay.sudoext.meta.InvalidMetaException;
+import com.sudoplay.sudoext.meta.MetaParseException;
 import com.sudoplay.sudoext.meta.Meta;
 
 /**
@@ -15,8 +15,8 @@ public interface IMetaParser {
    *
    * @param jsonString json string
    * @return Meta object
-   * @throws InvalidMetaException if any errors occur during parsing
+   * @throws MetaParseException if any errors occur during parsing
    */
-  Meta parseMetaFile(String jsonString, Meta store) throws InvalidMetaException;
+  Meta parseMetaFile(String jsonString, Meta store) throws MetaParseException;
 
 }

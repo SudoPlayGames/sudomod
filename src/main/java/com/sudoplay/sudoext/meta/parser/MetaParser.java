@@ -1,10 +1,8 @@
 package com.sudoplay.sudoext.meta.parser;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
-import com.sudoplay.sudoext.meta.InvalidMetaException;
+import com.sudoplay.sudoext.meta.MetaParseException;
 import com.sudoplay.sudoext.meta.Meta;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,27 +23,20 @@ public class MetaParser implements
   }
 
   @Override
-  public Meta parseMetaFile(String jsonString, Meta store) throws InvalidMetaException {
+  public Meta parseMetaFile(String jsonString, Meta store) throws MetaParseException {
 
     LOG.debug("Entering parseMetaFile(jsonString, store)");
     LOG.trace("...jsonString=[{}]", jsonString);
     LOG.trace("...store=[{}]", store);
 
-    JsonValue jsonValue;
-    JsonObject jsonObject;
+    JSONObject jsonObject;
 
     try {
-      jsonValue = Json.parse(jsonString);
+      jsonObject = new JSONObject(jsonString);
 
     } catch (Exception e) {
-      throw new InvalidMetaException("Error parsing meta", e);
+      throw new MetaParseException("Error parsing meta", e);
     }
-
-    if (!jsonValue.isObject()) {
-      throw new InvalidMetaException(String.format("Expected meta object, got: %s", jsonValue));
-    }
-
-    jsonObject = jsonValue.asObject();
 
     for (IMetaElementParser parser : this.elementParsers) {
       parser.parse(jsonObject, store);
