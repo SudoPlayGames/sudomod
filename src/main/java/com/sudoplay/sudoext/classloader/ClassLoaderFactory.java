@@ -53,7 +53,7 @@ public class ClassLoaderFactory implements IClassLoaderFactory {
   }
 
   @Override
-  public SourceClassLoader create(Container container) {
+  public SourceClassLoader create() {
 
     FilteredClassLoader filteredClassLoader = new FilteredClassLoader(
         this.getClass().getClassLoader(),

@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.folder;
 
 import com.sudoplay.sudoext.service.SEServiceInitializationException;
-import com.sudoplay.sudoext.util.FileUtils;
+import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +19,14 @@ public class TempFolderLifecycleEventHandler implements
   private static final Logger LOG = LoggerFactory.getLogger(TempFolderLifecycleEventHandler.class);
 
   private Path folder;
+  private RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
 
-  public TempFolderLifecycleEventHandler(Path folder) {
+  public TempFolderLifecycleEventHandler(
+      Path folder,
+      RecursiveFileRemovalProcessor recursiveFileRemovalProcessor
+  ) {
     this.folder = folder;
+    this.recursiveFileRemovalProcessor = recursiveFileRemovalProcessor;
   }
 
   @Override
@@ -30,7 +35,8 @@ public class TempFolderLifecycleEventHandler implements
     try {
 
       // cleanup
-      deleteRecursively(this.folder);
+      this.recursiveFileRemovalProcessor
+          .deleteRecursively(this.folder);
 
       // create
       Files.createDirectories(this.folder);
@@ -54,17 +60,11 @@ public class TempFolderLifecycleEventHandler implements
   public void onDispose() {
 
     try {
-      this.deleteRecursively(this.folder);
+      this.recursiveFileRemovalProcessor
+          .deleteRecursively(this.folder);
 
     } catch (IOException e) {
       LOG.error("Error deleting folder [{}]", this.folder, e);
-    }
-  }
-
-  private void deleteRecursively(Path folder) throws IOException {
-
-    if (Files.exists(folder)) {
-      FileUtils.deleteRecursively(folder);
     }
   }
 }

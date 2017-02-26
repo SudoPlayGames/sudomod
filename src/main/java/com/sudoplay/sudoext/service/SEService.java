@@ -3,7 +3,7 @@ package com.sudoplay.sudoext.service;
 import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.candidate.Candidate;
 import com.sudoplay.sudoext.candidate.ICandidateListExtractor;
-import com.sudoplay.sudoext.candidate.ICandidateListProvider;
+import com.sudoplay.sudoext.candidate.ICandidateListCreator;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactoryProvider;
 import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.container.ICandidateListConverter;
@@ -31,7 +31,7 @@ public class SEService {
   @SuppressWarnings("WeakerAccess")
   public SEService(
       IFolderLifecycleEventPlugin folderLifecycleEventPlugin,
-      ICandidateListProvider candidateListProvider,
+      ICandidateListCreator candidateListProvider,
       ICandidateListExtractor candidateListExtractor,
       ICandidateListConverter candidateListConverter,
       IContainerListMetaLoader containerListMetaLoader,
@@ -48,11 +48,11 @@ public class SEService {
     this.folderLifecycleEventPlugin.initialize();
 
     // look in the folder and build a list of folders and files that might be valid
-    candidateList = candidateListProvider.getCandidateList(new ArrayList<>());
+    candidateList = candidateListProvider.createCandidateList();
 
     // go through each candidate and extract compressed files to temporary directory
     // replace compressed candidates with temporary candidates
-    candidateList = candidateListExtractor.extract(candidateList, new ArrayList<>());
+    candidateList = candidateListExtractor.extract(candidateList);
 
     // create container list from the candidate list
     containerList = candidateListConverter.convert(candidateList, new ArrayList<>());

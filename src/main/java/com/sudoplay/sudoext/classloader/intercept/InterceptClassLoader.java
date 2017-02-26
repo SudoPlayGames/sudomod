@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.classloader.intercept;
 
 import com.sudoplay.sudoext.security.ISecureClassLoader;
-import com.sudoplay.sudoext.util.FileUtils;
+import com.sudoplay.sudoext.util.CloseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,10 @@ public class InterceptClassLoader extends
 
   private IClassInterceptor classInterceptor;
 
-  public InterceptClassLoader(ClassLoader parent, IClassInterceptor classInterceptor) {
+  public InterceptClassLoader(
+      ClassLoader parent,
+      IClassInterceptor classInterceptor
+  ) {
     super(parent);
     this.classInterceptor = classInterceptor;
   }
@@ -32,7 +35,14 @@ public class InterceptClassLoader extends
       Class<?> c = this.findLoadedClass(name);
 
       if (c == null && this.classInterceptor.canIntercept(name)) {
-        c = this.interceptClass(name);
+        byte[] classBytes = this.getClassBytes(name);
+        c = super.defineClass(null, classBytes, 0, classBytes.length);
+
+        if (!c.getName().equals(name)) {
+          throw new ClassNotFoundException(name);
+        }
+
+        this.classInterceptor.intercept(c);
       }
 
       if (c != null) {
@@ -43,7 +53,7 @@ public class InterceptClassLoader extends
     }
   }
 
-  private Class<?> interceptClass(String name) throws ClassNotFoundException {
+  private byte[] getClassBytes(String name) throws ClassNotFoundException {
 
     String path = name.replace(".", "/").concat(".class");
     InputStream inputStream = this.getResourceAsStream(path);
@@ -71,19 +81,11 @@ public class InterceptClassLoader extends
       throw new ClassNotFoundException(String.format("Reading class file from [%s]", path), e);
 
     } finally {
-      FileUtils.close(inputStream);
+      CloseUtil.close(inputStream, LOG);
     }
 
     byte[] classBytes = byteArrayOutputStream.toByteArray();
 
-    Class<?> aClass = super.defineClass(null, classBytes, 0, classBytes.length);
-
-    if (!aClass.getName().equals(name)) {
-      throw new ClassNotFoundException(name);
-    }
-
-    this.classInterceptor.intercept(aClass);
-
-    return aClass;
+    return classBytes;
   }
 }

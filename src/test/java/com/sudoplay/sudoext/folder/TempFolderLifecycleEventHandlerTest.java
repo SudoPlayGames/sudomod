@@ -1,6 +1,7 @@
 package com.sudoplay.sudoext.folder;
 
 import com.sudoplay.sudoext.service.SEServiceInitializationException;
+import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static org.mockito.Mockito.*;
 
 /**
  * Created by codetaylor on 2/24/2017.
@@ -27,27 +30,19 @@ public class TempFolderLifecycleEventHandlerTest {
       File file = this.folder.newFolder("test");
       Path path = Paths.get(file.toURI()).resolve("child-folder");
 
-      TempFolderLifecycleEventHandler handler = new TempFolderLifecycleEventHandler(path);
+      RecursiveFileRemovalProcessor fileRemovalProcessor = mock(RecursiveFileRemovalProcessor.class);
+
+      TempFolderLifecycleEventHandler handler = new TempFolderLifecycleEventHandler(path, fileRemovalProcessor);
 
       handler.onInitialize();
 
       // should create file
       Assert.assertTrue(Files.exists(path));
 
-      Files.newOutputStream(path.resolve("test-file-0.txt")).close();
-      Files.newOutputStream(path.resolve("test-file-1.txt")).close();
-      Files.newOutputStream(path.resolve("test-file-2.txt")).close();
-
-      Path nestedPath = path.resolve("folder-a/folder-b");
-      Files.createDirectories(nestedPath);
-      Files.newOutputStream(nestedPath.resolve("test-file-3.txt")).close();
-      Files.newOutputStream(nestedPath.resolve("test-file-4.txt")).close();
-      Files.newOutputStream(nestedPath.resolve("test-file-5.txt")).close();
-
       handler.onDispose();
 
-      // should clean up recursively
-      Assert.assertFalse(Files.exists(path));
+      // should call the file removal processor twice, once on init and once on dispose
+      verify(fileRemovalProcessor, times(2)).deleteRecursively(path);
 
     } catch (IOException | SEServiceInitializationException e) {
       e.printStackTrace();
@@ -62,27 +57,19 @@ public class TempFolderLifecycleEventHandlerTest {
       File file = this.folder.newFolder("test");
       Path path = Paths.get(file.toURI()).resolve("child-folder");
 
-      TempFolderLifecycleEventHandler handler = new TempFolderLifecycleEventHandler(path);
+      RecursiveFileRemovalProcessor fileRemovalProcessor = mock(RecursiveFileRemovalProcessor.class);
+
+      TempFolderLifecycleEventHandler handler = new TempFolderLifecycleEventHandler(path, fileRemovalProcessor);
 
       Files.createDirectories(path);
-
-      Files.newOutputStream(path.resolve("test-file-0.txt")).close();
-      Files.newOutputStream(path.resolve("test-file-1.txt")).close();
-      Files.newOutputStream(path.resolve("test-file-2.txt")).close();
-
-      Path nestedPath = path.resolve("folder-a/folder-b");
-      Files.createDirectories(nestedPath);
-      Files.newOutputStream(nestedPath.resolve("test-file-3.txt")).close();
-      Files.newOutputStream(nestedPath.resolve("test-file-4.txt")).close();
-      Files.newOutputStream(nestedPath.resolve("test-file-5.txt")).close();
 
       handler.onInitialize();
 
       // should create file
       Assert.assertTrue(Files.exists(path));
 
-      // should be empty
-      Assert.assertEquals(0, Files.list(path).count());
+      // should call the file removal processor
+      verify(fileRemovalProcessor, times(1)).deleteRecursively(path);
 
     } catch (IOException | SEServiceInitializationException e) {
       e.printStackTrace();

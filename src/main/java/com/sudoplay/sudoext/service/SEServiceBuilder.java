@@ -2,30 +2,36 @@ package com.sudoplay.sudoext.service;
 
 import com.sudoplay.sudoext.api.ContainerAPI;
 import com.sudoplay.sudoext.api.logging.Slf4jLoggerAPIProvider;
-import com.sudoplay.sudoext.candidate.extractor.ICompressedCandidateExtractor;
-import com.sudoplay.sudoext.candidate.extractor.ZipCompressedCandidateExtractor;
-import com.sudoplay.sudoext.candidate.locator.CandidateCompressedFileLocator;
-import com.sudoplay.sudoext.candidate.locator.CandidateFolderLocator;
-import com.sudoplay.sudoext.candidate.locator.ICandidateLocator;
-import com.sudoplay.sudoext.classloader.intercept.ClassIntercept;
-import com.sudoplay.sudoext.classloader.intercept.DelegateClassInterceptProcessor;
-import com.sudoplay.sudoext.classloader.intercept.IClassInterceptProcessor;
-import com.sudoplay.sudoext.classloader.intercept.StaticFieldClassInterceptProcessor;
+import com.sudoplay.sudoext.candidate.Candidate;
+import com.sudoplay.sudoext.candidate.CandidateListCreator;
+import com.sudoplay.sudoext.candidate.CandidateListExtractor;
+import com.sudoplay.sudoext.candidate.extractor.IZipFileExtractor;
+import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
+import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
+import com.sudoplay.sudoext.candidate.locator.*;
+import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
+import com.sudoplay.sudoext.classloader.intercept.*;
 import com.sudoplay.sudoext.container.*;
 import com.sudoplay.sudoext.folder.DefaultFolderLifecycleInitializeEventHandler;
+import com.sudoplay.sudoext.folder.FolderLifecycleEventPlugin;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventHandler;
 import com.sudoplay.sudoext.folder.TempFolderLifecycleEventHandler;
+import com.sudoplay.sudoext.meta.ContainerListMetaLoader;
 import com.sudoplay.sudoext.meta.DefaultMetaFactory;
 import com.sudoplay.sudoext.meta.IMetaFactory;
 import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
+import com.sudoplay.sudoext.meta.parser.MetaParser;
 import com.sudoplay.sudoext.meta.parser.element.*;
 import com.sudoplay.sudoext.meta.validator.IMetaValidator;
+import com.sudoplay.sudoext.meta.validator.MetaValidator;
 import com.sudoplay.sudoext.meta.validator.element.ApiVersionValidator;
 import com.sudoplay.sudoext.meta.validator.element.DependsOnValidator;
 import com.sudoplay.sudoext.meta.validator.element.IdValidator;
 import com.sudoplay.sudoext.meta.validator.element.JarValidator;
 import com.sudoplay.sudoext.security.IClassFilter;
+import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,7 +48,9 @@ public class SEServiceBuilder {
   private IContainerCacheFactory containerCacheFactory;
   private IContainerSorter containerSorter;
   private IMetaFactory metaFactory;
-  private ICompressedCandidateExtractor compressedCandidateExtractor;
+  private IZipFileExtractor compressedCandidateExtractor;
+
+  private RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
 
   private List<IClassFilter> defaultClassFilterList;
   private List<ClassIntercept> defaultClassInterceptList;
@@ -78,35 +86,54 @@ public class SEServiceBuilder {
     this.containerCacheFactory = new LRUContainerCacheFactory(64);
     this.containerSorter = new DefaultContainerSorter();
     this.metaFactory = new DefaultMetaFactory();
-    this.compressedCandidateExtractor = new ZipCompressedCandidateExtractor();
+    this.compressedCandidateExtractor = new ZipFileExtractor();
+
+    this.recursiveFileRemovalProcessor = new RecursiveFileRemovalProcessor();
 
     // adds the default folder lifecycle event handlers
     this.defaultFolderLifecycleEventHandlerList = new ArrayList<>();
     this.defaultFolderLifecycleEventHandlerList.add(
         new DefaultFolderLifecycleInitializeEventHandler(
-            config.getLocation()
+            this.config.getLocation()
         )
     );
     this.defaultFolderLifecycleEventHandlerList.add(
         new DefaultFolderLifecycleInitializeEventHandler(
-            config.getDataLocation()
+            this.config.getDataLocation()
         )
     );
     this.defaultFolderLifecycleEventHandlerList.add(
         new TempFolderLifecycleEventHandler(
-            config.getTempLocation()
+            this.config.getTempLocation(),
+            this.recursiveFileRemovalProcessor
         )
     );
 
     // adds the default candidate locators
     this.defaultCandidateLocatorList = new ArrayList<>();
-    this.defaultCandidateLocatorList.add(new CandidateFolderLocator(
-        this.config.getMetaFilename()
-    ));
-    this.defaultCandidateLocatorList.add(new CandidateCompressedFileLocator(
-        this.config.getMetaFilename(),
-        this.config.getCompressedFileExtension()
-    ));
+    this.defaultCandidateLocatorList.add(
+        new CandidateLocator(
+            new FolderPathListProvider(
+                this.config.getLocation()
+            ),
+            new FolderPathValidator(
+                this.config.getMetaFilename()
+            ),
+            path -> new Candidate(path, Candidate.Type.Folder)
+        )
+    );
+    this.defaultCandidateLocatorList.add(
+        new CandidateLocator(
+            new FileExtensionPathListProvider(
+                this.config.getLocation(),
+                this.config.getCompressedFileExtension()
+            ),
+            new CompressedFilePathValidator(
+                this.config.getMetaFilename()
+            ),
+            path -> new Candidate(path, Candidate.Type.Compressed)
+        )
+    );
 
     // adds the default meta element parsers
     this.defaultMetaElementParserList = new ArrayList<>();
@@ -127,15 +154,8 @@ public class SEServiceBuilder {
     this.defaultMetaValidatorList.add(new DependsOnValidator());
     this.defaultMetaValidatorList.add(new JarValidator());
 
-    // adds the default class filter blacklist
+    // adds the default class filter
     this.defaultClassFilterList = new ArrayList<>();
-    this.defaultClassFilterList.add(name -> {
-      switch (name) {
-        case "java.lang.Thread":
-          return false;
-      }
-      return true;
-    });
 
     // adds the default container api class intercept
     this.defaultClassInterceptList = new ArrayList<>();
@@ -228,7 +248,7 @@ public class SEServiceBuilder {
     return this.removeByClass(aClass, this.defaultMetaValidatorList);
   }
 
-  public SEServiceBuilder setCompressedCandidateExtractor(ICompressedCandidateExtractor extractor) {
+  public SEServiceBuilder setCompressedCandidateExtractor(IZipFileExtractor extractor) {
     this.compressedCandidateExtractor = extractor;
     return this;
   }
@@ -263,66 +283,108 @@ public class SEServiceBuilder {
     return this.removeByClass(aClass, this.defaultFolderLifecycleEventHandlerList);
   }
 
-  /* package */ IClassFilter[] getClassFilters() {
+  private IClassFilter[] getClassFilters() {
     List<IClassFilter> list = new ArrayList<>();
     list.addAll(this.defaultClassFilterList);
     list.addAll(this.classFilterList);
     return list.toArray(new IClassFilter[list.size()]);
   }
 
-  /* package */ ClassIntercept[] getClassIntercepts() {
+  private ClassIntercept[] getClassIntercepts() {
     List<ClassIntercept> list = new ArrayList<>();
     list.addAll(this.defaultClassInterceptList);
     list.addAll(this.classInterceptList);
     return list.toArray(new ClassIntercept[list.size()]);
   }
 
-  /* package */ IMetaElementParser[] getMetaElementParsers() {
+  private IMetaElementParser[] getMetaElementParsers() {
     List<IMetaElementParser> list = new ArrayList<>();
     list.addAll(this.defaultMetaElementParserList);
     list.addAll(this.metaElementParserList);
     return list.toArray(new IMetaElementParser[list.size()]);
   }
 
-  /* package */ IMetaValidator[] getMetaValidators() {
+  private IMetaValidator[] getMetaValidators() {
     List<IMetaValidator> list = new ArrayList<>();
     list.addAll(this.defaultMetaValidatorList);
     list.addAll(this.metaValidatorList);
     return list.toArray(new IMetaValidator[list.size()]);
   }
 
-  /* package */ ICandidateLocator[] getCandidateLocators() {
+  private ICandidateLocator[] getCandidateLocators() {
     List<ICandidateLocator> list = new ArrayList<>();
     list.addAll(this.defaultCandidateLocatorList);
     list.addAll(this.candidateLocatorList);
     return list.toArray(new ICandidateLocator[list.size()]);
   }
 
-  /* package */ IFolderLifecycleEventHandler[] getFolderLifecycleEventHandlers() {
+  private IFolderLifecycleEventHandler[] getFolderLifecycleEventHandlers() {
     List<IFolderLifecycleEventHandler> list = new ArrayList<>();
     list.addAll(this.defaultFolderLifecycleEventHandlerList);
     list.addAll(this.folderLifecycleEventHandlerList);
     return list.toArray(new IFolderLifecycleEventHandler[list.size()]);
   }
 
-  /* package */ IContainerCacheFactory getContainerCacheFactory() {
+  private IContainerCacheFactory getContainerCacheFactory() {
     return this.containerCacheFactory;
   }
 
-  /* package */ IContainerSorter getContainerSorter() {
+  private IContainerSorter getContainerSorter() {
     return this.containerSorter;
   }
 
-  /* package */ IMetaFactory getMetaFactory() {
+  private IMetaFactory getMetaFactory() {
     return this.metaFactory;
   }
 
-  /* package */ ICompressedCandidateExtractor getCompressedCandidateExtractor() {
+  private IZipFileExtractor getCompressedCandidateExtractor() {
     return this.compressedCandidateExtractor;
   }
 
   public SEService create() throws SEServiceInitializationException {
-    return SEServiceFactory.create(this, this.config);
+
+    return new SEService(
+        new FolderLifecycleEventPlugin(
+            this.getFolderLifecycleEventHandlers()
+        ),
+        new CandidateListCreator(
+            this.getCandidateLocators()
+        ),
+        new CandidateListExtractor(
+            this.getCompressedCandidateExtractor(),
+            new ZipFileExtractionPathProvider(
+                this.config.getTempLocation(),
+                this.config.getCompressedFileExtension()
+            ),
+            path -> Files.newInputStream(path),
+            this.recursiveFileRemovalProcessor
+        ),
+        new CandidateListConverter(
+            new ContainerFactory(
+                this.getContainerCacheFactory()
+            )
+        ),
+        new ContainerListMetaLoader(
+            new MetaParser(
+                this.getMetaElementParsers()
+            ),
+            this.getMetaFactory(),
+            this.config.getMetaFilename()
+        ),
+        new ContainerListValidator(
+            new MetaValidator(
+                this.getMetaValidators()
+            )
+        ),
+        this.getContainerSorter(),
+        new ClassLoaderFactoryProvider(
+            this.getClassFilters(),
+            new DefaultClassInterceptorFactory(
+                this.getClassIntercepts()
+            )
+        )
+    );
+
   }
 
   private SEServiceBuilder removeByClass(Class<?> aClass, List<?> list) {

@@ -6,10 +6,23 @@ Naming Conventions:
 Test:
   ✔ Setup for integration tests @done (17-02-24 13:31)
 
+Meta:
+  ☐ Should we switch to a more mature json lib that allows comments?
+    ie. https://github.com/stleary/JSON-java
+
+Security:
+  ☐ Should we attempt bytecode transformation to further sandbox the plugin code?
+    http://www.java-gaming.org/index.php?;topic=31183.0
+    https://github.com/lihaoyi/6858
+
 File Access:
   ☐ Sandbox mod file access into the data folder
+    Should grant extensions read-only access to certain files in the mod's home folder: json, csv (any others?).
+    Should grant the mod read/write access to a NBT data file in the data folder, albeit via API.
 
 Configuration:
+  ☐ Provide simple configuration file framework
+    Maybe use an ini file framework?
   ✔ Move "mod-plugin" @done (17-02-24 11:34)
     A mod-plugin is simply an extension of plugin and should be treated as such.
   ✔ Split Config and builder into (SEConfig / SEConfigBuilder) and SEServiceBuilder @done (17-02-24 11:34)

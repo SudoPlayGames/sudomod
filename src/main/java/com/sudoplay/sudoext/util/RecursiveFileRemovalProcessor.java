@@ -1,7 +1,6 @@
 package com.sudoplay.sudoext.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,11 +8,15 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
- * Created by codetaylor on 2/20/2017.
+ * Created by codetaylor on 2/25/2017.
  */
-public class FileUtils {
+public class RecursiveFileRemovalProcessor {
 
-  public static void deleteRecursively(Path path) throws IOException {
+  public void deleteRecursively(Path path) throws IOException {
+
+    if (!Files.exists(path)) {
+      return;
+    }
 
     Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 
@@ -29,23 +32,5 @@ public class FileUtils {
         return FileVisitResult.CONTINUE;
       }
     });
-  }
-
-  public static void close(InputStream inputStream) {
-
-    if (inputStream == null) {
-      return;
-    }
-
-    try {
-      inputStream.close();
-
-    } catch (IOException e) {
-      //
-    }
-  }
-
-  private FileUtils() {
-    //
   }
 }

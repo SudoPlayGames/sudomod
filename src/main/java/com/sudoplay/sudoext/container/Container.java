@@ -47,7 +47,7 @@ public class Container {
 
   public void reload() {
     this.cache = this.containerCacheFactory.create();
-    this.classLoader = this.classLoaderFactory.create(this);
+    this.classLoader = this.classLoaderFactory.create();
   }
 
   public IClassLoader getClassLoader() {

@@ -2,7 +2,7 @@ package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.api.AncillaryPlugin;
 import com.sudoplay.sudoext.api.TestModPlugin;
-import com.sudoplay.sudoext.security.Policy;
+import com.sudoplay.sudoext.security.SEServicePolicy;
 import com.sudoplay.sudoext.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class Main {
 
   static {
     java.security.Policy.setPolicy(
-        new Policy(
+        new SEServicePolicy(
             () -> {
               Permissions permissions = new Permissions();
               permissions.add(new AllPermission());
@@ -34,20 +34,16 @@ public class Main {
 
   public static void main(String... args) throws SEServiceInitializationException {
 
-    SEConfigBuilder configBuilder = new SEConfigBuilder()
+    SEService service = new SEServiceBuilder(new SEConfigBuilder()
         .setCompressedFileExtension(".lsm")
         .setLocation(Paths.get("../sudomod-test/src/mods"))
         .setDataLocation(Paths.get("mod-data"))
         .setTempLocation(Paths.get("mods-temp"))
         .setMetaFilename("mod-info.json")
-        .setApiVersion("1.0");
+        .setApiVersion("1.0"))
 
-    SEService SEService = new SEServiceBuilder(configBuilder)
+        .addClassFilter(new WhitelistClassFilter())
         .create();
-
-    SEServiceLocator.registerService("default", SEService);
-
-    SEService service = SEServiceLocator.locate("default");
 
     try {
       PluginReference<TestModPlugin> pluginA = service.getPlugin("test-mod-a:scripts.ModPluginA", TestModPlugin.class);

@@ -4,6 +4,7 @@ import com.sudoplay.sudoext.meta.Dependency;
 import com.sudoplay.sudoext.meta.DependencyContainer;
 import com.sudoplay.sudoext.sort.DirectedGraph;
 import com.sudoplay.sudoext.sort.CyclicGraphException;
+import com.sudoplay.sudoext.sort.SortObjectWrapper;
 import com.sudoplay.sudoext.sort.TopologicalSort;
 
 import java.util.ArrayList;
