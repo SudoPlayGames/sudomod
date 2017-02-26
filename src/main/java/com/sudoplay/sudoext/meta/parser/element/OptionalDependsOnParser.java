@@ -51,13 +51,22 @@ public class OptionalDependsOnParser extends
       jsonArray = jsonObject.getJSONArray(key);
 
     } catch (JSONException e) {
-      throw new MetaParseException(String.format("Expected [%s] to be an array, got: %s", key, jsonObject.get(key)), e);
+      throw new MetaParseException(String.format("Expected [%s] to be an array", key), e);
     }
 
     dependencyIdSet = new HashSet<>();
     dependencyStringList = new ArrayList<>();
 
-    for (Object value : jsonArray.toList()) {
+    for (int i = 0; i < jsonArray.length(); i++) {
+
+      Object value;
+
+      try {
+        value = jsonArray.get(i);
+
+      } catch (JSONException e) {
+        throw new MetaParseException(String.format("Error parsing array [%s]", key), e);
+      }
 
       if (!(value instanceof String) || ((String) value).isEmpty()) {
         throw new MetaParseException(String.format(

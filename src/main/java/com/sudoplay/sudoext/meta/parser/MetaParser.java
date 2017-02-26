@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.meta.parser;
 
-import com.sudoplay.sudoext.meta.MetaParseException;
 import com.sudoplay.sudoext.meta.Meta;
+import com.sudoplay.sudoext.meta.MetaParseException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
