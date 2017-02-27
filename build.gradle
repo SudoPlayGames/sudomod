@@ -35,6 +35,7 @@ dependencies {
     compile 'org.slf4j:slf4j-ext:1.7.7'
 
     compile 'org.codehaus.janino:janino:3.0.6'
+    compile 'org.ow2.asm:asm:5.2'
     compile 'org.jetbrains:annotations:15.0'
 
     testCompile 'junit:junit:4.11'

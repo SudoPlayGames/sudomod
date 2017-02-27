@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/21/2017.
  */
-public class ClassLoaderFactory implements IClassLoaderFactory {
+/* package */ class ClassLoaderFactory implements IClassLoaderFactory {
 
   private final URL[] urls;
   private File[] sourcePath;
@@ -26,7 +26,7 @@ public class ClassLoaderFactory implements IClassLoaderFactory {
   private IClassFilter[] classFilters;
   private IClassInterceptor classInterceptor;
 
-  public ClassLoaderFactory(
+  /* package */ ClassLoaderFactory(
       Path path,
       List<String> jarFileList,
       List<Container> dependencyList,

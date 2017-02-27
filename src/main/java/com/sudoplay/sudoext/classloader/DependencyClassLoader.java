@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/22/2017.
  */
-public class DependencyClassLoader extends
+/* package */ class DependencyClassLoader extends
     ClassLoader implements
     IClassLoader,
     ISecureClassLoader {
@@ -18,7 +18,7 @@ public class DependencyClassLoader extends
   private static final Logger LOG = LoggerFactory.getLogger(DependencyClassLoader.class);
   private List<Container> containerList;
 
-  public DependencyClassLoader(ClassLoader parent, List<Container> containerList) {
+  /* package */ DependencyClassLoader(ClassLoader parent, List<Container> containerList) {
     super(parent);
     this.containerList = containerList;
   }

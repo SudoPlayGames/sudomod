@@ -168,8 +168,8 @@ public class SEServiceBuilder {
                     container -> new Slf4jLoggerAPIProvider(container.getMeta().getId())
                 ),
                 new StaticFieldClassInterceptProcessor(
-                    "META",
-                    Container::getMeta
+                    "ID",
+                    container -> container.getMeta().getId()
                 )
             }
         )

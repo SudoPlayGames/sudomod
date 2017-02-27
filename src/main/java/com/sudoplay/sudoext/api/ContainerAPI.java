@@ -2,7 +2,6 @@ package com.sudoplay.sudoext.api;
 
 import com.sudoplay.sudoext.api.logging.ILoggerAPIProvider;
 import com.sudoplay.sudoext.api.logging.LoggerAPI;
-import com.sudoplay.sudoext.meta.Meta;
 
 /**
  * Created by codetaylor on 2/24/2017.
@@ -19,10 +18,10 @@ public class ContainerAPI {
 
   // injected
   @SuppressWarnings("unused")
-  private static Meta META;
+  private static String ID;
 
   public static String getId() {
-    return META.getId();
+    return ID;
   }
 
   private ContainerAPI() {

@@ -5,19 +5,12 @@ import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.api.TestModPlugin;
 import com.sudoplay.sudoext.api.logging.ILoggerAPIProvider;
 import com.sudoplay.sudoext.api.logging.LoggerAPI;
-import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.security.IClassFilter;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,33 +30,33 @@ public class WhitelistClassFilter implements
 
     // java.lang interfaces
     this.whitelist.addAll(Arrays.asList(
-        Appendable.class.getName(),
-        CharSequence.class.getName(),
-        Cloneable.class.getName(),
-        Comparable.class.getName(),
-        Iterable.class.getName()
+        java.lang.Appendable.class.getName(),
+        java.lang.CharSequence.class.getName(),
+        java.lang.Cloneable.class.getName(),
+        java.lang.Comparable.class.getName(),
+        java.lang.Iterable.class.getName()
     ));
 
     // java.lang classes
     this.whitelist.addAll(Arrays.asList(
         "java.lang.AbstractStringBuilder",
-        Boolean.class.getName(),
-        Byte.class.getName(),
-        Character.class.getName(),
-        Class.class.getName(),
-        Double.class.getName(),
-        Enum.class.getName(),
-        Float.class.getName(),
-        Integer.class.getName(),
-        Long.class.getName(),
-        Math.class.getName(),
-        Number.class.getName(),
-        Object.class.getName(),
-        Short.class.getName(),
-        String.class.getName(),
-        StringBuffer.class.getName(),
-        StringBuilder.class.getName(),
-        Throwable.class.getName()
+        java.lang.Boolean.class.getName(),
+        java.lang.Byte.class.getName(),
+        java.lang.Character.class.getName(),
+        java.lang.Class.class.getName(),
+        java.lang.Double.class.getName(),
+        java.lang.Enum.class.getName(),
+        java.lang.Float.class.getName(),
+        java.lang.Integer.class.getName(),
+        java.lang.Long.class.getName(),
+        java.lang.Math.class.getName(),
+        java.lang.Number.class.getName(),
+        java.lang.Object.class.getName(),
+        java.lang.Short.class.getName(),
+        java.lang.String.class.getName(),
+        java.lang.StringBuffer.class.getName(),
+        java.lang.StringBuilder.class.getName(),
+        java.lang.Throwable.class.getName()
     ));
 
     // java.lang exceptions
@@ -149,8 +142,7 @@ public class WhitelistClassFilter implements
     this.whitelist.addAll(Arrays.asList(
         ILoggerAPIProvider.class.getName(),
         LoggerAPI.class.getName(),
-        Plugin.class.getName(),
-        Meta.class.getName() // ugh
+        Plugin.class.getName()
     ));
 
     // ugh
@@ -158,6 +150,7 @@ public class WhitelistClassFilter implements
         TestModPlugin.class.getName(),
         AncillaryPlugin.class.getName(),
 
+        // not happy about allowing these
         System.class.getName(),
         ClassLoader.class.getName(),
 

@@ -9,7 +9,7 @@
     <logger name="com.sudoplay.sudoext.ext.classloader" level="INFO"/>
     <logger name="mod" level="TRACE"/>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

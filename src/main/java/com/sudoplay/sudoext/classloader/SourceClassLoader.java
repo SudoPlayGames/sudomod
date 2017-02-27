@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by codetaylor on 2/21/2017.
  */
-public class SourceClassLoader extends
+/* package */ class SourceClassLoader extends
     JavaSourceClassLoader implements
     IClassLoader,
     ISecureClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(SourceClassLoader.class);
 
-  public SourceClassLoader(ClassLoader parentClassLoader, JavaSourceIClassLoader iClassLoader) {
+  /* package */ SourceClassLoader(ClassLoader parentClassLoader, JavaSourceIClassLoader iClassLoader) {
     super(parentClassLoader, iClassLoader);
   }
 

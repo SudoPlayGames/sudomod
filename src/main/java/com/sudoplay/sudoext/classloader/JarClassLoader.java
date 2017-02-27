@@ -8,12 +8,12 @@ import java.net.URLClassLoader;
 /**
  * Created by codetaylor on 2/22/2017.
  */
-public class JarClassLoader extends
+/* package */ class JarClassLoader extends
     URLClassLoader implements
     IClassLoader,
     ISecureClassLoader {
 
-  public JarClassLoader(URL[] urls, ClassLoader parent) {
+  /* package */ JarClassLoader(URL[] urls, ClassLoader parent) {
     super(urls, parent);
   }
 

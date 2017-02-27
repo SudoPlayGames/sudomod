@@ -3,6 +3,8 @@ package com.sudoplay.sudoext.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.AccessControlException;
+
 /**
  * Created by codetaylor on 2/22/2017.
  */
@@ -29,12 +31,11 @@ public class FilteredClassLoader extends
       try {
 
         if (parent != null) {
+          c = parent.loadClass(name);
 
-          if (this.checkFilters(name)) {
-            c = parent.loadClass(name);
-
-          } else {
-            LOG.trace("Class [{}] denied by [{}]", name, this.getClass());
+          if (c != null && !this.checkFilters(name)) {
+            LOG.error("Class [{}] is not allowed", name);
+            throw new AccessControlException(String.format("Class [%s] is not allowed", name));
           }
         }
 
