@@ -2,13 +2,10 @@ package com.sudoplay.sudoext.service;
 
 import com.sudoplay.sudoext.api.ContainerAPI;
 import com.sudoplay.sudoext.api.logging.Slf4jLoggerAPIProvider;
-import com.sudoplay.sudoext.candidate.Candidate;
-import com.sudoplay.sudoext.candidate.CandidateListCreator;
-import com.sudoplay.sudoext.candidate.CandidateListExtractor;
+import com.sudoplay.sudoext.candidate.*;
 import com.sudoplay.sudoext.candidate.extractor.IZipFileExtractor;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
-import com.sudoplay.sudoext.candidate.locator.*;
 import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
 import com.sudoplay.sudoext.classloader.intercept.*;
 import com.sudoplay.sudoext.container.*;
@@ -31,7 +28,6 @@ import com.sudoplay.sudoext.meta.validator.element.JarValidator;
 import com.sudoplay.sudoext.security.IClassFilter;
 import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -56,14 +52,14 @@ public class SEServiceBuilder {
   private List<ClassIntercept> defaultClassInterceptList;
   private List<IMetaElementParser> defaultMetaElementParserList;
   private List<IMetaValidator> defaultMetaValidatorList;
-  private List<ICandidateLocator> defaultCandidateLocatorList;
+  private List<ICandidateProvider> defaultCandidateLocatorList;
   private List<IFolderLifecycleEventHandler> defaultFolderLifecycleEventHandlerList;
 
   private List<IClassFilter> classFilterList;
   private List<ClassIntercept> classInterceptList;
   private List<IMetaElementParser> metaElementParserList;
   private List<IMetaValidator> metaValidatorList;
-  private List<ICandidateLocator> candidateLocatorList;
+  private List<ICandidateProvider> candidateLocatorList;
   private List<IFolderLifecycleEventHandler> folderLifecycleEventHandlerList;
 
   public SEServiceBuilder(SEConfigBuilder configBuilder) {
@@ -112,18 +108,19 @@ public class SEServiceBuilder {
     // adds the default candidate locators
     this.defaultCandidateLocatorList = new ArrayList<>();
     this.defaultCandidateLocatorList.add(
-        new CandidateLocator(
+        new CandidateProvider(
             new FolderPathListProvider(
                 this.config.getLocation()
             ),
             new FolderPathValidator(
                 this.config.getMetaFilename()
             ),
-            path -> new Candidate(path, Candidate.Type.Folder)
+            new DefaultCandidateFactory(),
+            new NoOpCandidateProcessor()
         )
     );
     this.defaultCandidateLocatorList.add(
-        new CandidateLocator(
+        new CandidateProvider(
             new FileExtensionPathListProvider(
                 this.config.getLocation(),
                 this.config.getCompressedFileExtension()
@@ -131,7 +128,16 @@ public class SEServiceBuilder {
             new CompressedFilePathValidator(
                 this.config.getMetaFilename()
             ),
-            path -> new Candidate(path, Candidate.Type.Compressed)
+            new DefaultCandidateFactory(),
+            new CompressedFileCandidateProcessor(
+                this.getCompressedCandidateExtractor(),
+                new ZipFileExtractionPathProvider(
+                    this.config.getTempLocation(),
+                    this.config.getCompressedFileExtension()
+                ),
+                new DefaultInputStreamProvider(),
+                this.recursiveFileRemovalProcessor
+            )
         )
     );
 
@@ -253,7 +259,7 @@ public class SEServiceBuilder {
     return this;
   }
 
-  public SEServiceBuilder addCandidateLocator(ICandidateLocator locator) {
+  public SEServiceBuilder addCandidateLocator(ICandidateProvider locator) {
     this.candidateLocatorList.add(locator);
     return this;
   }
@@ -263,7 +269,7 @@ public class SEServiceBuilder {
     return this;
   }
 
-  public SEServiceBuilder removeDefaultCandidateLocator(Class<? extends ICandidateLocator> aClass) {
+  public SEServiceBuilder removeDefaultCandidateLocator(Class<? extends ICandidateProvider> aClass) {
     return this.removeByClass(aClass, this.defaultCandidateLocatorList);
   }
 
@@ -311,11 +317,11 @@ public class SEServiceBuilder {
     return list.toArray(new IMetaValidator[list.size()]);
   }
 
-  private ICandidateLocator[] getCandidateLocators() {
-    List<ICandidateLocator> list = new ArrayList<>();
+  private ICandidateProvider[] getCandidateLocators() {
+    List<ICandidateProvider> list = new ArrayList<>();
     list.addAll(this.defaultCandidateLocatorList);
     list.addAll(this.candidateLocatorList);
-    return list.toArray(new ICandidateLocator[list.size()]);
+    return list.toArray(new ICandidateProvider[list.size()]);
   }
 
   private IFolderLifecycleEventHandler[] getFolderLifecycleEventHandlers() {
@@ -349,15 +355,6 @@ public class SEServiceBuilder {
         ),
         new CandidateListCreator(
             this.getCandidateLocators()
-        ),
-        new CandidateListExtractor(
-            this.getCompressedCandidateExtractor(),
-            new ZipFileExtractionPathProvider(
-                this.config.getTempLocation(),
-                this.config.getCompressedFileExtension()
-            ),
-            path -> Files.newInputStream(path),
-            this.recursiveFileRemovalProcessor
         ),
         new CandidateListConverter(
             new ContainerFactory(

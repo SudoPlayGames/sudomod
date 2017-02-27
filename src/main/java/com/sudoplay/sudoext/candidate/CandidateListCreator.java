@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.candidate;
 
-import com.sudoplay.sudoext.candidate.locator.ICandidateLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,10 +18,10 @@ public class CandidateListCreator implements
 
   private static final Logger LOG = LoggerFactory.getLogger(CandidateListCreator.class);
 
-  private ICandidateLocator[] candidateLocators;
+  private ICandidateProvider[] candidateLocators;
 
   public CandidateListCreator(
-      ICandidateLocator[] candidateLocators
+      ICandidateProvider[] candidateLocators
   ) {
     this.candidateLocators = candidateLocators;
   }
@@ -38,10 +37,10 @@ public class CandidateListCreator implements
 
     List<Candidate> result = new ArrayList<>();
 
-    for (ICandidateLocator locator : this.candidateLocators) {
+    for (ICandidateProvider locator : this.candidateLocators) {
 
       try {
-        result.addAll(locator.locateCandidates());
+        result.addAll(locator.getCandidates());
 
       } catch (IOException e) {
         LOG.error("Error locating candidates with [{}]", locator, e);

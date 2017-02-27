@@ -1,6 +1,9 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
 import com.sudoplay.sudoext.candidate.Candidate;
+import com.sudoplay.sudoext.candidate.CandidateProvider;
+import com.sudoplay.sudoext.candidate.IPathListProvider;
+import com.sudoplay.sudoext.candidate.IPathValidator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,13 +39,14 @@ public class CandidateLocatorTest {
     when(pathValidator.isPathValid(Paths.get("path-a"))).thenReturn(true);
     when(pathValidator.isPathValid(Paths.get("path-b"))).thenReturn(false);
 
-    CandidateLocator locator = new CandidateLocator(
+    CandidateProvider locator = new CandidateProvider(
         pathListProvider,
         pathValidator,
-        path -> new Candidate(path, null)
+        Candidate::new,
+        candidate -> candidate
     );
 
-    List<Candidate> candidateList = locator.locateCandidates();
+    List<Candidate> candidateList = locator.getCandidates();
 
     Assert.assertEquals(1, candidateList.size());
     Assert.assertEquals(Paths.get("path-a"), candidateList.get(0).getPath());

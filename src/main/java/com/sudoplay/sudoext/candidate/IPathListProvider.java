@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
 import java.io.IOException;
 import java.nio.file.Path;

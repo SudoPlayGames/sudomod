@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.candidate.extractor;
 
-import com.sudoplay.sudoext.candidate.Candidate;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -13,13 +12,11 @@ import java.nio.file.Path;
 public interface IZipFileExtractor {
 
   /**
-   * Extracts the provided compressed file to a temporary folder and returns a new
-   * {@link Candidate} pointing to the new location.
+   * Extracts the provided compressed file to a temporary folder.
    *
    * @param inputStream   the input stream
    * @param extractToPath the temporary path for this specific candidate
-   * @return a new candidate object
    */
-  Candidate extract(@NotNull InputStream inputStream, @NotNull Path extractToPath) throws IOException;
+  void extract(@NotNull InputStream inputStream, @NotNull Path extractToPath) throws IOException;
 
 }

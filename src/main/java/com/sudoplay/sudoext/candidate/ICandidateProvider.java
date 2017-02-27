@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
 import com.sudoplay.sudoext.candidate.Candidate;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public interface ICandidateLocator {
+public interface ICandidateProvider {
 
   /**
    * Returns a new list of candidates.
@@ -18,5 +18,5 @@ public interface ICandidateLocator {
    * @return a new list of candidates
    * @throws IOException
    */
-  List<Candidate> locateCandidates() throws IOException;
+  List<Candidate> getCandidates() throws IOException;
 }

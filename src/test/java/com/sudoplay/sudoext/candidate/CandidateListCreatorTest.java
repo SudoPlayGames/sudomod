@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.candidate;
 
-import com.sudoplay.sudoext.candidate.locator.ICandidateLocator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,25 +19,25 @@ public class CandidateListCreatorTest {
   @Test
   public void shouldReturnListOfAggregateResultsFromAllLocators() throws IOException {
 
-    Candidate candidateA = new Candidate(Paths.get("candidate-a"), null);
-    Candidate candidateB = new Candidate(Paths.get("candidate-b"), null);
-    Candidate candidateC = new Candidate(Paths.get("candidate-c"), null);
-    Candidate candidateD = new Candidate(Paths.get("candidate-d"), null);
+    Candidate candidateA = new Candidate(Paths.get("candidate-a"));
+    Candidate candidateB = new Candidate(Paths.get("candidate-b"));
+    Candidate candidateC = new Candidate(Paths.get("candidate-c"));
+    Candidate candidateD = new Candidate(Paths.get("candidate-d"));
 
-    ICandidateLocator locatorA = mock(ICandidateLocator.class);
-    when(locatorA.locateCandidates()).thenReturn(Arrays.asList(
+    ICandidateProvider locatorA = mock(ICandidateProvider.class);
+    when(locatorA.getCandidates()).thenReturn(Arrays.asList(
         candidateA,
         candidateB
     ));
 
-    ICandidateLocator locatorB = mock(ICandidateLocator.class);
-    when(locatorB.locateCandidates()).thenReturn(Arrays.asList(
+    ICandidateProvider locatorB = mock(ICandidateProvider.class);
+    when(locatorB.getCandidates()).thenReturn(Arrays.asList(
         candidateC,
         candidateD
     ));
 
     CandidateListCreator listCreator = new CandidateListCreator(
-        new ICandidateLocator[]{
+        new ICandidateProvider[]{
             locatorA,
             locatorB
         }
@@ -56,20 +55,20 @@ public class CandidateListCreatorTest {
   @Test
   public void shouldReturnListOfAggregateResultsFromAllLocatorsThatDoNotThrow() throws IOException {
 
-    Candidate candidateA = new Candidate(Paths.get("candidate-a"), null);
-    Candidate candidateB = new Candidate(Paths.get("candidate-b"), null);
+    Candidate candidateA = new Candidate(Paths.get("candidate-a"));
+    Candidate candidateB = new Candidate(Paths.get("candidate-b"));
 
-    ICandidateLocator locatorA = mock(ICandidateLocator.class);
-    when(locatorA.locateCandidates()).thenReturn(Arrays.asList(
+    ICandidateProvider locatorA = mock(ICandidateProvider.class);
+    when(locatorA.getCandidates()).thenReturn(Arrays.asList(
         candidateA,
         candidateB
     ));
 
-    ICandidateLocator locatorB = mock(ICandidateLocator.class);
-    when(locatorB.locateCandidates()).thenThrow(IOException.class);
+    ICandidateProvider locatorB = mock(ICandidateProvider.class);
+    when(locatorB.getCandidates()).thenThrow(IOException.class);
 
     CandidateListCreator listCreator = new CandidateListCreator(
-        new ICandidateLocator[]{
+        new ICandidateProvider[]{
             locatorA,
             locatorB
         }

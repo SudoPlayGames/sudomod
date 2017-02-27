@@ -1,6 +1,5 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
-import com.sudoplay.sudoext.candidate.Candidate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,31 +13,35 @@ import java.util.List;
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class CandidateLocator implements
-    ICandidateLocator {
+public class CandidateProvider implements
+    ICandidateProvider {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CandidateLocator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CandidateProvider.class);
 
   private IPathListProvider pathListProvider;
   private IPathValidator pathValidator;
   private ICandidateFactory candidateFactory;
+  private ICandidateProcessor candidateProcessor;
 
-  public CandidateLocator(
+  public CandidateProvider(
       IPathListProvider pathListProvider,
       IPathValidator pathValidator,
-      ICandidateFactory candidateFactory
+      ICandidateFactory candidateFactory,
+      ICandidateProcessor candidateProcessor
   ) {
     this.pathListProvider = pathListProvider;
     this.pathValidator = pathValidator;
     this.candidateFactory = candidateFactory;
+    this.candidateProcessor = candidateProcessor;
   }
 
   @Override
-  public List<Candidate> locateCandidates() throws IOException {
-    LOG.debug("Entering locateCandidates()");
+  public List<Candidate> getCandidates() throws IOException {
+    LOG.debug("Entering getCandidates()");
 
     List<Candidate> result;
     List<Path> pathList;
+    Candidate candidate;
 
     result = new ArrayList<>();
 
@@ -50,17 +53,19 @@ public class CandidateLocator implements
       try {
 
         if (this.pathValidator.isPathValid(path)) {
-          result.add(this.candidateFactory.create(path));
+          candidate = this.candidateFactory.create(path);
+          candidate = this.candidateProcessor.process(candidate);
+          result.add(candidate);
           LOG.debug("Found candidate [{}]", path);
         }
 
-      } catch (IOException e) {
-        LOG.error("Error validating candidate [{}]", path);
+      } catch (Exception e) {
+        LOG.error("Error validating and processing candidate [{}]", path);
       }
     }
 
     LOG.info("Found [{}] candidates", result.size());
-    LOG.debug("Leaving locateCandidates()");
+    LOG.debug("Leaving getCandidates()");
     LOG.trace("...[{}]", result);
     return result;
   }

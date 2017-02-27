@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.candidate.extractor;
 
-import com.sudoplay.sudoext.candidate.Candidate;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ public class ZipFileExtractor implements
   private static final int BUFFER_SIZE = 4096;
 
   @Override
-  public Candidate extract(
+  public void extract(
       @NotNull InputStream inputStream,
       @NotNull Path extractToPath
   ) throws IOException {
@@ -70,7 +69,5 @@ public class ZipFileExtractor implements
 
       zipInputStream.closeEntry();
     }
-
-    return new Candidate(extractToPath, Candidate.Type.Folder);
   }
 }

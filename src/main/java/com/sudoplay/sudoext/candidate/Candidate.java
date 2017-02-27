@@ -7,24 +7,14 @@ import java.nio.file.Path;
  */
 public class Candidate {
 
-  public enum Type {
-    Folder, Compressed
-  }
-
   private Path path;
-  private Type type;
 
-  public Candidate(Path path, Type type) {
+  public Candidate(Path path) {
     this.path = path;
-    this.type = type;
   }
 
   public Path getPath() {
     return this.path;
-  }
-
-  public Type getType() {
-    return type;
   }
 
   @Override
@@ -34,14 +24,12 @@ public class Candidate {
 
     Candidate candidate = (Candidate) o;
 
-    if (!path.equals(candidate.path)) return false;
-    return type == candidate.type;
+    return path.equals(candidate.path);
+
   }
 
   @Override
   public int hashCode() {
-    int result = path.hashCode();
-    result = 31 * result + type.hashCode();
-    return result;
+    return path.hashCode();
   }
 }

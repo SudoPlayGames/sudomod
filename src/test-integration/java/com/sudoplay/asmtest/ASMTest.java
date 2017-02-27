@@ -58,7 +58,7 @@ public class ASMTest {
           "defineClass", String.class, byte[].class, int.class, int.class
       );
 
-      // protected method invocaton
+      // protected method invocation
       method.setAccessible(true);
 
       try {

@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
 import com.sudoplay.sudoext.candidate.Candidate;
 

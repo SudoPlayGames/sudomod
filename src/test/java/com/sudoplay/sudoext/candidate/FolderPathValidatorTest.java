@@ -1,5 +1,6 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
+import com.sudoplay.sudoext.candidate.FolderPathValidator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

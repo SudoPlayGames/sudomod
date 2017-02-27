@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.candidate.locator;
+package com.sudoplay.sudoext.candidate;
 
 import com.sudoplay.sudoext.util.CloseUtil;
 import org.slf4j.Logger;

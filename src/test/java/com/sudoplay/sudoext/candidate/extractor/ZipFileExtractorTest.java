@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.candidate.extractor;
 
-import com.sudoplay.sudoext.candidate.Candidate;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +22,6 @@ public class ZipFileExtractorTest {
   public void shouldExtractZipFile() throws Throwable {
 
     ZipFileExtractor extractor;
-    Candidate extracted;
 
     extractor = new ZipFileExtractor();
 
@@ -34,11 +32,9 @@ public class ZipFileExtractorTest {
         Paths.get("src/test/resources/compressed-file.zip")
     );
 
-    extracted = extractor.extract(inputStream, temporaryPath);
+    extractor.extract(inputStream, temporaryPath);
 
     inputStream.close();
-
-    Assert.assertEquals(temporaryPath, extracted.getPath());
 
     Assert.assertTrue(Files.exists(temporaryPath.resolve("test-file-0.txt")));
     Assert.assertTrue(Files.exists(temporaryPath.resolve("test-folder-a/test-file-1.txt")));
