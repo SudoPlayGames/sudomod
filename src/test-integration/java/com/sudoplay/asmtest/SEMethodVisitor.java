@@ -4,8 +4,6 @@ import com.sudoplay.sudoext.security.IClassFilter;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.LocalVariablesSorter;
 
-import java.util.Arrays;
-
 import static org.objectweb.asm.Opcodes.ASM5;
 
 /**
@@ -17,10 +15,7 @@ public class SEMethodVisitor extends
     ISEMethodVisitor {
 
   private final IClassFilter[] classFilters;
-  private LocalVariablesSorter localvariableSorter;
-
-  private int arrayId;
-  private int[] id;
+  private LocalVariablesSorter localVariableSorter;
 
   public SEMethodVisitor(
       MethodVisitor mv,
@@ -28,8 +23,6 @@ public class SEMethodVisitor extends
   ) {
     super(ASM5, mv);
     this.classFilters = classFilters;
-
-    this.id = new int[8];
   }
 
   @Override
@@ -100,45 +93,41 @@ public class SEMethodVisitor extends
   @Override
   public void visitMultiANewArrayInsn(String desc, int dims) {
 
-    this.arrayId = this.localvariableSorter.newLocal(Type.getType(int[].class));
-    System.out.println(this.arrayId);
-
-    for (int i = 0; i < this.id.length; i++) {
-      this.id[i] = this.localvariableSorter.newLocal(Type.INT_TYPE);
-    }
-    System.out.println(Arrays.toString(this.id));
+    int arrayId = this.localVariableSorter.newLocal(Type.getType(int[].class));
+    int storeId = this.localVariableSorter.newLocal(Type.INT_TYPE);
 
     // create a new array to hold the local values
-    this.mv.visitLdcInsn(this.id.length);
+    this.mv.visitLdcInsn(dims);
     this.mv.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_INT);
-    this.mv.visitVarInsn(Opcodes.ASTORE, this.arrayId);
+    this.mv.visitVarInsn(Opcodes.ASTORE, arrayId);
 
-    // store the values off the stack
-    for (int i = 0; i < dims; i++) {
-      this.mv.visitVarInsn(Opcodes.ISTORE, this.id[i]);
-    }
-
-    // store the local variables in the array
-    for (int i = 0; i < dims; i++) {
-      this.mv.visitVarInsn(Opcodes.ALOAD, this.arrayId);
+    // store the top stack value into the array
+    // ie. stack: 1, 2, 3, 4, 5
+    //     array: 5, 4, 3, 2, 1
+    for (int i = dims - 1; i >= 0; i--) {
+      this.mv.visitVarInsn(Opcodes.ISTORE, storeId);
+      this.mv.visitVarInsn(Opcodes.ALOAD, arrayId);
       this.mv.visitLdcInsn(i);
-      this.mv.visitVarInsn(Opcodes.ILOAD, this.id[i]);
+      this.mv.visitVarInsn(Opcodes.ILOAD, storeId);
       this.mv.visitInsn(Opcodes.IASTORE);
     }
 
     // call the callback
     this.mv.visitLdcInsn(dims);
-    this.mv.visitVarInsn(Opcodes.ALOAD, this.arrayId);
+    this.mv.visitVarInsn(Opcodes.ALOAD, arrayId);
     this.injectCallback("callback_MULTIANEWARRAY", "(I[I)V");
 
     // put the locals back on the stack
-    for (int i = 0; i < dims; i++) {
-      this.mv.visitVarInsn(Opcodes.ILOAD, this.id[i]);
+    // ie. array: 5, 4, 3, 2, 1
+    //     stack: 1, 2, 3, 4, 5
+    for (int i = dims - 1; i >= 0; i--) {
+      this.mv.visitVarInsn(Opcodes.ALOAD, arrayId);
+      this.mv.visitLdcInsn(i);
+      this.mv.visitInsn(Opcodes.IALOAD);
     }
 
     // create the array
     this.mv.visitMultiANewArrayInsn(desc, dims);
-    // throw new RestrictedUseException("Usage of multi-dimensional arrays is prohibited in extensions");
   }
 
   @Override
@@ -224,6 +213,6 @@ public class SEMethodVisitor extends
 
   @Override
   public void setLocalVariableSorter(LocalVariablesSorter localVariableSorter) {
-    this.localvariableSorter = localVariableSorter;
+    this.localVariableSorter = localVariableSorter;
   }
 }

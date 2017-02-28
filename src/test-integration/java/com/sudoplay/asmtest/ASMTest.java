@@ -47,12 +47,12 @@ public class ASMTest {
         )
     );
 
-    CheckClassAdapter checkClassAdapter = new CheckClassAdapter(classVisitor, true);
+    //CheckClassAdapter checkClassAdapter = new CheckClassAdapter(classVisitor, true);
 
     ClassReader classReader = new ClassReader(getClass()
         .getResourceAsStream("/" + classToModifyNameString.replace('.', '/') + ".class"));
 
-    classReader.accept(checkClassAdapter, 0);
+    classReader.accept(classVisitor, ClassReader.EXPAND_FRAMES);
 
     byte[] bytecode = classWriter.toByteArray();
 

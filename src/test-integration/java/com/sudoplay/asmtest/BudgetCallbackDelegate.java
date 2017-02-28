@@ -3,7 +3,7 @@ package com.sudoplay.asmtest;
 /**
  * Created by codetaylor on 2/27/2017.
  */
-public class AccountingCallbackDelegate implements
+public class BudgetCallbackDelegate implements
     ICallbackDelegate {
 
   private int maxInstructionCount;
