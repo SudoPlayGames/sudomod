@@ -3,9 +3,9 @@ package com.sudoplay.asmtest;
 /**
  * Created by codetaylor on 2/26/2017.
  */
-public class Instrument {
+public class InjectedCallback {
 
-  public static IInstrument DELEGATE;
+  public static ICallbackDelegate DELEGATE;
 
   public static void callback_NEW() {
     DELEGATE.callback_NEW();
@@ -15,12 +15,12 @@ public class Instrument {
     DELEGATE.callback_NEWARRAY(size);
   }
 
-  public static void callback_ANEWARRAY() {
-    DELEGATE.callback_ANEWARRAY();
+  public static void callback_ANEWARRAY(int size) {
+    DELEGATE.callback_ANEWARRAY(size);
   }
 
-  public static void callback_MULTIANEWARRAY(int dims) {
-    DELEGATE.callback_MULTIANEWARRAY(dims);
+  public static void callback_MULTIANEWARRAY(int dims, int[] sizes) {
+    DELEGATE.callback_MULTIANEWARRAY(dims, sizes);
   }
 
   public static void callback_INVOKESPECIAL() {
@@ -49,6 +49,10 @@ public class Instrument {
 
   public static void callback_ATHROW() {
     DELEGATE.callback_ATHROW();
+  }
+
+  private InjectedCallback() {
+    //
   }
 
 }

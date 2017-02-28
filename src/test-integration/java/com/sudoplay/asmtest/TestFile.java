@@ -5,16 +5,16 @@ package com.sudoplay.asmtest;
  */
 public class TestFile {
 
-  public String getIntegersString(int maxInteger) {
-    String integersString = "";
+  public String getIntegersString() {
 
-    for (int i = 0; i < maxInteger; i++) {
-      integersString += i;
-    }
+    int[][][][][] strings = new int[500000][500][900][54][638664654];
 
-    int[] arr = new int[5000];
+    /*int x = 73;
 
-    return integersString;
+    int[] arr = new int[42];
+
+    arr[37] = x;*/
+
+    return "Done!";
   }
-
 }

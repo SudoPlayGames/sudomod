@@ -1,12 +1,10 @@
 package com.sudoplay.asmtest;
 
 import com.sudoplay.sudoext.security.IClassFilter;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
+import org.objectweb.asm.commons.LocalVariablesSorter;
 
-import java.security.AccessControlException;
+import java.util.Arrays;
 
 import static org.objectweb.asm.Opcodes.ASM5;
 
@@ -15,9 +13,14 @@ import static org.objectweb.asm.Opcodes.ASM5;
  * Created by codetaylor on 2/26/2017.
  */
 public class SEMethodVisitor extends
-    MethodVisitor {
+    MethodVisitor implements
+    ISEMethodVisitor {
 
   private final IClassFilter[] classFilters;
+  private LocalVariablesSorter localvariableSorter;
+
+  private int arrayId;
+  private int[] id;
 
   public SEMethodVisitor(
       MethodVisitor mv,
@@ -25,6 +28,8 @@ public class SEMethodVisitor extends
   ) {
     super(ASM5, mv);
     this.classFilters = classFilters;
+
+    this.id = new int[8];
   }
 
   @Override
@@ -32,10 +37,11 @@ public class SEMethodVisitor extends
     this.checkClassFilters(type);
 
     if (opcode == Opcodes.NEW) {
-      this.injectInstrumentCallback("callback_NEW");
+      this.injectCallback("callback_NEW");
 
     } else if (opcode == Opcodes.ANEWARRAY) {
-      this.injectInstrumentCallback("callback_ANEWARRAY");
+      this.mv.visitInsn(Opcodes.DUP);
+      this.injectCallback("callback_ANEWARRAY");
     }
 
     this.mv.visitTypeInsn(opcode, type);
@@ -45,17 +51,20 @@ public class SEMethodVisitor extends
   public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
     this.checkClassFilters(owner);
 
-    if (opcode == Opcodes.INVOKESPECIAL) {
-      this.injectInstrumentCallback("callback_INVOKESPECIAL");
+    if (!InjectedCallback.class.getName().replace(".", "/").equals(owner)) {
 
-    } else if (opcode == Opcodes.INVOKEVIRTUAL) {
-      this.injectInstrumentCallback("callback_INVOKEVIRTUAL");
+      if (opcode == Opcodes.INVOKESPECIAL) {
+        this.injectCallback("callback_INVOKESPECIAL");
 
-    } else if (opcode == Opcodes.INVOKESTATIC) {
-      this.injectInstrumentCallback("callback_INVOKESTATIC");
+      } else if (opcode == Opcodes.INVOKEVIRTUAL) {
+        this.injectCallback("callback_INVOKEVIRTUAL");
 
-    } else if (opcode == Opcodes.INVOKEINTERFACE) {
-      this.injectInstrumentCallback("callback_INVOKEINTERFACE");
+      } else if (opcode == Opcodes.INVOKESTATIC) {
+        this.injectCallback("callback_INVOKESTATIC");
+
+      } else if (opcode == Opcodes.INVOKEINTERFACE) {
+        this.injectCallback("callback_INVOKEINTERFACE");
+      }
     }
 
     this.mv.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -63,7 +72,7 @@ public class SEMethodVisitor extends
 
   @Override
   public void visitJumpInsn(int opcode, Label label) {
-    this.injectInstrumentCallback("callback_JUMP");
+    this.injectCallback("callback_JUMP");
     this.mv.visitJumpInsn(opcode, label);
   }
 
@@ -71,7 +80,7 @@ public class SEMethodVisitor extends
   public void visitVarInsn(int opcode, int var) {
 
     if (opcode == Opcodes.RET) {
-      this.injectInstrumentCallback("callback_JUMP");
+      this.injectCallback("callback_JUMP");
     }
 
     this.mv.visitVarInsn(opcode, var);
@@ -81,9 +90,8 @@ public class SEMethodVisitor extends
   public void visitIntInsn(int opcode, int operand) {
 
     if (opcode == Opcodes.NEWARRAY) {
-      //this.mv.visitLdcInsn(operand);
       this.mv.visitInsn(Opcodes.DUP);
-      this.injectInstrumentCallback("callback_NEWARRAY", "(I)V");
+      this.injectCallback("callback_NEWARRAY", "(I)V");
     }
 
     this.mv.visitIntInsn(opcode, operand);
@@ -91,17 +99,53 @@ public class SEMethodVisitor extends
 
   @Override
   public void visitMultiANewArrayInsn(String desc, int dims) {
-    this.checkClassFilters(desc);
+
+    this.arrayId = this.localvariableSorter.newLocal(Type.getType(int[].class));
+    System.out.println(this.arrayId);
+
+    for (int i = 0; i < this.id.length; i++) {
+      this.id[i] = this.localvariableSorter.newLocal(Type.INT_TYPE);
+    }
+    System.out.println(Arrays.toString(this.id));
+
+    // create a new array to hold the local values
+    this.mv.visitLdcInsn(this.id.length);
+    this.mv.visitIntInsn(Opcodes.NEWARRAY, Opcodes.T_INT);
+    this.mv.visitVarInsn(Opcodes.ASTORE, this.arrayId);
+
+    // store the values off the stack
+    for (int i = 0; i < dims; i++) {
+      this.mv.visitVarInsn(Opcodes.ISTORE, this.id[i]);
+    }
+
+    // store the local variables in the array
+    for (int i = 0; i < dims; i++) {
+      this.mv.visitVarInsn(Opcodes.ALOAD, this.arrayId);
+      this.mv.visitLdcInsn(i);
+      this.mv.visitVarInsn(Opcodes.ILOAD, this.id[i]);
+      this.mv.visitInsn(Opcodes.IASTORE);
+    }
+
+    // call the callback
     this.mv.visitLdcInsn(dims);
-    this.injectInstrumentCallback("callback_MULTIANEWARRAYINSN", "(I)V");
+    this.mv.visitVarInsn(Opcodes.ALOAD, this.arrayId);
+    this.injectCallback("callback_MULTIANEWARRAY", "(I[I)V");
+
+    // put the locals back on the stack
+    for (int i = 0; i < dims; i++) {
+      this.mv.visitVarInsn(Opcodes.ILOAD, this.id[i]);
+    }
+
+    // create the array
     this.mv.visitMultiANewArrayInsn(desc, dims);
+    // throw new RestrictedUseException("Usage of multi-dimensional arrays is prohibited in extensions");
   }
 
   @Override
   public void visitInsn(int opcode) {
 
     if (opcode == Opcodes.ATHROW) {
-      this.injectInstrumentCallback("callback_ATHROW");
+      this.injectCallback("callback_ATHROW");
     }
 
     this.mv.visitInsn(opcode);
@@ -115,7 +159,7 @@ public class SEMethodVisitor extends
 
   @Override
   public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
-    this.injectInstrumentCallback("callback_INVOKEDYNAMIC");
+    this.injectCallback("callback_INVOKEDYNAMIC");
     this.mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
   }
 
@@ -143,22 +187,17 @@ public class SEMethodVisitor extends
 
   @Override
   public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
-
-    if ("java/lang/Exception".equals(type)) {
-      throw new AccessControlException("Usage of [java.lang.Exception] in try/catch block is restricted");
-    }
-
-    this.mv.visitTryCatchBlock(start, end, handler, type);
+    throw new RestrictedUseException("Usage of try/catch block is prohibited in extensions");
   }
 
-  private void injectInstrumentCallback(String name) {
-    this.injectInstrumentCallback(name, "()V");
+  private void injectCallback(String name) {
+    this.injectCallback(name, "()V");
   }
 
-  private void injectInstrumentCallback(String name, String desc) {
+  private void injectCallback(String name, String desc) {
     this.mv.visitMethodInsn(
         Opcodes.INVOKESTATIC,
-        Instrument.class.getName().replace(".", "/"),
+        InjectedCallback.class.getName().replace(".", "/"),
         name,
         desc,
         false
@@ -179,8 +218,12 @@ public class SEMethodVisitor extends
     }
 
     if (!isAllowed) {
-      throw new AccessControlException(String.format("Usage of class [%s] restricted", name));
+      throw new RestrictedUseException(String.format("Usage of class [%s] is prohibited in extensions", name));
     }
   }
 
+  @Override
+  public void setLocalVariableSorter(LocalVariablesSorter localVariableSorter) {
+    this.localvariableSorter = localVariableSorter;
+  }
 }

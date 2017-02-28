@@ -4,7 +4,10 @@ import com.sudoplay.sudoext.security.IClassFilter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.util.TraceClassVisitor;
 
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 
 /**
@@ -14,35 +17,60 @@ public class ASMTest {
 
   public ASMTest() throws Exception {
     String classToModifyNameString = "com.sudoplay.asmtest.TestFile";
-    Instrument.DELEGATE = new DebugInstrument();
 
-    ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES & ClassWriter.COMPUTE_MAXS);
-    ClassVisitor classVisitor = new SEClassVisitor(classWriter, new SEMethodVisitorFactory(new IClassFilter[]{
-        name -> {
-          switch (name) {
-            case "I": // int
-            case "[I": // int array
-            case "java.lang.Object":
-            case "java.lang.String":
-            case "java.lang.StringBuilder":
-            case "java.lang.Integer":
-            case "java.io.IOException":
-              return true;
-          }
-          return name.startsWith("com.sudoplay.asmtest.");
-        }
-    }));
+    DebugCallbackDelegate delegate = new DebugCallbackDelegate();
+    InjectedCallback.DELEGATE = delegate;
+
+    ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+
+    ClassVisitor classVisitor = new SEClassVisitor(
+        classWriter,
+        new SEMethodVisitorFactory(
+            new IClassFilter[]{
+                name -> {
+                  switch (name) {
+                    case "I": // int
+                    case "[I": // int array
+                    case "[[[[[I": // for testing
+                    case "java.lang.Object":
+                    case "java.lang.String":
+                    case "java.lang.StringBuilder":
+                    case "java.lang.Integer":
+                    case "java.io.IOException":
+                    case "java.lang.System":
+                    case "java.io.PrintStream":
+                      return true;
+                  }
+                  return name.startsWith("com.sudoplay.asmtest.");
+                }
+            }
+        )
+    );
+
+    CheckClassAdapter checkClassAdapter = new CheckClassAdapter(classVisitor, true);
 
     ClassReader classReader = new ClassReader(getClass()
         .getResourceAsStream("/" + classToModifyNameString.replace('.', '/') + ".class"));
 
-    classReader.accept(classVisitor, 0);
+    classReader.accept(checkClassAdapter, 0);
 
     byte[] bytecode = classWriter.toByteArray();
+
+    ClassReader printClassReader = new ClassReader(bytecode);
+    printClassReader.accept(new TraceClassVisitor(new PrintWriter(System.out)), 0);
+
     Class classModified = loadClass(classToModifyNameString, bytecode);
 
-    TestFile testFile = (TestFile) classModified.newInstance();
-    System.out.println(testFile.getIntegersString(10));
+    try {
+
+      TestFile testFile = (TestFile) classModified.newInstance();
+      System.out.println(testFile.getIntegersString());
+
+      delegate.report();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   // From: http://asm.ow2.org/doc/faq.html#Q5

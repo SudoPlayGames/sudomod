@@ -3,15 +3,15 @@ package com.sudoplay.asmtest;
 /**
  * Created by codetaylor on 2/26/2017.
  */
-public interface IInstrument {
+public interface ICallbackDelegate {
 
   void callback_NEW();
 
   void callback_NEWARRAY(int size);
 
-  void callback_ANEWARRAY();
+  void callback_ANEWARRAY(int size);
 
-  void callback_MULTIANEWARRAY(int dims);
+  void callback_MULTIANEWARRAY(int dims, int[] sizes);
 
   void callback_INVOKESPECIAL();
 

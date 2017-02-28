@@ -15,7 +15,7 @@ public class SEMethodVisitorFactory implements IMethodVisitorFactory {
   }
 
   @Override
-  public MethodVisitor create(MethodVisitor methodVisitor) {
+  public ISEMethodVisitor create(MethodVisitor methodVisitor) {
     return new SEMethodVisitor(methodVisitor, this.classFilters);
   }
 
