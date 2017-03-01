@@ -1,10 +1,14 @@
 package com.sudoplay.asmtest;
 
-import com.sudoplay.sudoext.security.IClassFilter;
+import com.sudoplay.sudoext.classloader.IClassFilter;
+import com.sudoplay.sudoext.classloader.asm.callback.BudgetCallbackDelegate;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
+import com.sudoplay.sudoext.classloader.asm.callback.InjectedCallback;
+import com.sudoplay.sudoext.classloader.asm.visitor.SEClassVisitor;
+import com.sudoplay.sudoext.classloader.asm.visitor.SEMethodVisitorFactory;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.PrintWriter;
@@ -18,7 +22,7 @@ public class ASMTest {
   public ASMTest() throws Exception {
     String classToModifyNameString = "com.sudoplay.asmtest.TestFile";
 
-    DebugCallbackDelegate delegate = new DebugCallbackDelegate();
+    ICallbackDelegate delegate = new BudgetCallbackDelegate();
     InjectedCallback.DELEGATE = delegate;
 
     ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -30,24 +34,37 @@ public class ASMTest {
                 name -> {
                   switch (name) {
                     case "I": // int
-                    case "[I": // int array
-                    case "[[[[[I": // for testing
+                    case "J": // long?
                     case "java.lang.Object":
                     case "java.lang.String":
                     case "java.lang.StringBuilder":
                     case "java.lang.Integer":
+                    case "java.lang.Exception":
                     case "java.io.IOException":
                     case "java.lang.System":
                     case "java.io.PrintStream":
+                    case "java.util.ArrayList":
+                    case "java.util.List":
+                    case "java.lang.Class":
                       return true;
                   }
                   return name.startsWith("com.sudoplay.asmtest.");
                 }
-            }
-        )
+            },
+            new IClassFilter[]{
+                name -> {
+                  switch (name) {
+                    case "java.lang.Throwable":
+                    case "java.lang.Exception":
+                    case "java.lang.RuntimeException":
+                      return false;
+                  }
+                  return true;
+                }
+            })
     );
 
-    //CheckClassAdapter checkClassAdapter = new CheckClassAdapter(classVisitor, true);
+    //classVisitor = new CheckClassAdapter(classVisitor, true);
 
     ClassReader classReader = new ClassReader(getClass()
         .getResourceAsStream("/" + classToModifyNameString.replace('.', '/') + ".class"));
@@ -63,6 +80,7 @@ public class ASMTest {
 
     try {
 
+      delegate.reset();
       TestFile testFile = (TestFile) classModified.newInstance();
       System.out.println(testFile.getIntegersString());
 

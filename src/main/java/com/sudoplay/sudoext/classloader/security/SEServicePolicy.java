@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.security;
+package com.sudoplay.sudoext.classloader.security;
 
 import java.security.PermissionCollection;
 import java.security.Policy;
@@ -24,7 +24,7 @@ public class SEServicePolicy extends
   @Override
   public PermissionCollection getPermissions(ProtectionDomain domain) {
 
-    if (domain.getClassLoader() instanceof ISecureClassLoader) {
+    if (domain.getClassLoader() instanceof ISandboxClassLoader) {
       return this.sandboxPermissionsProvider.getPermissionCollection();
 
     } else {

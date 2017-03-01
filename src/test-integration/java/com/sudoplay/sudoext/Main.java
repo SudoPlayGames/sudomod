@@ -2,7 +2,7 @@ package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.api.AncillaryPlugin;
 import com.sudoplay.sudoext.api.TestModPlugin;
-import com.sudoplay.sudoext.security.SEServicePolicy;
+import com.sudoplay.sudoext.classloader.security.SEServicePolicy;
 import com.sudoplay.sudoext.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class Main {
         .setMetaFilename("mod-info.json")
         .setApiVersion("1.0"))
 
-        .addClassFilter(new WhitelistClassFilter())
+        .addClassLoaderClassFilter(new WhitelistClassFilter())
         .create();
 
     try {

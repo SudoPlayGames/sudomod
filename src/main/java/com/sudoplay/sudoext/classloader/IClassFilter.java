@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.security;
+package com.sudoplay.sudoext.classloader;
 
 /**
  * Created by codetaylor on 2/22/2017.

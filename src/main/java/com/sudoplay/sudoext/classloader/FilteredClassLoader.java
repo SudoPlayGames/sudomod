@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.security;
+package com.sudoplay.sudoext.classloader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,13 @@ public class FilteredClassLoader extends
 
   public FilteredClassLoader(ClassLoader parent, IClassFilter[] classFilters) {
     super(parent);
+
+    SecurityManager security = System.getSecurityManager();
+
+    if (security != null) {
+      security.checkCreateClassLoader();
+    }
+
     this.classFilters = classFilters;
   }
 

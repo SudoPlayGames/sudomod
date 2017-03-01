@@ -7,6 +7,9 @@ import com.sudoplay.sudoext.candidate.extractor.IZipFileExtractor;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
 import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
+import com.sudoplay.sudoext.classloader.IClassFilter;
+import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.NoOpByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.intercept.*;
 import com.sudoplay.sudoext.container.*;
 import com.sudoplay.sudoext.folder.DefaultFolderLifecycleInitializeEventHandler;
@@ -25,7 +28,6 @@ import com.sudoplay.sudoext.meta.validator.element.ApiVersionValidator;
 import com.sudoplay.sudoext.meta.validator.element.DependsOnValidator;
 import com.sudoplay.sudoext.meta.validator.element.IdValidator;
 import com.sudoplay.sudoext.meta.validator.element.JarValidator;
-import com.sudoplay.sudoext.security.IClassFilter;
 import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 
 import java.util.ArrayList;
@@ -45,17 +47,18 @@ public class SEServiceBuilder {
   private IContainerSorter containerSorter;
   private IMetaFactory metaFactory;
   private IZipFileExtractor compressedCandidateExtractor;
+  private IByteCodeTransformer byteCodeTransformer;
 
   private RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
 
-  private List<IClassFilter> defaultClassFilterList;
+  private List<IClassFilter> defaultClassLoaderClassFilterList;
   private List<ClassIntercept> defaultClassInterceptList;
   private List<IMetaElementParser> defaultMetaElementParserList;
   private List<IMetaValidator> defaultMetaValidatorList;
   private List<ICandidateProvider> defaultCandidateLocatorList;
   private List<IFolderLifecycleEventHandler> defaultFolderLifecycleEventHandlerList;
 
-  private List<IClassFilter> classFilterList;
+  private List<IClassFilter> classLoaderClassFilterList;
   private List<ClassIntercept> classInterceptList;
   private List<IMetaElementParser> metaElementParserList;
   private List<IMetaValidator> metaValidatorList;
@@ -66,7 +69,7 @@ public class SEServiceBuilder {
     this.config = configBuilder.getConfig();
 
     // init user-defined lists
-    this.classFilterList = new ArrayList<>();
+    this.classLoaderClassFilterList = new ArrayList<>();
     this.classInterceptList = new ArrayList<>();
     this.metaElementParserList = new ArrayList<>();
     this.metaValidatorList = new ArrayList<>();
@@ -83,6 +86,7 @@ public class SEServiceBuilder {
     this.containerSorter = new DefaultContainerSorter();
     this.metaFactory = new DefaultMetaFactory();
     this.compressedCandidateExtractor = new ZipFileExtractor();
+    this.byteCodeTransformer = new NoOpByteCodeTransformer();
 
     this.recursiveFileRemovalProcessor = new RecursiveFileRemovalProcessor();
 
@@ -161,7 +165,7 @@ public class SEServiceBuilder {
     this.defaultMetaValidatorList.add(new JarValidator());
 
     // adds the default class filter
-    this.defaultClassFilterList = new ArrayList<>();
+    this.defaultClassLoaderClassFilterList = new ArrayList<>();
 
     // adds the default container api class intercept
     this.defaultClassInterceptList = new ArrayList<>();
@@ -183,18 +187,18 @@ public class SEServiceBuilder {
 
   }
 
-  public SEServiceBuilder addClassFilter(IClassFilter filter) {
-    this.classFilterList.add(filter);
+  public SEServiceBuilder addClassLoaderClassFilter(IClassFilter filter) {
+    this.classLoaderClassFilterList.add(filter);
     return this;
   }
 
-  public SEServiceBuilder removeAllDefaultClassFilters() {
-    this.defaultClassFilterList.clear();
+  public SEServiceBuilder removeAllDefaultClassLoaderClassFilters() {
+    this.defaultClassLoaderClassFilterList.clear();
     return this;
   }
 
-  public SEServiceBuilder removeDefaultClassFilter(Class<? extends IClassFilter> aClass) {
-    return this.removeByClass(aClass, this.defaultClassFilterList);
+  public SEServiceBuilder removeDefaultClassLoaderClassFilter(Class<? extends IClassFilter> aClass) {
+    return this.removeByClass(aClass, this.defaultClassLoaderClassFilterList);
   }
 
   public SEServiceBuilder setContainerCacheFactory(IContainerCacheFactory factory) {
@@ -289,10 +293,15 @@ public class SEServiceBuilder {
     return this.removeByClass(aClass, this.defaultFolderLifecycleEventHandlerList);
   }
 
+  public SEServiceBuilder setByteCodeTransformer(IByteCodeTransformer byteCodeTransformer) {
+    this.byteCodeTransformer = byteCodeTransformer;
+    return this;
+  }
+
   private IClassFilter[] getClassFilters() {
     List<IClassFilter> list = new ArrayList<>();
-    list.addAll(this.defaultClassFilterList);
-    list.addAll(this.classFilterList);
+    list.addAll(this.defaultClassLoaderClassFilterList);
+    list.addAll(this.classLoaderClassFilterList);
     return list.toArray(new IClassFilter[list.size()]);
   }
 
@@ -347,6 +356,10 @@ public class SEServiceBuilder {
     return this.compressedCandidateExtractor;
   }
 
+  private IByteCodeTransformer getByteCodeTransformer() {
+    return this.byteCodeTransformer;
+  }
+
   public SEService create() throws SEServiceInitializationException {
 
     return new SEService(
@@ -378,7 +391,8 @@ public class SEServiceBuilder {
             this.getClassFilters(),
             new DefaultClassInterceptorFactory(
                 this.getClassIntercepts()
-            )
+            ),
+            this.getByteCodeTransformer()
         )
     );
 

@@ -1,10 +1,9 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.intercept.IClassInterceptor;
 import com.sudoplay.sudoext.classloader.intercept.InterceptClassLoader;
 import com.sudoplay.sudoext.container.Container;
-import com.sudoplay.sudoext.security.FilteredClassLoader;
-import com.sudoplay.sudoext.security.IClassFilter;
 import org.codehaus.janino.ClassLoaderIClassLoader;
 import org.codehaus.janino.JavaSourceIClassLoader;
 import org.codehaus.janino.util.resource.PathResourceFinder;
@@ -18,24 +17,28 @@ import java.util.List;
 /**
  * Created by codetaylor on 2/21/2017.
  */
-/* package */ class ClassLoaderFactory implements IClassLoaderFactory {
+/* package */ class ClassLoaderFactory implements
+    IClassLoaderFactory {
 
   private final URL[] urls;
   private File[] sourcePath;
   private List<Container> dependencyList;
   private IClassFilter[] classFilters;
   private IClassInterceptor classInterceptor;
+  private IByteCodeTransformer byteCodeTransformer;
 
   /* package */ ClassLoaderFactory(
       Path path,
       List<String> jarFileList,
       List<Container> dependencyList,
       IClassFilter[] classFilters,
-      IClassInterceptor classInterceptor
+      IClassInterceptor classInterceptor,
+      IByteCodeTransformer byteCodeTransformer
   ) {
     this.dependencyList = dependencyList;
     this.classFilters = classFilters;
     this.classInterceptor = classInterceptor;
+    this.byteCodeTransformer = byteCodeTransformer;
     int size = jarFileList.size();
     this.urls = new URL[size];
 
@@ -67,7 +70,8 @@ import java.util.List;
 
     JarClassLoader jarClassLoader = new JarClassLoader(
         this.urls,
-        interceptClassLoader
+        interceptClassLoader,
+        this.byteCodeTransformer
     );
 
     DependencyClassLoader dependencyClassLoader = new DependencyClassLoader(
@@ -81,7 +85,8 @@ import java.util.List;
             new PathResourceFinder(this.sourcePath),
             null,
             new ClassLoaderIClassLoader(dependencyClassLoader)
-        )
+        ),
+        this.byteCodeTransformer
     );
 
     sourceClassLoader.setDebuggingInfo(true, true, true);

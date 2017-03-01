@@ -1,10 +1,10 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.intercept.IClassInterceptorFactory;
 import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Dependency;
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.security.IClassFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +18,16 @@ public class ClassLoaderFactoryProvider implements
 
   private IClassFilter[] classFilters;
   private IClassInterceptorFactory classInterceptorFactory;
+  private IByteCodeTransformer byteCodeTransformer;
 
   public ClassLoaderFactoryProvider(
       IClassFilter[] classFilters,
-      IClassInterceptorFactory classInterceptorFactory
+      IClassInterceptorFactory classInterceptorFactory,
+      IByteCodeTransformer byteCodeTransformer
   ) {
     this.classFilters = classFilters;
     this.classInterceptorFactory = classInterceptorFactory;
+    this.byteCodeTransformer = byteCodeTransformer;
   }
 
   @Override
@@ -51,7 +54,8 @@ public class ClassLoaderFactoryProvider implements
         meta.getJarFileList(),
         dependencyList,
         this.classFilters,
-        this.classInterceptorFactory.create(container)
+        this.classInterceptorFactory.create(container),
+        this.byteCodeTransformer
     );
   }
 }

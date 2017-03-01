@@ -1,4 +1,4 @@
-package com.sudoplay.asmtest;
+package com.sudoplay.sudoext.classloader.asm.visitor;
 
 import org.objectweb.asm.MethodVisitor;
 
@@ -7,5 +7,5 @@ import org.objectweb.asm.MethodVisitor;
  */
 public interface IMethodVisitorFactory {
 
-  ISEMethodVisitor create(MethodVisitor methodVisitor);
+  MethodVisitor create(MethodVisitor methodVisitor);
 }

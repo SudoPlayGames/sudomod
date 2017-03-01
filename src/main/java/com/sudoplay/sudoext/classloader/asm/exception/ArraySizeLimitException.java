@@ -1,4 +1,4 @@
-package com.sudoplay.asmtest;
+package com.sudoplay.sudoext.classloader.asm.exception;
 
 /**
  * Created by codetaylor on 2/27/2017.

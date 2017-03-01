@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.classloader.intercept;
 
-import com.sudoplay.sudoext.security.ISecureClassLoader;
+import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
 import com.sudoplay.sudoext.util.CloseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.io.InputStream;
  */
 public class InterceptClassLoader extends
     ClassLoader implements
-    ISecureClassLoader {
+    ISandboxClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(InterceptClassLoader.class);
 
@@ -25,6 +25,13 @@ public class InterceptClassLoader extends
       IClassInterceptor classInterceptor
   ) {
     super(parent);
+
+    SecurityManager security = System.getSecurityManager();
+
+    if (security != null) {
+      security.checkCreateClassLoader();
+    }
+
     this.classInterceptor = classInterceptor;
   }
 
@@ -84,8 +91,6 @@ public class InterceptClassLoader extends
       CloseUtil.close(inputStream, LOG);
     }
 
-    byte[] classBytes = byteArrayOutputStream.toByteArray();
-
-    return classBytes;
+    return byteArrayOutputStream.toByteArray();
   }
 }

@@ -1,5 +1,7 @@
 package com.sudoplay.asmtest;
 
+import java.io.IOException;
+
 /**
  * Created by codetaylor on 2/26/2017.
  */
@@ -7,10 +9,11 @@ public class TestFile {
 
   public String getIntegersString() {
 
-    //int[][][][][] strings = new int[500000][500][900][54][638664654];
+    try {
+      throw new IOException();
 
-    for (int i = 0; i < 5; i++) {
-
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
     return "Done!";

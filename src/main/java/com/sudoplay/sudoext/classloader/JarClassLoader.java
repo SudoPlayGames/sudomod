@@ -1,7 +1,9 @@
 package com.sudoplay.sudoext.classloader;
 
-import com.sudoplay.sudoext.security.ISecureClassLoader;
+import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -11,10 +13,17 @@ import java.net.URLClassLoader;
 /* package */ class JarClassLoader extends
     URLClassLoader implements
     IClassLoader,
-    ISecureClassLoader {
+    ISandboxClassLoader {
 
-  /* package */ JarClassLoader(URL[] urls, ClassLoader parent) {
+  private final IByteCodeTransformer byteCodeTransformer;
+
+  /* package */ JarClassLoader(
+      URL[] urls,
+      ClassLoader parent,
+      IByteCodeTransformer byteCodeTransformer
+  ) {
     super(urls, parent);
+    this.byteCodeTransformer = byteCodeTransformer;
   }
 
   @Override
@@ -30,6 +39,25 @@ import java.net.URLClassLoader;
       }
 
       return c;
+    }
+  }
+
+  protected Class<?> findClass(final String name)
+      throws ClassNotFoundException {
+
+    String path = name.replace('.', '/').concat(".class");
+    InputStream inputStream = this.getResourceAsStream(path);
+
+    if (inputStream == null) {
+      throw new ClassNotFoundException(name);
+    }
+
+    try {
+      byte[] bytecode = this.byteCodeTransformer.transform(inputStream);
+      return defineClass(name, bytecode, 0, bytecode.length);
+
+    } catch (Exception e) {
+      throw new ClassNotFoundException(name, e);
     }
   }
 }

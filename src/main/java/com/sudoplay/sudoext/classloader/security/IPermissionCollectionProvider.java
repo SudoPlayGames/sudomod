@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.security;
+package com.sudoplay.sudoext.classloader.security;
 
 import java.security.PermissionCollection;
 

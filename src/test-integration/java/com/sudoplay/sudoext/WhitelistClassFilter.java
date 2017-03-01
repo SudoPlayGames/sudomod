@@ -5,7 +5,7 @@ import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.api.TestModPlugin;
 import com.sudoplay.sudoext.api.logging.ILoggerAPIProvider;
 import com.sudoplay.sudoext.api.logging.LoggerAPI;
-import com.sudoplay.sudoext.security.IClassFilter;
+import com.sudoplay.sudoext.classloader.IClassFilter;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
