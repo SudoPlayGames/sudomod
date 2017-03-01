@@ -5,7 +5,7 @@ package com.sudoplay.sudoext.classloader.asm.callback;
  */
 public class InjectedCallback {
 
-  public static ICallbackDelegate DELEGATE;
+  public static ICallbackDelegate DELEGATE = NoOpCallbackDelegate.INSTANCE;
 
   public static void callback_NEW(String type) {
     DELEGATE.callback_NEW(type);

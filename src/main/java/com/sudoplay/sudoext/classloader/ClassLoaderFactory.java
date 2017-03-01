@@ -1,9 +1,11 @@
 package com.sudoplay.sudoext.classloader;
 
-import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.filter.IClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.intercept.IClassInterceptor;
 import com.sudoplay.sudoext.classloader.intercept.InterceptClassLoader;
 import com.sudoplay.sudoext.container.Container;
+import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 import org.codehaus.janino.ClassLoaderIClassLoader;
 import org.codehaus.janino.JavaSourceIClassLoader;
 import org.codehaus.janino.util.resource.PathResourceFinder;
@@ -23,22 +25,25 @@ import java.util.List;
   private final URL[] urls;
   private File[] sourcePath;
   private List<Container> dependencyList;
-  private IClassFilter[] classFilters;
+  private IClassFilterPredicate classFilterPredicate;
   private IClassInterceptor classInterceptor;
   private IByteCodeTransformer byteCodeTransformer;
+  private InputStreamByteArrayConverter inputStreamByteArrayConverter;
 
   /* package */ ClassLoaderFactory(
       Path path,
       List<String> jarFileList,
       List<Container> dependencyList,
-      IClassFilter[] classFilters,
+      IClassFilterPredicate classFilterPredicate,
       IClassInterceptor classInterceptor,
-      IByteCodeTransformer byteCodeTransformer
+      IByteCodeTransformer byteCodeTransformer,
+      InputStreamByteArrayConverter inputStreamByteArrayConverter
   ) {
     this.dependencyList = dependencyList;
-    this.classFilters = classFilters;
+    this.classFilterPredicate = classFilterPredicate;
     this.classInterceptor = classInterceptor;
     this.byteCodeTransformer = byteCodeTransformer;
+    this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
     int size = jarFileList.size();
     this.urls = new URL[size];
 
@@ -60,7 +65,7 @@ import java.util.List;
 
     FilteredClassLoader filteredClassLoader = new FilteredClassLoader(
         this.getClass().getClassLoader(),
-        this.classFilters
+        this.classFilterPredicate
     );
 
     InterceptClassLoader interceptClassLoader = new InterceptClassLoader(
@@ -71,7 +76,8 @@ import java.util.List;
     JarClassLoader jarClassLoader = new JarClassLoader(
         this.urls,
         interceptClassLoader,
-        this.byteCodeTransformer
+        this.byteCodeTransformer,
+        this.inputStreamByteArrayConverter
     );
 
     DependencyClassLoader dependencyClassLoader = new DependencyClassLoader(

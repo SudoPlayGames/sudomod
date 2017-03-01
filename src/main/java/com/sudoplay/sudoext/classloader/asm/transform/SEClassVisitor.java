@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.classloader.asm.visitor;
+package com.sudoplay.sudoext.classloader.asm.transform;
 
 import com.sudoplay.sudoext.classloader.asm.exception.RestrictedUseException;
 import org.objectweb.asm.ClassVisitor;

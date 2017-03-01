@@ -1,11 +1,13 @@
 package com.sudoplay.asmtest;
 
-import com.sudoplay.sudoext.classloader.IClassFilter;
 import com.sudoplay.sudoext.classloader.asm.callback.BudgetCallbackDelegate;
 import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
 import com.sudoplay.sudoext.classloader.asm.callback.InjectedCallback;
-import com.sudoplay.sudoext.classloader.asm.visitor.SEClassVisitor;
-import com.sudoplay.sudoext.classloader.asm.visitor.SEMethodVisitorFactory;
+import com.sudoplay.sudoext.classloader.asm.filter.AllowedJavaLangClassFilter;
+import com.sudoplay.sudoext.classloader.asm.filter.RestrictedTryCatchExceptionClassFilter;
+import com.sudoplay.sudoext.classloader.asm.transform.SEClassVisitor;
+import com.sudoplay.sudoext.classloader.asm.transform.SEMethodVisitorFactory;
+import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -31,36 +33,10 @@ public class ASMTest {
         classWriter,
         new SEMethodVisitorFactory(
             new IClassFilter[]{
-                name -> {
-                  switch (name) {
-                    case "I": // int
-                    case "J": // long?
-                    case "java.lang.Object":
-                    case "java.lang.String":
-                    case "java.lang.StringBuilder":
-                    case "java.lang.Integer":
-                    case "java.lang.Exception":
-                    case "java.io.IOException":
-                    case "java.lang.System":
-                    case "java.io.PrintStream":
-                    case "java.util.ArrayList":
-                    case "java.util.List":
-                    case "java.lang.Class":
-                      return true;
-                  }
-                  return name.startsWith("com.sudoplay.asmtest.");
-                }
+                new AllowedJavaLangClassFilter()
             },
             new IClassFilter[]{
-                name -> {
-                  switch (name) {
-                    case "java.lang.Throwable":
-                    case "java.lang.Exception":
-                    case "java.lang.RuntimeException":
-                      return false;
-                  }
-                  return true;
-                }
+                new RestrictedTryCatchExceptionClassFilter()
             })
     );
 

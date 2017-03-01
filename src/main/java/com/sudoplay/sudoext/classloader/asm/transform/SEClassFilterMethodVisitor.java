@@ -1,6 +1,6 @@
-package com.sudoplay.sudoext.classloader.asm.visitor;
+package com.sudoplay.sudoext.classloader.asm.transform;
 
-import com.sudoplay.sudoext.classloader.IClassFilter;
+import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.asm.exception.RestrictedUseException;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;

@@ -1,7 +1,8 @@
 package com.sudoplay.sudoext.classloader;
 
-import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
+import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -16,14 +17,17 @@ import java.net.URLClassLoader;
     ISandboxClassLoader {
 
   private final IByteCodeTransformer byteCodeTransformer;
+  private final InputStreamByteArrayConverter inputStreamByteArrayConverter;
 
   /* package */ JarClassLoader(
       URL[] urls,
       ClassLoader parent,
-      IByteCodeTransformer byteCodeTransformer
+      IByteCodeTransformer byteCodeTransformer,
+      InputStreamByteArrayConverter inputStreamByteArrayConverter
   ) {
     super(urls, parent);
     this.byteCodeTransformer = byteCodeTransformer;
+    this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
   }
 
   @Override
@@ -53,7 +57,10 @@ import java.net.URLClassLoader;
     }
 
     try {
-      byte[] bytecode = this.byteCodeTransformer.transform(inputStream);
+      byte[] bytecode = this.byteCodeTransformer.transform(
+          this.inputStreamByteArrayConverter.convert(inputStream)
+      );
+
       return defineClass(name, bytecode, 0, bytecode.length);
 
     } catch (Exception e) {

@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.classloader.asm.visitor;
+package com.sudoplay.sudoext.classloader.asm.transform;
 
 import org.objectweb.asm.MethodVisitor;
 

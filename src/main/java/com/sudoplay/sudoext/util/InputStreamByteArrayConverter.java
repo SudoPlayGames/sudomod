@@ -1,17 +1,15 @@
-package com.sudoplay.sudoext.classloader.asm;
+package com.sudoplay.sudoext.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Created by codetaylor on 2/28/2017.
+ * Created by codetaylor on 3/1/2017.
  */
-public class NoOpByteCodeTransformer implements
-    IByteCodeTransformer {
+public class InputStreamByteArrayConverter {
 
-  @Override
-  public byte[] transform(InputStream inputStream) throws IOException {
+  public byte[] convert(InputStream inputStream) throws IOException {
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
 

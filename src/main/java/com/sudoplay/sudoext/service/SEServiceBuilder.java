@@ -7,9 +7,10 @@ import com.sudoplay.sudoext.candidate.extractor.IZipFileExtractor;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
 import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
-import com.sudoplay.sudoext.classloader.IClassFilter;
-import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
-import com.sudoplay.sudoext.classloader.asm.NoOpByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.NoOpByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
+import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.intercept.*;
 import com.sudoplay.sudoext.container.*;
 import com.sudoplay.sudoext.folder.DefaultFolderLifecycleInitializeEventHandler;
@@ -28,6 +29,7 @@ import com.sudoplay.sudoext.meta.validator.element.ApiVersionValidator;
 import com.sudoplay.sudoext.meta.validator.element.DependsOnValidator;
 import com.sudoplay.sudoext.meta.validator.element.IdValidator;
 import com.sudoplay.sudoext.meta.validator.element.JarValidator;
+import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 
 import java.util.ArrayList;
@@ -48,8 +50,6 @@ public class SEServiceBuilder {
   private IMetaFactory metaFactory;
   private IZipFileExtractor compressedCandidateExtractor;
   private IByteCodeTransformer byteCodeTransformer;
-
-  private RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
 
   private List<IClassFilter> defaultClassLoaderClassFilterList;
   private List<ClassIntercept> defaultClassInterceptList;
@@ -88,7 +88,9 @@ public class SEServiceBuilder {
     this.compressedCandidateExtractor = new ZipFileExtractor();
     this.byteCodeTransformer = new NoOpByteCodeTransformer();
 
-    this.recursiveFileRemovalProcessor = new RecursiveFileRemovalProcessor();
+    // init statics
+    RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
+    recursiveFileRemovalProcessor = new RecursiveFileRemovalProcessor();
 
     // adds the default folder lifecycle event handlers
     this.defaultFolderLifecycleEventHandlerList = new ArrayList<>();
@@ -105,7 +107,7 @@ public class SEServiceBuilder {
     this.defaultFolderLifecycleEventHandlerList.add(
         new TempFolderLifecycleEventHandler(
             this.config.getTempLocation(),
-            this.recursiveFileRemovalProcessor
+            recursiveFileRemovalProcessor
         )
     );
 
@@ -140,7 +142,7 @@ public class SEServiceBuilder {
                     this.config.getCompressedFileExtension()
                 ),
                 new DefaultInputStreamProvider(),
-                this.recursiveFileRemovalProcessor
+                recursiveFileRemovalProcessor
             )
         )
     );
@@ -298,7 +300,7 @@ public class SEServiceBuilder {
     return this;
   }
 
-  private IClassFilter[] getClassFilters() {
+  private IClassFilter[] getClassLoaderClassFilters() {
     List<IClassFilter> list = new ArrayList<>();
     list.addAll(this.defaultClassLoaderClassFilterList);
     list.addAll(this.classLoaderClassFilterList);
@@ -388,11 +390,14 @@ public class SEServiceBuilder {
         ),
         this.getContainerSorter(),
         new ClassLoaderFactoryProvider(
-            this.getClassFilters(),
+            new ClassFilterPredicate(
+                this.getClassLoaderClassFilters()
+            ),
             new DefaultClassInterceptorFactory(
                 this.getClassIntercepts()
             ),
-            this.getByteCodeTransformer()
+            this.getByteCodeTransformer(),
+            new InputStreamByteArrayConverter()
         )
     );
 

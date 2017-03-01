@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.classloader;
 
-import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
 import org.codehaus.commons.nullanalysis.Nullable;
 import org.codehaus.janino.JaninoRuntimeException;
@@ -9,8 +9,6 @@ import org.codehaus.janino.JavaSourceIClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,10 +112,10 @@ import java.util.Map;
     }
 
     try {
-      bytecode = this.byteCodeTransformer.transform(new ByteArrayInputStream(bytecode));
+      bytecode = this.byteCodeTransformer.transform(bytecode);
       return this.defineClass(name, bytecode, 0, bytecode.length);
 
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new ClassNotFoundException(name, e);
     }
   }

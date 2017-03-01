@@ -1,10 +1,12 @@
 package com.sudoplay.sudoext.classloader;
 
-import com.sudoplay.sudoext.classloader.asm.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.filter.IClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.intercept.IClassInterceptorFactory;
 import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Dependency;
 import com.sudoplay.sudoext.meta.Meta;
+import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +18,21 @@ import java.util.Map;
 public class ClassLoaderFactoryProvider implements
     IClassLoaderFactoryProvider {
 
-  private IClassFilter[] classFilters;
+  private IClassFilterPredicate filteredClassLoaderPredicate;
   private IClassInterceptorFactory classInterceptorFactory;
   private IByteCodeTransformer byteCodeTransformer;
+  private InputStreamByteArrayConverter inputStreamByteArrayConverter;
 
   public ClassLoaderFactoryProvider(
-      IClassFilter[] classFilters,
+      IClassFilterPredicate filteredClassLoaderPredicate,
       IClassInterceptorFactory classInterceptorFactory,
-      IByteCodeTransformer byteCodeTransformer
+      IByteCodeTransformer byteCodeTransformer,
+      InputStreamByteArrayConverter inputStreamByteArrayConverter
   ) {
-    this.classFilters = classFilters;
+    this.filteredClassLoaderPredicate = filteredClassLoaderPredicate;
     this.classInterceptorFactory = classInterceptorFactory;
     this.byteCodeTransformer = byteCodeTransformer;
+    this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
   }
 
   @Override
@@ -53,9 +58,10 @@ public class ClassLoaderFactoryProvider implements
         container.getPath(),
         meta.getJarFileList(),
         dependencyList,
-        this.classFilters,
+        this.filteredClassLoaderPredicate,
         this.classInterceptorFactory.create(container),
-        this.byteCodeTransformer
+        this.byteCodeTransformer,
+        this.inputStreamByteArrayConverter
     );
   }
 }

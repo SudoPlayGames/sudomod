@@ -1,5 +1,6 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.classloader.filter.IClassFilterPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +14,9 @@ public class FilteredClassLoader extends
 
   private static final Logger LOG = LoggerFactory.getLogger(FilteredClassLoader.class);
 
-  private IClassFilter[] classFilters;
+  private IClassFilterPredicate classFilterPredicate;
 
-  public FilteredClassLoader(ClassLoader parent, IClassFilter[] classFilters) {
+  public FilteredClassLoader(ClassLoader parent, IClassFilterPredicate classFilterPredicate) {
     super(parent);
 
     SecurityManager security = System.getSecurityManager();
@@ -24,7 +25,7 @@ public class FilteredClassLoader extends
       security.checkCreateClassLoader();
     }
 
-    this.classFilters = classFilters;
+    this.classFilterPredicate = classFilterPredicate;
   }
 
   @Override
@@ -40,7 +41,7 @@ public class FilteredClassLoader extends
         if (parent != null) {
           c = parent.loadClass(name);
 
-          if (c != null && !this.checkFilters(name)) {
+          if (c != null && !this.classFilterPredicate.isAllowed(name)) {
             LOG.error("Class [{}] is not allowed", name);
             throw new AccessControlException(String.format("Class [%s] is not allowed", name));
           }
@@ -60,18 +61,5 @@ public class FilteredClassLoader extends
 
       return c;
     }
-  }
-
-  private boolean checkFilters(String name) {
-
-    for (IClassFilter classFilter : this.classFilters) {
-
-      // if any white-list contains the class, let it pass
-      if (classFilter.isAllowed(name)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 }

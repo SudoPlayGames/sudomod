@@ -272,7 +272,7 @@ public class BudgetCallbackDelegate implements
 
   @Override
   public void callback_TRYCATCH(String type) {
-    //throw new RestrictedUseException("Usage of try/catch block is prohibited in extensions");
+    throw new RestrictedUseException("Usage of try/catch block is prohibited in extensions");
   }
 
   @Override
