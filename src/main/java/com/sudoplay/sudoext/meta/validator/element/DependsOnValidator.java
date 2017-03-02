@@ -71,7 +71,7 @@ public class DependsOnValidator implements
           return true;
 
         } else {
-          LOG.error("[{}] requires a version within {} of [{}], found incompatible version [{}]",
+          LOG.error("[{}] requires version {} of [{}], found incompatible version [{}]",
               id, versionRange, dependencyId, candidateVersion
           );
           return false;
@@ -100,7 +100,7 @@ public class DependsOnValidator implements
           return true;
 
         } else {
-          LOG.error("[{}] requires a version within {} of [{}], found incompatible version [{}]",
+          LOG.error("[{}] requires version {} of [{}], found incompatible version [{}]",
               id, versionRange, dependencyId, candidateVersion
           );
           return false;

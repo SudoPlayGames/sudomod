@@ -12,17 +12,17 @@ import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuild
 import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.intercept.*;
-import com.sudoplay.sudoext.container.*;
+import com.sudoplay.sudoext.container.ContainerFactory;
+import com.sudoplay.sudoext.container.IContainerCacheFactory;
+import com.sudoplay.sudoext.container.LRUContainerCacheFactory;
+import com.sudoplay.sudoext.container.provider.*;
 import com.sudoplay.sudoext.folder.DefaultFolderLifecycleInitializeEventHandler;
 import com.sudoplay.sudoext.folder.FolderLifecycleEventPlugin;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventHandler;
 import com.sudoplay.sudoext.folder.TempFolderLifecycleEventHandler;
-import com.sudoplay.sudoext.meta.ContainerListMetaLoader;
-import com.sudoplay.sudoext.meta.DefaultMetaFactory;
-import com.sudoplay.sudoext.meta.DependencyContainer;
-import com.sudoplay.sudoext.meta.IMetaFactory;
-import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
-import com.sudoplay.sudoext.meta.parser.MetaParser;
+import com.sudoplay.sudoext.meta.*;
+import com.sudoplay.sudoext.meta.parser.IMetaElementAdapter;
+import com.sudoplay.sudoext.meta.parser.MetaAdapter;
 import com.sudoplay.sudoext.meta.parser.element.*;
 import com.sudoplay.sudoext.meta.validator.IMetaValidator;
 import com.sudoplay.sudoext.meta.validator.MetaValidator;
@@ -30,11 +30,13 @@ import com.sudoplay.sudoext.meta.validator.element.ApiVersionValidator;
 import com.sudoplay.sudoext.meta.validator.element.DependsOnValidator;
 import com.sudoplay.sudoext.meta.validator.element.IdValidator;
 import com.sudoplay.sudoext.meta.validator.element.JarValidator;
+import com.sudoplay.sudoext.sort.TopologicalSort;
 import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 import com.sudoplay.sudoext.util.RecursiveFileRemovalProcessor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -47,21 +49,20 @@ public class SEServiceBuilder {
   private SEConfig config;
 
   private IContainerCacheFactory containerCacheFactory;
-  private IContainerSorter containerSorter;
   private IMetaFactory metaFactory;
   private IZipFileExtractor compressedCandidateExtractor;
   private IByteCodeTransformer byteCodeTransformer;
 
   private List<IClassFilter> defaultClassLoaderClassFilterList;
   private List<ClassIntercept> defaultClassInterceptList;
-  private List<IMetaElementParser> defaultMetaElementParserList;
+  private List<IMetaElementAdapter<? extends Meta>> defaultMetaElementAdapterList;
   private List<IMetaValidator> defaultMetaValidatorList;
   private List<ICandidateProvider> defaultCandidateLocatorList;
   private List<IFolderLifecycleEventHandler> defaultFolderLifecycleEventHandlerList;
 
   private List<IClassFilter> classLoaderClassFilterList;
   private List<ClassIntercept> classInterceptList;
-  private List<IMetaElementParser> metaElementParserList;
+  private List<IMetaElementAdapter<? extends Meta>> metaElementAdapterList;
   private List<IMetaValidator> metaValidatorList;
   private List<ICandidateProvider> candidateLocatorList;
   private List<IFolderLifecycleEventHandler> folderLifecycleEventHandlerList;
@@ -72,19 +73,13 @@ public class SEServiceBuilder {
     // init user-defined lists
     this.classLoaderClassFilterList = new ArrayList<>();
     this.classInterceptList = new ArrayList<>();
-    this.metaElementParserList = new ArrayList<>();
+    this.metaElementAdapterList = new ArrayList<>();
     this.metaValidatorList = new ArrayList<>();
     this.candidateLocatorList = new ArrayList<>();
     this.folderLifecycleEventHandlerList = new ArrayList<>();
 
-    this.initializeDefaults();
-  }
-
-  private void initializeDefaults() {
-
     // init component objects
     this.containerCacheFactory = new LRUContainerCacheFactory(64);
-    this.containerSorter = new DefaultContainerSorter();
     this.metaFactory = new DefaultMetaFactory();
     this.compressedCandidateExtractor = new ZipFileExtractor();
 
@@ -118,7 +113,7 @@ public class SEServiceBuilder {
     // adds the default candidate locators
     this.defaultCandidateLocatorList = new ArrayList<>();
     this.defaultCandidateLocatorList.add(
-        new CandidateProvider(
+        new FileSystemCandidateProvider(
             new FolderPathListProvider(
                 this.config.getLocation()
             ),
@@ -130,7 +125,7 @@ public class SEServiceBuilder {
         )
     );
     this.defaultCandidateLocatorList.add(
-        new CandidateProvider(
+        new FileSystemCandidateProvider(
             new FileExtensionPathListProvider(
                 this.config.getLocation(),
                 this.config.getCompressedFileExtension()
@@ -152,18 +147,18 @@ public class SEServiceBuilder {
     );
 
     // adds the default meta element parsers
-    this.defaultMetaElementParserList = new ArrayList<>();
-    this.defaultMetaElementParserList.add(new IdParser());
-    this.defaultMetaElementParserList.add(new NameParser());
-    this.defaultMetaElementParserList.add(new AuthorParser());
-    this.defaultMetaElementParserList.add(new VersionParser());
-    this.defaultMetaElementParserList.add(new DescriptionParser());
-    this.defaultMetaElementParserList.add(new OptionalWebsiteParser());
-    this.defaultMetaElementParserList.add(new OptionalApiVersionParser());
-    this.defaultMetaElementParserList.add(new OptionalDependsOnParser(
+    this.defaultMetaElementAdapterList = new ArrayList<>();
+    this.defaultMetaElementAdapterList.add(new IdAdapter());
+    this.defaultMetaElementAdapterList.add(new NameAdapter());
+    this.defaultMetaElementAdapterList.add(new AuthorAdapter());
+    this.defaultMetaElementAdapterList.add(new VersionAdapter());
+    this.defaultMetaElementAdapterList.add(new DescriptionAdapter());
+    this.defaultMetaElementAdapterList.add(new OptionalWebsiteAdapter());
+    this.defaultMetaElementAdapterList.add(new OptionalApiVersionAdapter());
+    this.defaultMetaElementAdapterList.add(new OptionalDependsOnAdapter(
         DependencyContainer::new
     ));
-    this.defaultMetaElementParserList.add(new OptionalJarParser());
+    this.defaultMetaElementAdapterList.add(new OptionalJarAdapter());
 
     // adds the default meta validators
     this.defaultMetaValidatorList = new ArrayList<>();
@@ -228,28 +223,23 @@ public class SEServiceBuilder {
     return this.removeByClass(aClass, this.defaultClassInterceptList);
   }
 
-  public SEServiceBuilder setContainerSorter(IContainerSorter sorter) {
-    this.containerSorter = sorter;
-    return this;
-  }
-
   public SEServiceBuilder setMetaFactory(IMetaFactory metaFactory) {
     this.metaFactory = metaFactory;
     return this;
   }
 
-  public SEServiceBuilder addMetaElementParser(IMetaElementParser parser) {
-    this.metaElementParserList.add(parser);
+  public SEServiceBuilder addMetaElementAdapter(IMetaElementAdapter<? extends Meta> adapter) {
+    this.metaElementAdapterList.add(adapter);
     return this;
   }
 
-  public SEServiceBuilder removeAllDefaultMetaElementParsers() {
-    this.defaultMetaElementParserList.clear();
+  public SEServiceBuilder removeAllDefaultMetaElementAdapters() {
+    this.defaultMetaElementAdapterList.clear();
     return this;
   }
 
-  public SEServiceBuilder removeDefaultMetaElementParser(Class<? extends IMetaElementParser> aClass) {
-    return this.removeByClass(aClass, this.defaultMetaElementParserList);
+  public SEServiceBuilder removeDefaultMetaElementAdapter(Class<? extends IMetaElementAdapter> aClass) {
+    return this.removeByClass(aClass, this.defaultMetaElementAdapterList);
   }
 
   public SEServiceBuilder addMetaValidator(IMetaValidator validator) {
@@ -320,11 +310,11 @@ public class SEServiceBuilder {
     return list.toArray(new ClassIntercept[list.size()]);
   }
 
-  private IMetaElementParser[] getMetaElementParsers() {
-    List<IMetaElementParser> list = new ArrayList<>();
-    list.addAll(this.defaultMetaElementParserList);
-    list.addAll(this.metaElementParserList);
-    return list.toArray(new IMetaElementParser[list.size()]);
+  private IMetaElementAdapter[] getMetaElementAdapters() {
+    List<IMetaElementAdapter<? extends Meta>> list = new ArrayList<>();
+    list.addAll(this.defaultMetaElementAdapterList);
+    list.addAll(this.metaElementAdapterList);
+    return list.toArray(new IMetaElementAdapter[list.size()]);
   }
 
   private IMetaValidator[] getMetaValidators() {
@@ -352,10 +342,6 @@ public class SEServiceBuilder {
     return this.containerCacheFactory;
   }
 
-  private IContainerSorter getContainerSorter() {
-    return this.containerSorter;
-  }
-
   private IMetaFactory getMetaFactory() {
     return this.metaFactory;
   }
@@ -370,31 +356,54 @@ public class SEServiceBuilder {
 
   public SEService create() throws SEServiceInitializationException {
 
-    return new SEService(
-        new FolderLifecycleEventPlugin(
-            this.getFolderLifecycleEventHandlers()
+    ICandidateListProvider candidateListProvider = new CandidateListProvider(
+        this.getCandidateLocators()
+    );
+
+    IContainerListProvider candidateContainerListProvider = new CandidateContainerListProvider(
+        candidateListProvider,
+        new ContainerFactory(
+            this.getContainerCacheFactory()
+        )
+    );
+
+    IContainerListProvider adaptedMetaContainerListProvider = new AdaptedMetaContainerListProvider(
+        candidateContainerListProvider,
+        new MetaAdapter(
+            this.getMetaElementAdapters()
         ),
-        new CandidateListCreator(
-            this.getCandidateLocators()
-        ),
-        new CandidateListConverter(
-            new ContainerFactory(
-                this.getContainerCacheFactory()
-            )
-        ),
-        new ContainerListMetaLoader(
-            new MetaParser(
-                this.getMetaElementParsers()
+        this.getMetaFactory(),
+        new DefaultMetaJsonProvider(
+            new DefaultStringLoader(
+                this.config.getCharset()
             ),
-            this.getMetaFactory(),
+            new DefaultJsonAdapter(),
             this.config.getMetaFilename()
-        ),
-        new ContainerListValidator(
-            new MetaValidator(
-                this.getMetaValidators()
-            )
-        ),
-        this.getContainerSorter(),
+        )
+    );
+
+    IContainerListProvider metaValidatedContainerListProvider = new MetaValidatedContainerListProvider(
+        adaptedMetaContainerListProvider,
+        new MetaValidator(
+            this.getMetaValidators()
+        )
+    );
+
+    IContainerListProvider sortedContainerListProvider = new SortedContainerListProvider(
+        metaValidatedContainerListProvider,
+        new TopologicalSort()
+    );
+
+    IContainerListProvider dependencyValidatedContainerListProvider = new DependencyValidatedContainerListProvider(
+        sortedContainerListProvider
+    );
+
+    IContainerListProvider validContainerListProvider = new ValidContainerListProvider(
+        dependencyValidatedContainerListProvider
+    );
+
+    IContainerListProvider initializedContainerListProvider = new InitializedContainerListProvider(
+        validContainerListProvider,
         new ClassLoaderFactoryProvider(
             new ClassFilterPredicate(
                 this.getClassLoaderClassFilters()
@@ -407,6 +416,17 @@ public class SEServiceBuilder {
         )
     );
 
+    IContainerMapProvider containerMapProvider = new DefaultContainerMapProvider(
+        initializedContainerListProvider,
+        LinkedHashMap::new
+    );
+
+    return new SEService(
+        new FolderLifecycleEventPlugin(
+            this.getFolderLifecycleEventHandlers()
+        ),
+        containerMapProvider.getContainerMap()
+    );
   }
 
   private SEServiceBuilder removeByClass(Class<?> aClass, List<?> list) {

@@ -19,6 +19,7 @@ public class Container {
   private IClassLoaderFactory classLoaderFactory;
   private IClassLoader classLoader;
   private IContainerCache cache;
+  private boolean valid;
 
   public Container(
       Path path,
@@ -26,6 +27,15 @@ public class Container {
   ) {
     this.path = path;
     this.containerCacheFactory = containerCacheFactory;
+    this.valid = false;
+  }
+
+  public boolean isValid() {
+    return this.valid;
+  }
+
+  public void setValid(boolean valid) {
+    this.valid = valid;
   }
 
   public Path getPath() {

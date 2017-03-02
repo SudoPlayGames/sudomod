@@ -34,6 +34,7 @@ package com.sudoplay.sudoext.sort;
  * expand out the cycle.
  */
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class TopologicalSort {
+public final class TopologicalSort implements
+    IDirectedGraphSort {
 
   private static final Logger LOG = LoggerFactory.getLogger(TopologicalSort.class);
 
@@ -55,7 +57,9 @@ public final class TopologicalSort {
    * @return A topological sort of that graph.
    * @throws IllegalArgumentException If the graph is not a DAG.
    */
-  public static <T> List<T> sort(DirectedGraph<T> g) throws CyclicGraphException {
+  @NotNull
+  @Override
+  public <T> List<T> sort(@NotNull DirectedGraph<T> g) throws CyclicGraphException {
         /* Construct the reverse graph from the input graph. */
     DirectedGraph<T> gRev = reverseGraph(g);
 
@@ -74,8 +78,9 @@ public final class TopologicalSort {
     Set<T> expanded = new HashSet<>();
 
         /* Fire off a DFS from each node in the graph. */
-    for (T node : gRev)
+    for (T node : gRev) {
       explore(node, gRev, result, visited, expanded);
+    }
 
         /* Hand back the resulting ordering. */
     return result;
@@ -92,9 +97,12 @@ public final class TopologicalSort {
    * @param visited  A set of nodes that have already been visited.
    * @param expanded A set of nodes that have been fully expanded.
    */
-  private static <T> void explore(T node, DirectedGraph<T> g,
-                                  List<T> ordering, Set<T> visited,
-                                  Set<T> expanded) throws CyclicGraphException {
+  private <T> void explore(
+      T node, DirectedGraph<T> g,
+      List<T> ordering,
+      Set<T> visited,
+      Set<T> expanded
+  ) throws CyclicGraphException {
         /* Check whether we've been here before.  If so, we should stop the
          * search.
          */
@@ -107,21 +115,27 @@ public final class TopologicalSort {
              * and therefore is part of a cycle.  In that case, we should
              * report an error.
              */
-      if (expanded.contains(node)) return;
+      if (expanded.contains(node)) {
+        return;
+      }
 
-      LOG.error("Cyclic dependency detected while sorting the dependency graph");
+      LOG.error("Cycle detected while sorting the graph");
       Set<T> differenceSet = new HashSet<>(visited);
       differenceSet.removeAll(expanded);
-      LOG.error("Cyclic dependency is probably within: {}", differenceSet);
-      throw new CyclicGraphException("Graph contains a cycle.");
+
+      LOG.error("Cycle is probably within: {}", differenceSet);
+      throw new CyclicGraphException(String.format(
+          "Graph contains a cycle. Cycle is probably within: %s", differenceSet.toString()
+      ));
     }
 
         /* Mark that we've been here */
     visited.add(node);
 
         /* Recursively explore all of the node's predecessors. */
-    for (T predecessor : g.edgesFrom(node))
+    for (T predecessor : g.edgesFrom(node)) {
       explore(predecessor, g, ordering, visited, expanded);
+    }
 
         /* Having explored all of the node's predecessors, we can now add this
          * node to the sorted ordering.
@@ -138,19 +152,23 @@ public final class TopologicalSort {
    * @param g A graph to reverse.
    * @return The reverse of that graph.
    */
-  private static <T> DirectedGraph<T> reverseGraph(DirectedGraph<T> g) {
+  private <T> DirectedGraph<T> reverseGraph(DirectedGraph<T> g) {
     DirectedGraph<T> result = new DirectedGraph<>();
 
         /* Add all the nodes from the original graph. */
-    for (T node : g)
+    for (T node : g) {
       result.addNode(node);
+    }
 
         /* Scan over all the edges in the graph, adding their reverse to the
          * reverse graph.
          */
-    for (T node : g)
-      for (T endpoint : g.edgesFrom(node))
+    for (T node : g) {
+
+      for (T endpoint : g.edgesFrom(node)) {
         result.addEdge(endpoint, node);
+      }
+    }
 
     return result;
   }

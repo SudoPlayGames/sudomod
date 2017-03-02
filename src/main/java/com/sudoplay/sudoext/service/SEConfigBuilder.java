@@ -2,6 +2,7 @@ package com.sudoplay.sudoext.service;
 
 import com.sudoplay.sudoext.versioning.DefaultArtifactVersion;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 /**
@@ -44,6 +45,11 @@ public class SEConfigBuilder {
 
   public SEConfigBuilder setApiVersion(String apiVersionString) {
     this.config.apiVersion = new DefaultArtifactVersion(apiVersionString);
+    return this;
+  }
+
+  public SEConfigBuilder setCharset(Charset charset) {
+    this.config.charset = charset;
     return this;
   }
 

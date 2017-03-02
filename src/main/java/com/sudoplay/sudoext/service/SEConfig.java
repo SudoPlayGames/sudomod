@@ -3,6 +3,7 @@ package com.sudoplay.sudoext.service;
 import com.sudoplay.sudoext.versioning.ArtifactVersion;
 import com.sudoplay.sudoext.versioning.DefaultArtifactVersion;
 
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -22,6 +23,8 @@ public class SEConfig {
 
   /* package */ ArtifactVersion apiVersion;
 
+  /* package */ Charset charset;
+
   /* package */ SEConfig() {
 
     // init default paths
@@ -35,6 +38,8 @@ public class SEConfig {
 
     // init default objects
     this.apiVersion = new DefaultArtifactVersion("0");
+
+    this.charset = Charset.forName("UTF-8");
   }
 
   /* package */ Path getDataLocation() {
@@ -59,6 +64,10 @@ public class SEConfig {
 
   /* package */ ArtifactVersion getApiVersion() {
     return this.apiVersion;
+  }
+
+  /* package */ Charset getCharset() {
+    return this.charset;
   }
 
 }

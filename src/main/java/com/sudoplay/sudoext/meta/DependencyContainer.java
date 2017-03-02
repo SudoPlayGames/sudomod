@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.meta;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public class DependencyContainer {
   private List<Dependency> dependentList;
 
   public DependencyContainer() {
-    this.required = new HashSet<>();
+    this.required = new LinkedHashSet<>();
     this.dependencyList = new ArrayList<>();
     this.dependentList = new ArrayList<>();
   }

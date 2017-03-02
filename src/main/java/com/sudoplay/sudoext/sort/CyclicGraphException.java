@@ -4,7 +4,7 @@ package com.sudoplay.sudoext.sort;
  * Created by codetaylor on 2/21/2017.
  */
 public class CyclicGraphException extends
-    Exception {
+    RuntimeException {
 
   public CyclicGraphException() {
   }

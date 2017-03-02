@@ -1,8 +1,7 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
-import com.sudoplay.sudoext.meta.parser.element.DescriptionParser;
+import com.sudoplay.sudoext.meta.parser.IMetaElementAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -19,9 +18,9 @@ public class DescriptionParserTest {
 
     String json = "{ \"description\": \"bring a towel\" }";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new DescriptionParser();
+    IMetaElementAdapter parser = new DescriptionAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
 
     verify(meta, times(1)).setDescription("bring a towel");
   }
@@ -31,8 +30,8 @@ public class DescriptionParserTest {
 
     String json = "{}";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new DescriptionParser();
+    IMetaElementAdapter parser = new DescriptionAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
   }
 }

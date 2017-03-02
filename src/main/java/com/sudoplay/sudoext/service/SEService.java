@@ -1,120 +1,60 @@
 package com.sudoplay.sudoext.service;
 
 import com.sudoplay.sudoext.api.Plugin;
-import com.sudoplay.sudoext.candidate.Candidate;
-import com.sudoplay.sudoext.candidate.ICandidateListCreator;
-import com.sudoplay.sudoext.classloader.IClassLoaderFactoryProvider;
 import com.sudoplay.sudoext.container.Container;
-import com.sudoplay.sudoext.container.ICandidateListConverter;
-import com.sudoplay.sudoext.container.IContainerListValidator;
-import com.sudoplay.sudoext.container.IContainerSorter;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventPlugin;
 import com.sudoplay.sudoext.meta.Dependency;
-import com.sudoplay.sudoext.meta.IContainerListMetaLoader;
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.sort.CyclicGraphException;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 2/20/2017.
  */
 public class SEService {
 
-  private IFolderLifecycleEventPlugin folderLifecycleEventPlugin;
+  private final IFolderLifecycleEventPlugin folderLifecycleEventPlugin;
 
-  private Map<String, Container> containerMap;
-  private List<Container> containerList;
-  private ResourceStringParser resourceStringParser;
+  private final Map<String, Container> containerMap;
 
   @SuppressWarnings("WeakerAccess")
   public SEService(
       IFolderLifecycleEventPlugin folderLifecycleEventPlugin,
-      ICandidateListCreator candidateListCreator,
-      ICandidateListConverter candidateListConverter,
-      IContainerListMetaLoader containerListMetaLoader,
-      IContainerListValidator containerListValidator,
-      IContainerSorter containerSorter,
-      IClassLoaderFactoryProvider classLoaderFactoryProvider
+      Map<String, Container> containerMap
   ) throws SEServiceInitializationException {
-
     this.folderLifecycleEventPlugin = folderLifecycleEventPlugin;
+    this.containerMap = containerMap;
+  }
 
-    List<Candidate> candidateList;
-    List<Container> containerList;
-
+  public void initialize() throws SEServiceInitializationException {
     this.folderLifecycleEventPlugin.initialize();
-
-    // look in the folder and build a list of folders and files that might be valid
-    candidateList = candidateListCreator.createCandidateList();
-
-    // create container list from the candidate list
-    containerList = candidateListConverter.convert(candidateList, new ArrayList<>());
-
-    // load each meta file
-    containerList = containerListMetaLoader.load(containerList, new ArrayList<>());
-
-    // validate each meta file, remove containers that don't validate
-    containerList = containerListValidator.validate(containerList, new ArrayList<>());
-
-    // sort containers
-    try {
-      containerList = containerSorter.sort(containerList, new ArrayList<>());
-
-    } catch (CyclicGraphException e) {
-      // exception is thrown when a cyclic dependency in the graph is detected
-      throw new SEServiceInitializationException("Error initializing service", e);
-    }
-
-    // initialize container collections
-    this.containerList = new ArrayList<>(containerList);
-    this.containerMap = new HashMap<>();
-
-    for (Container container : containerList) {
-      // build the container map
-      this.containerMap.put(
-          container.getMeta().getId(),
-          container
-      );
-    }
-
-    // initialize containers
-    for (Container container : containerList) {
-
-      // init the container's class loader factory
-      container.setClassLoaderFactory(
-          classLoaderFactoryProvider.create(
-              container,
-              this.containerMap
-          )
-      );
-    }
-
-    this.resourceStringParser = new ResourceStringParser();
   }
 
   public void dispose() {
     this.folderLifecycleEventPlugin.dispose();
   }
 
-  public void reloadAll() {
-    this.containerList.forEach(Container::reload);
+  public void reloadAllContainers() {
+    this.containerMap.values().forEach(Container::reload);
   }
 
-  public void reload(String id, boolean reloadDependents) {
+  public void reloadContainer(String id, boolean reloadDependents) {
     Container container;
 
     container = this.getContainer(id);
 
     if (reloadDependents) {
-      this.reloadWithDependents(container, new HashSet<>());
+      this.reloadContainerWithDependents(container, new HashSet<>());
 
     } else {
       container.reload();
     }
   }
 
-  private void reloadWithDependents(Container container, Set<String> reloaded) {
+  private void reloadContainerWithDependents(Container container, Set<String> reloaded) {
     Meta meta;
     List<Dependency> dependentList;
 
@@ -127,7 +67,7 @@ public class SEService {
     for (Dependency dependent : dependentList) {
 
       if (!reloaded.contains(dependent.getId())) {
-        this.reloadWithDependents(this.getContainer(dependent.getId()), reloaded);
+        this.reloadContainerWithDependents(this.getContainer(dependent.getId()), reloaded);
       }
     }
   }
@@ -146,14 +86,14 @@ public class SEService {
     // TODO: swap out id if overridden
 
     container = this.getContainer(resourceLocation.getId());
-    return new PluginReference<>(tClass, resourceLocation.getResourceString(), container);
+    return new PluginReference<>(tClass, resourceLocation.getResource(), container);
   }
 
   private ResourceLocation createResourceLocation(String resourceString) {
     ResourceLocation resourceLocation;
 
     try {
-      resourceLocation = this.resourceStringParser.parse(resourceString);
+      resourceLocation = new ResourceLocation(resourceString);
 
     } catch (ResourceStringParseException e) {
       throw new IllegalArgumentException(String.format("Invalid resource string: %s", resourceString));

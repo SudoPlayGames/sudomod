@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
+import com.sudoplay.sudoext.meta.parser.IMetaElementAdapter;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -17,9 +17,9 @@ public class OptionalWebsiteParserTest {
 
     String json = "{ \"website\": \"www.example.com\" }";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new OptionalWebsiteParser();
+    IMetaElementAdapter parser = new OptionalWebsiteAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
 
     verify(meta, times(1)).setWebsite("www.example.com");
   }
@@ -29,8 +29,8 @@ public class OptionalWebsiteParserTest {
 
     String json = "{}";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new OptionalWebsiteParser();
+    IMetaElementAdapter parser = new OptionalWebsiteAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
   }
 }

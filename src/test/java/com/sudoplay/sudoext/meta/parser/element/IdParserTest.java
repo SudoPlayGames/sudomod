@@ -1,8 +1,7 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
-import com.sudoplay.sudoext.meta.parser.element.IdParser;
+import com.sudoplay.sudoext.meta.parser.IMetaElementAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -19,9 +18,9 @@ public class IdParserTest {
 
     String json = "{ \"id\": \"someid\" }";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new IdParser();
+    IMetaElementAdapter parser = new IdAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
 
     verify(meta, times(1)).setId("someid");
   }
@@ -31,8 +30,8 @@ public class IdParserTest {
 
     String json = "{}";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new IdParser();
+    IMetaElementAdapter parser = new IdAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
   }
 }

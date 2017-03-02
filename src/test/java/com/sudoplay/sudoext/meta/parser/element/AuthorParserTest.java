@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
+import com.sudoplay.sudoext.meta.parser.IMetaElementAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -18,9 +18,9 @@ public class AuthorParserTest {
 
     String json = "{ \"author\": \"codetaylor\" }";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new AuthorParser();
+    IMetaElementAdapter parser = new AuthorAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
 
     verify(meta, times(1)).setAuthor("codetaylor");
   }
@@ -30,8 +30,8 @@ public class AuthorParserTest {
 
     String json = "{}";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new AuthorParser();
+    IMetaElementAdapter parser = new AuthorAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
   }
 }

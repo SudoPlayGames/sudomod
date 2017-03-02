@@ -1,7 +1,5 @@
 package com.sudoplay.sudoext.candidate;
 
-import com.sudoplay.sudoext.candidate.Candidate;
-
 import java.io.IOException;
 import java.util.List;
 

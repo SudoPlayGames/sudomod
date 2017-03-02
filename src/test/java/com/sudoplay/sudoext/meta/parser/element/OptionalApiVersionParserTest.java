@@ -1,9 +1,8 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.MetaParseException;
-import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
-import com.sudoplay.sudoext.meta.parser.element.OptionalApiVersionParser;
+import com.sudoplay.sudoext.meta.MetaAdaptException;
+import com.sudoplay.sudoext.meta.parser.IMetaElementAdapter;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -19,21 +18,21 @@ public class OptionalApiVersionParserTest {
 
     String json = "{ \"api-version\": \"[1,2)\" }";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new OptionalApiVersionParser();
+    IMetaElementAdapter parser = new OptionalApiVersionAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
 
     verify(meta, times(1)).setApiVersionRange(any());
   }
 
-  @Test(expected = MetaParseException.class)
+  @Test(expected = MetaAdaptException.class)
   public void shouldThrowWhenVersionStringIsInvalid() throws Exception {
 
     String json = "{ \"api-version\": \"[1,version)\" }";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new OptionalApiVersionParser();
+    IMetaElementAdapter parser = new OptionalApiVersionAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
   }
 
   @Test
@@ -41,8 +40,8 @@ public class OptionalApiVersionParserTest {
 
     String json = "{}";
     Meta meta = mock(Meta.class);
-    IMetaElementParser parser = new OptionalApiVersionParser();
+    IMetaElementAdapter parser = new OptionalApiVersionAdapter();
 
-    parser.parse(new JSONObject(json), meta);
+    parser.adapt(new JSONObject(json), meta);
   }
 }

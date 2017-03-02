@@ -2,7 +2,7 @@ package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.DependencyContainer;
 import com.sudoplay.sudoext.meta.Meta;
-import com.sudoplay.sudoext.meta.MetaParseException;
+import com.sudoplay.sudoext.meta.MetaAdaptException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -18,37 +18,37 @@ import static org.mockito.Mockito.verify;
  */
 public class OptionalDependsOnTest {
 
-  @Test(expected = MetaParseException.class)
-  public void shouldThrowWhenArrayContainsEmptyString() throws MetaParseException, JSONException {
-    OptionalDependsOnParser parser = new OptionalDependsOnParser(DependencyContainer::new);
+  @Test(expected = MetaAdaptException.class)
+  public void shouldThrowWhenArrayContainsEmptyString() throws MetaAdaptException, JSONException {
+    OptionalDependsOnAdapter parser = new OptionalDependsOnAdapter(DependencyContainer::new);
     JSONObject jsonObject = new JSONObject("{ \"depends-on\": [ \"\" ] }");
-    parser.parse(jsonObject, null);
+    parser.adapt(jsonObject, null);
   }
 
-  @Test(expected = MetaParseException.class)
-  public void shouldThrowWhenArrayContainsDuplicateId() throws MetaParseException, JSONException {
-    OptionalDependsOnParser parser = new OptionalDependsOnParser(DependencyContainer::new);
+  @Test(expected = MetaAdaptException.class)
+  public void shouldThrowWhenArrayContainsDuplicateId() throws MetaAdaptException, JSONException {
+    OptionalDependsOnAdapter parser = new OptionalDependsOnAdapter(DependencyContainer::new);
     JSONObject jsonObject = new JSONObject("{ \"depends-on\": [ \"after:id\", \"before:id@2.3\" ] }");
-    parser.parse(jsonObject, null);
+    parser.adapt(jsonObject, null);
   }
 
   @Test
-  public void shouldNotThrowWhenMissingKey() throws MetaParseException, JSONException {
-    OptionalDependsOnParser parser = new OptionalDependsOnParser(DependencyContainer::new);
+  public void shouldNotThrowWhenMissingKey() throws MetaAdaptException, JSONException {
+    OptionalDependsOnAdapter parser = new OptionalDependsOnAdapter(DependencyContainer::new);
     JSONObject jsonObject = new JSONObject("{}");
-    parser.parse(jsonObject, mock(Meta.class));
+    parser.adapt(jsonObject, mock(Meta.class));
   }
 
   @Test
-  public void shouldNotThrowWhenEmptyArray() throws MetaParseException, JSONException {
-    OptionalDependsOnParser parser = new OptionalDependsOnParser(DependencyContainer::new);
+  public void shouldNotThrowWhenEmptyArray() throws MetaAdaptException, JSONException {
+    OptionalDependsOnAdapter parser = new OptionalDependsOnAdapter(DependencyContainer::new);
     JSONObject jsonObject = new JSONObject("{ \"depends-on\": [] }");
-    parser.parse(jsonObject, mock(Meta.class));
+    parser.adapt(jsonObject, mock(Meta.class));
   }
 
   @Test
-  public void shouldThrowWhenArrayContainsInvalidString() throws MetaParseException, JSONException {
-    OptionalDependsOnParser parser = new OptionalDependsOnParser(DependencyContainer::new);
+  public void shouldThrowWhenArrayContainsInvalidString() throws MetaAdaptException, JSONException {
+    OptionalDependsOnAdapter parser = new OptionalDependsOnAdapter(DependencyContainer::new);
 
     String[] invalidStrings = new String[]{
         "invalid",
@@ -64,19 +64,19 @@ public class OptionalDependsOnTest {
     for (String invalidString : invalidStrings) {
       try {
         JSONObject jsonObject = new JSONObject("{ \"depends-on\": [ \"" + invalidString + "\" ] }");
-        parser.parse(jsonObject, new Meta());
+        parser.adapt(jsonObject, new Meta());
         Assert.fail(invalidString);
 
-      } catch (MetaParseException e) {
+      } catch (MetaAdaptException e) {
         // expected
       }
     }
   }
 
   @Test
-  public void shouldNotThrowWhenArrayContainsValidString() throws MetaParseException, JSONException {
+  public void shouldNotThrowWhenArrayContainsValidString() throws MetaAdaptException, JSONException {
     DependencyContainer dependencyContainer = mock(DependencyContainer.class);
-    OptionalDependsOnParser parser = new OptionalDependsOnParser(() -> dependencyContainer);
+    OptionalDependsOnAdapter parser = new OptionalDependsOnAdapter(() -> dependencyContainer);
 
     String[] invalidStrings = new String[]{
         "after:id@1.0",
@@ -89,9 +89,9 @@ public class OptionalDependsOnTest {
       try {
         JSONObject jsonObject = new JSONObject("{ \"depends-on\": [ \"" + invalidString + "\" ] }");
         Meta store = new Meta();
-        parser.parse(jsonObject, store);
+        parser.adapt(jsonObject, store);
 
-      } catch (MetaParseException e) {
+      } catch (MetaAdaptException e) {
         Assert.fail(invalidString);
       }
     }
