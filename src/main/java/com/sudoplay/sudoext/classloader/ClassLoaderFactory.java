@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 2/21/2017.
@@ -32,7 +33,7 @@ import java.util.List;
 
   /* package */ ClassLoaderFactory(
       Path path,
-      List<String> jarFileList,
+      Set<String> jarFileSet,
       List<Container> dependencyList,
       IClassFilterPredicate classFilterPredicate,
       IClassInterceptor classInterceptor,
@@ -44,13 +45,15 @@ import java.util.List;
     this.classInterceptor = classInterceptor;
     this.byteCodeTransformer = byteCodeTransformer;
     this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
-    int size = jarFileList.size();
+    int size = jarFileSet.size();
     this.urls = new URL[size];
 
-    for (int i = 0; i < size; i++) {
+    int i = 0;
+    for (String jarFile : jarFileSet) {
 
       try {
-        this.urls[i] = path.resolve(jarFileList.get(i)).toUri().toURL();
+        this.urls[i] = path.resolve(jarFile).toUri().toURL();
+        i += 1;
 
       } catch (MalformedURLException e) {
         // this should be prevented by the URL conversion check in the validation phase

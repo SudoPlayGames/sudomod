@@ -2,7 +2,6 @@ package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.meta.MetaParseException;
-import com.sudoplay.sudoext.meta.parser.AbstractMetaElementParser;
 import org.json.JSONObject;
 
 /**

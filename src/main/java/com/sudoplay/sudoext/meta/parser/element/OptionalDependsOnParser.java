@@ -1,8 +1,11 @@
 package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.*;
-import com.sudoplay.sudoext.meta.parser.AbstractMetaElementParser;
+import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
+import com.sudoplay.sudoext.util.StringUtil;
+import com.sudoplay.sudoext.versioning.InvalidVersionSpecificationException;
 import com.sudoplay.sudoext.versioning.VersionRange;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,30 +16,50 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Reads optional depends-on from meta file.
+ * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class OptionalDependsOnParser extends
-    AbstractMetaElementParser {
+public class OptionalDependsOnParser implements
+    IMetaElementParser {
 
   private static final String VERSION_RANGE_ANY = "[0,)";
   private static final String VERSION_STRING_TEMPLATE = "<instruction>:<id>[@<version>]";
 
+  /**
+   * Simple data object used in this class only.
+   */
   private class DependencyString {
+
     String loadOrder;
     String id;
     String versionRange;
   }
 
+  public interface IDependencyContainerFactory {
+    DependencyContainer create();
+  }
+
+  private IDependencyContainerFactory dependencyContainerFactory;
+
+  public OptionalDependsOnParser(IDependencyContainerFactory dependencyContainerFactory) {
+    this.dependencyContainerFactory = dependencyContainerFactory;
+  }
+
   @Override
-  public void parse(JSONObject jsonObject, Meta store) throws MetaParseException {
-    store.setDependencyContainer(this.readDependencyList("depends-on", jsonObject, new DependencyContainer()));
+  public void parse(JSONObject jsonObject, Meta store) throws MetaParseException, JSONException {
+    store.setDependencyContainer(this.readDependencyList(
+        "depends-on",
+        jsonObject,
+        this.dependencyContainerFactory.create())
+    );
   }
 
   private DependencyContainer readDependencyList(
       String key,
       JSONObject jsonObject,
       DependencyContainer store
-  ) throws MetaParseException {
+  ) throws MetaParseException, JSONException {
 
     JSONArray jsonArray;
     Set<String> dependencyIdSet;
@@ -47,12 +70,7 @@ public class OptionalDependsOnParser extends
       return store;
     }
 
-    try {
-      jsonArray = jsonObject.getJSONArray(key);
-
-    } catch (JSONException e) {
-      throw new MetaParseException(String.format("Expected [%s] to be an array", key), e);
-    }
+    jsonArray = jsonObject.getJSONArray(key);
 
     dependencyIdSet = new HashSet<>();
     dependencyStringList = new ArrayList<>();
@@ -61,14 +79,9 @@ public class OptionalDependsOnParser extends
 
       Object value;
 
-      try {
-        value = jsonArray.get(i);
+      value = jsonArray.getString(i);
 
-      } catch (JSONException e) {
-        throw new MetaParseException(String.format("Error parsing array [%s]", key), e);
-      }
-
-      if (!(value instanceof String) || ((String) value).isEmpty()) {
+      if (value == null || ((String) value).isEmpty()) {
         throw new MetaParseException(String.format(
             "Array [%s] must contain non-empty strings only, got: %s", key, value
         ));
@@ -85,32 +98,49 @@ public class OptionalDependsOnParser extends
     }
 
     for (DependencyString dependencyString : dependencyStringList) {
-      Dependency dependency = createDependency(dependencyString);
+
+      Dependency dependency;
+
+      dependency = new Dependency(
+          dependencyString.id,
+          this.readLoadOrder(dependencyString.loadOrder),
+          this.readVersionRange(dependencyString.versionRange)
+      );
+
       store.addDependency(dependency, dependency.getLoadOrder());
     }
 
     return store;
   }
 
-  private DependencyString parseDependencyString(String string) throws MetaParseException {
+  @NotNull
+  private DependencyString parseDependencyString(@NotNull String string) throws MetaParseException {
+
+    if (StringUtil.countOccurrences(string, '@') > 1) {
+      throw new MetaParseException(String.format(
+          "Invalid version string: %s, must be " + VERSION_STRING_TEMPLATE, string)
+      );
+    }
+
+    if (StringUtil.countOccurrences(string, ':') != 1) {
+      throw new MetaParseException(String.format(
+          "Invalid version string: %s, must be " + VERSION_STRING_TEMPLATE, string)
+      );
+    }
+
     DependencyString data = new DependencyString();
     String[] dependencyAndVersion = string.split("@");
 
-    if (dependencyAndVersion.length > 2 || dependencyAndVersion.length < 1) {
-      throw new MetaParseException(String.format("Invalid version string: %s, must be " + VERSION_STRING_TEMPLATE,
-          string));
-    }
-
     if (dependencyAndVersion.length == 1) {
       // the dependency string doesn't contain a version
-      String[] loadOrderAndId = splitIdString(dependencyAndVersion[0]);
+      String[] loadOrderAndId = this.splitIdString(dependencyAndVersion[0]);
 
       data.loadOrder = loadOrderAndId[0];
       data.id = loadOrderAndId[1];
       data.versionRange = VERSION_RANGE_ANY;
 
     } else { // two parts: order/id and version
-      String[] loadOrderAndId = splitIdString(dependencyAndVersion[0]);
+      String[] loadOrderAndId = this.splitIdString(dependencyAndVersion[0]);
       data.loadOrder = loadOrderAndId[0];
       data.id = loadOrderAndId[1];
       data.versionRange = dependencyAndVersion[1];
@@ -118,19 +148,15 @@ public class OptionalDependsOnParser extends
     return data;
   }
 
-  private Dependency createDependency(
-      DependencyString dependencyString
-  ) throws MetaParseException {
-
-    LoadOrder loadOrder = readLoadOrder(dependencyString.loadOrder);
-
-    String errorMessage = "Invalid version range: " + dependencyString.versionRange;
-    VersionRange versionRange = this.parseVersionRange(dependencyString.versionRange, errorMessage);
-
-    return new Dependency(dependencyString.id, loadOrder, versionRange);
-  }
-
-  private String[] splitIdString(String idString) throws MetaParseException {
+  /**
+   * Splits a string of the form '<instruction>:<id>' and returns a string array containing each side.
+   *
+   * @param idString
+   * @return
+   * @throws MetaParseException
+   */
+  @NotNull
+  private String[] splitIdString(@NotNull String idString) throws MetaParseException {
     String[] idSplit = idString.split(":");
 
     // must have two parts: the load order and id
@@ -140,14 +166,25 @@ public class OptionalDependsOnParser extends
     return idSplit;
   }
 
-  private LoadOrder readLoadOrder(String key) throws MetaParseException {
-    LoadOrder loadOrder;
+  @NotNull
+  private LoadOrder readLoadOrder(@NotNull String key) throws MetaParseException {
+
     try {
-      loadOrder = LoadOrder.from(key);
+      return LoadOrder.from(key);
 
     } catch (Exception e) {
       throw new MetaParseException(e);
     }
-    return loadOrder;
+  }
+
+  @NotNull
+  private VersionRange readVersionRange(@NotNull String versionRangeString) throws MetaParseException {
+
+    try {
+      return VersionRange.createFromVersionSpec(versionRangeString);
+
+    } catch (InvalidVersionSpecificationException e) {
+      throw new MetaParseException("Invalid version range: " + versionRangeString, e);
+    }
   }
 }

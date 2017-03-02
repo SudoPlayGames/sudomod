@@ -23,7 +23,7 @@ public class MainPluginMetaValidator implements
 
   @Override
   public boolean isValid(Meta meta, Path path, List<Container> containerList) {
-    //return this.validateMainPlugin(path, meta.getPlugin(), meta.getJarFileList());
+    //return this.validateMainPlugin(path, meta.getPlugin(), meta.getJarFileSet());
     return false;
   }
 

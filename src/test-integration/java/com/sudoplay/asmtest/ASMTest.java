@@ -7,6 +7,7 @@ import com.sudoplay.sudoext.classloader.asm.filter.AllowedJavaLangClassFilter;
 import com.sudoplay.sudoext.classloader.asm.filter.RestrictedTryCatchExceptionClassFilter;
 import com.sudoplay.sudoext.classloader.asm.transform.SEClassVisitor;
 import com.sudoplay.sudoext.classloader.asm.transform.SEMethodVisitorFactory;
+import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -32,12 +33,17 @@ public class ASMTest {
     ClassVisitor classVisitor = new SEClassVisitor(
         classWriter,
         new SEMethodVisitorFactory(
-            new IClassFilter[]{
-                new AllowedJavaLangClassFilter()
-            },
-            new IClassFilter[]{
-                new RestrictedTryCatchExceptionClassFilter()
-            })
+            new ClassFilterPredicate(
+                new IClassFilter[]{
+                    new AllowedJavaLangClassFilter()
+                }
+            ),
+            new ClassFilterPredicate(
+                new IClassFilter[]{
+                    new RestrictedTryCatchExceptionClassFilter()
+                }
+            )
+        )
     );
 
     //classVisitor = new CheckClassAdapter(classVisitor, true);

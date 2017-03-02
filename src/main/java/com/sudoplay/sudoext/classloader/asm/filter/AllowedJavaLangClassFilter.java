@@ -34,6 +34,13 @@ public class AllowedJavaLangClassFilter implements
         Short.class.getName(),
         String.class.getName(),
 
+        // exceptions
+        ClassNotFoundException.class.getName(),
+        Exception.class.getName(),
+        NoClassDefFoundError.class.getName(),
+        RuntimeException.class.getName(),
+        Throwable.class.getName(),
+
         // annotation
         Deprecated.class.getName(),
         Override.class.getName(),

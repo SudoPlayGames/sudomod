@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 2/24/2017.
@@ -21,14 +22,14 @@ public class JarValidator implements
 
   @Override
   public boolean isValid(Meta meta, Path path, List<Container> containerList) {
-    return this.validateJarFileList(path, meta.getJarFileList());
+    return this.validateJarFileSet(path, meta.getJarFileSet());
   }
 
-  private boolean validateJarFileList(Path path, List<String> jarFileList) {
+  private boolean validateJarFileSet(Path path, Set<String> jarFileSet) {
 
     boolean isValid = true;
 
-    for (String jarFileString : jarFileList) {
+    for (String jarFileString : jarFileSet) {
       path = path.resolve(jarFileString);
 
       if (!Files.exists(path)) {

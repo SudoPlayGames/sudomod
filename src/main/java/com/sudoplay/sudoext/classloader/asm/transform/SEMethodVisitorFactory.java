@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.classloader.asm.transform;
 
-import com.sudoplay.sudoext.classloader.filter.IClassFilter;
+import com.sudoplay.sudoext.classloader.filter.IClassFilterPredicate;
 import org.objectweb.asm.MethodVisitor;
 
 /**
@@ -8,22 +8,26 @@ import org.objectweb.asm.MethodVisitor;
  */
 public class SEMethodVisitorFactory implements IMethodVisitorFactory {
 
-  private IClassFilter[] classFilters;
-  private IClassFilter[] catchExceptionClassFilter;
+  private IClassFilterPredicate classFilterPredicate;
+  private IClassFilterPredicate catchExceptionClassFilterPredicate;
 
   public SEMethodVisitorFactory(
-      IClassFilter[] classFilters,
-      IClassFilter[] catchExceptionClassFilter
+      IClassFilterPredicate classFilterPredicate,
+      IClassFilterPredicate catchExceptionClassFilterPredicate
   ) {
-    this.classFilters = classFilters;
-    this.catchExceptionClassFilter = catchExceptionClassFilter;
+    this.classFilterPredicate = classFilterPredicate;
+    this.catchExceptionClassFilterPredicate = catchExceptionClassFilterPredicate;
   }
 
   @Override
   public MethodVisitor create(MethodVisitor methodVisitor) {
     MethodVisitor visitor;
     visitor = new SEMethodVisitor(methodVisitor);
-    visitor = new SEClassFilterMethodVisitor(visitor, this.classFilters, this.catchExceptionClassFilter);
+    visitor = new SEClassFilterMethodVisitor(
+        visitor,
+        this.classFilterPredicate,
+        this.catchExceptionClassFilterPredicate
+    );
     return visitor;
   }
 

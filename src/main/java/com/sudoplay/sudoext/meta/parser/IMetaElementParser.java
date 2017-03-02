@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.meta.parser;
 
-import com.sudoplay.sudoext.meta.MetaParseException;
 import com.sudoplay.sudoext.meta.Meta;
 import org.json.JSONObject;
 
@@ -9,5 +8,5 @@ import org.json.JSONObject;
  */
 public interface IMetaElementParser {
 
-  void parse(JSONObject jsonObject, Meta store) throws MetaParseException;
+  void parse(JSONObject jsonObject, Meta store) throws Exception;
 }

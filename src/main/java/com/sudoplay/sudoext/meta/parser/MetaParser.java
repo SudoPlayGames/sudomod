@@ -6,6 +6,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Validates the meta json string.
  * <p>
@@ -30,6 +33,7 @@ public class MetaParser implements
     LOG.trace("...store=[{}]", store);
 
     JSONObject jsonObject;
+    List<Throwable> throwableList;
 
     try {
       jsonObject = new JSONObject(jsonString);
@@ -38,8 +42,24 @@ public class MetaParser implements
       throw new MetaParseException("Error parsing meta", e);
     }
 
+    throwableList = new ArrayList<>();
+
     for (IMetaElementParser parser : this.elementParsers) {
-      parser.parse(jsonObject, store);
+
+      try {
+        parser.parse(jsonObject, store);
+
+      } catch (Exception e) {
+        throwableList.add(e);
+      }
+    }
+
+    if (!throwableList.isEmpty()) {
+
+      for (Throwable throwable : throwableList) {
+        LOG.error(throwable.getMessage());
+      }
+      throw new MetaParseException(String.format("Caught [%d] error(s) parsing meta", throwableList.size()));
     }
 
     LOG.debug("Leaving parseMetaFile()");

@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.classloader.asm.transform;
 
-import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.asm.exception.RestrictedUseException;
+import com.sudoplay.sudoext.classloader.filter.IClassFilterPredicate;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -15,17 +15,17 @@ import static org.objectweb.asm.Opcodes.ASM5;
 public class SEClassFilterMethodVisitor extends
     MethodVisitor {
 
-  private final IClassFilter[] classFilters;
-  private final IClassFilter[] catchExceptionClassFilters;
+  private final IClassFilterPredicate classFilterPredicate;
+  private final IClassFilterPredicate catchExceptionClassFilterPredicate;
 
   public SEClassFilterMethodVisitor(
       MethodVisitor mv,
-      IClassFilter[] classFilters,
-      IClassFilter[] catchExceptionClassFilters
+      IClassFilterPredicate classFilterPredicate,
+      IClassFilterPredicate catchExceptionClassFilterPredicate
   ) {
     super(ASM5, mv);
-    this.classFilters = classFilters;
-    this.catchExceptionClassFilters = catchExceptionClassFilters;
+    this.classFilterPredicate = classFilterPredicate;
+    this.catchExceptionClassFilterPredicate = catchExceptionClassFilterPredicate;
   }
 
   @Override
@@ -72,7 +72,7 @@ public class SEClassFilterMethodVisitor extends
   private void checkClassFilters(String name) {
     this.checkClassFilters(
         name,
-        this.classFilters,
+        this.classFilterPredicate,
         "Usage of class [%s] is prohibited"
     );
   }
@@ -80,26 +80,16 @@ public class SEClassFilterMethodVisitor extends
   private void checkCatchExceptionClassFilters(String name) {
     this.checkClassFilters(
         name,
-        this.catchExceptionClassFilters,
+        this.catchExceptionClassFilterPredicate,
         "Usage of class [%s] is prohibited in try/catch blocks"
     );
   }
 
-  private void checkClassFilters(String name, IClassFilter[] classFilters, String format) {
-    boolean isAllowed = false;
-
+  private void checkClassFilters(String name, IClassFilterPredicate predicate, String format) {
     name = parseClassName(name);
     name = name.replaceAll("/", ".");
 
-    for (IClassFilter classFilter : classFilters) {
-
-      if (classFilter.isAllowed(name)) {
-        isAllowed = true;
-        break;
-      }
-    }
-
-    if (!isAllowed) {
+    if (!predicate.isAllowed(name)) {
       throw new RestrictedUseException(String.format(format, name));
     }
   }

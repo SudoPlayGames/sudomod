@@ -56,7 +56,7 @@ public class ClassLoaderFactoryProvider implements
 
     return new ClassLoaderFactory(
         container.getPath(),
-        meta.getJarFileList(),
+        meta.getJarFileSet(),
         dependencyList,
         this.filteredClassLoaderPredicate,
         this.classInterceptorFactory.create(container),

@@ -3,7 +3,7 @@ package com.sudoplay.sudoext.meta;
 import com.sudoplay.sudoext.versioning.ArtifactVersion;
 import com.sudoplay.sudoext.versioning.VersionRange;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 2/18/2017.
@@ -18,7 +18,7 @@ public class Meta {
   private String website;
   private VersionRange apiVersionRange;
   private DependencyContainer dependencyContainer;
-  private List<String> jarFileList;
+  private Set<String> jarFileSet;
 
   public void setId(String id) {
     this.id = id;
@@ -52,8 +52,8 @@ public class Meta {
     this.dependencyContainer = dependencyContainer;
   }
 
-  public void setJarFileList(List<String> jarFileList) {
-    this.jarFileList = jarFileList;
+  public void setJarFileSet(Set<String> jarFileSet) {
+    this.jarFileSet = jarFileSet;
   }
 
   public String getId() {
@@ -88,8 +88,8 @@ public class Meta {
     return this.dependencyContainer;
   }
 
-  public List<String> getJarFileList() {
-    return this.jarFileList;
+  public Set<String> getJarFileSet() {
+    return this.jarFileSet;
   }
 
   @Override
@@ -103,7 +103,7 @@ public class Meta {
         ", apiVersionRange=" + this.apiVersionRange +
         ", website='" + this.website + '\'' +
         ", dependencyContainer=" + this.dependencyContainer +
-        ", jarFileList=" + this.jarFileList +
+        ", jarFileSet=" + this.jarFileSet +
         '}';
   }
 }

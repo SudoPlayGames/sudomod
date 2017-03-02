@@ -8,7 +8,7 @@ import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
 import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
-import com.sudoplay.sudoext.classloader.asm.transform.NoOpByteCodeTransformer;
+import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.intercept.*;
@@ -19,6 +19,7 @@ import com.sudoplay.sudoext.folder.IFolderLifecycleEventHandler;
 import com.sudoplay.sudoext.folder.TempFolderLifecycleEventHandler;
 import com.sudoplay.sudoext.meta.ContainerListMetaLoader;
 import com.sudoplay.sudoext.meta.DefaultMetaFactory;
+import com.sudoplay.sudoext.meta.DependencyContainer;
 import com.sudoplay.sudoext.meta.IMetaFactory;
 import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
 import com.sudoplay.sudoext.meta.parser.MetaParser;
@@ -86,7 +87,10 @@ public class SEServiceBuilder {
     this.containerSorter = new DefaultContainerSorter();
     this.metaFactory = new DefaultMetaFactory();
     this.compressedCandidateExtractor = new ZipFileExtractor();
-    this.byteCodeTransformer = new NoOpByteCodeTransformer();
+
+    // init the bytecode transformer
+    this.byteCodeTransformer = new SEByteCodeTransformerBuilder()
+        .create();
 
     // init statics
     RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
@@ -154,10 +158,12 @@ public class SEServiceBuilder {
     this.defaultMetaElementParserList.add(new AuthorParser());
     this.defaultMetaElementParserList.add(new VersionParser());
     this.defaultMetaElementParserList.add(new DescriptionParser());
-    this.defaultMetaElementParserList.add(new OptionalWebsiteParser()); // optional
-    this.defaultMetaElementParserList.add(new OptionalApiVersionParser()); // optional
-    this.defaultMetaElementParserList.add(new OptionalDependsOnParser()); // optional
-    this.defaultMetaElementParserList.add(new OptionalJarParser()); // optional
+    this.defaultMetaElementParserList.add(new OptionalWebsiteParser());
+    this.defaultMetaElementParserList.add(new OptionalApiVersionParser());
+    this.defaultMetaElementParserList.add(new OptionalDependsOnParser(
+        DependencyContainer::new
+    ));
+    this.defaultMetaElementParserList.add(new OptionalJarParser());
 
     // adds the default meta validators
     this.defaultMetaValidatorList = new ArrayList<>();

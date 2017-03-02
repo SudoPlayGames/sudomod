@@ -2,27 +2,29 @@ package com.sudoplay.sudoext.meta.parser.element;
 
 import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.meta.MetaParseException;
-import com.sudoplay.sudoext.meta.parser.AbstractMetaElementParser;
+import com.sudoplay.sudoext.meta.parser.IMetaElementParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
+ * Reads jar from meta file.
+ * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class OptionalJarParser extends
-    AbstractMetaElementParser {
+public class OptionalJarParser implements
+    IMetaElementParser {
 
   @Override
-  public void parse(JSONObject jsonObject, Meta store) throws MetaParseException {
-    store.setJarFileList(this.readJarFileList("jars", jsonObject, new ArrayList<>()));
+  public void parse(JSONObject jsonObject, Meta store) throws MetaParseException, JSONException {
+    store.setJarFileSet(this.readJarFileList("jars", jsonObject, new LinkedHashSet<>()));
   }
 
-  private List<String> readJarFileList(String key, JSONObject jsonObject, List<String> store) throws
-      MetaParseException {
+  private Set<String> readJarFileList(String key, JSONObject jsonObject, Set<String> store) throws
+      MetaParseException, JSONException {
 
     if (!jsonObject.has(key)) {
       return store;
@@ -30,28 +32,22 @@ public class OptionalJarParser extends
 
     JSONArray jsonArray;
 
-    try {
-      jsonArray = jsonObject.getJSONArray(key);
-
-    } catch (JSONException e) {
-      throw new MetaParseException(String.format("Expected [%s] to be an array", key), e);
-    }
+    jsonArray = jsonObject.getJSONArray(key);
 
     for (int i = 0; i < jsonArray.length(); i++) {
 
       Object value;
 
-      try {
-        value = jsonArray.get(i);
+      value = jsonArray.getString(i);
 
-      } catch (JSONException e) {
-        throw new MetaParseException(String.format("Error parsing array [%s]", key), e);
-      }
-
-      if (!(value instanceof String) || ((String) value).isEmpty()) {
+      if (value == null || ((String) value).isEmpty()) {
         throw new MetaParseException(String.format(
             "Array [%s] must contain non-empty strings only, got: %s", key, value
         ));
+      }
+
+      if (store.contains(value)) {
+        throw new MetaParseException(String.format("Duplicate jar file [%s]", value));
       }
 
       store.add((String) value);
