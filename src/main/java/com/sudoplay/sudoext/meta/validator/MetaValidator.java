@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.meta.validator;
 
-import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Meta;
 
 import java.nio.file.Path;
@@ -18,12 +17,12 @@ public class MetaValidator implements IMetaValidator {
   }
 
   @Override
-  public boolean isValid(Meta meta, Path path, List<Container> containerList) {
+  public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
 
     boolean isValid = true;
 
     for (IMetaValidator validator : this.metaValidators) {
-      isValid = validator.isValid(meta, path, containerList) && isValid;
+      isValid = validator.isValid(meta, path, metaList) && isValid;
     }
 
     return isValid;

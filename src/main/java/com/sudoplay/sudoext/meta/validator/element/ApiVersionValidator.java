@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.meta.validator.element;
 
-import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.meta.validator.IMetaValidator;
 import com.sudoplay.sudoext.versioning.ArtifactVersion;
@@ -26,7 +25,7 @@ public class ApiVersionValidator implements
   }
 
   @Override
-  public boolean isValid(Meta meta, Path path, List<Container> containerList) {
+  public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
     return this.validateApiVersion(meta.getApiVersionRange());
   }
 

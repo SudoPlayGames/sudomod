@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.meta.validator.element;
 
-import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.meta.validator.IMetaValidator;
 import org.slf4j.Logger;
@@ -21,11 +20,11 @@ public class JarValidator implements
   private static final Logger LOG = LoggerFactory.getLogger(JarValidator.class);
 
   @Override
-  public boolean isValid(Meta meta, Path path, List<Container> containerList) {
+  public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
     return this.validateJarFileSet(path, meta.getJarFileSet());
   }
 
-  private boolean validateJarFileSet(Path path, Set<String> jarFileSet) {
+  /* package */ boolean validateJarFileSet(Path path, Set<String> jarFileSet) {
 
     boolean isValid = true;
 

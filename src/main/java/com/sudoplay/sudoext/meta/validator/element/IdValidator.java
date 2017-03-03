@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.meta.validator.element;
 
-import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.meta.validator.IMetaValidator;
 import org.slf4j.Logger;
@@ -18,25 +17,25 @@ public class IdValidator implements
   private static final Logger LOG = LoggerFactory.getLogger(IdValidator.class);
 
   @Override
-  public boolean isValid(Meta meta, Path path, List<Container> containerList) {
+  public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
 
     String id = meta.getId();
 
     if (id == null || id.isEmpty()) {
-      LOG.error("Meta [id] is invalid: %s; must not be empty or null, valid characters are a-z 0-9 - _", id);
+      LOG.error("Meta [id] is invalid: [{}]; must not be empty or null, valid characters are: a-z 0-9 - _", id);
       return false;
     }
 
     if (id.replaceAll("[a-z0-9-_]", "").length() > 0) {
-      LOG.error("Meta [id] is invalid: %s; must not be empty or null, valid characters are a-z 0-9 - _", id);
+      LOG.error("Meta [id] is invalid: [{}]; must not be empty or null, valid characters are: a-z 0-9 - _", id);
       return false;
     }
 
     int idCount = 0;
 
-    for (Container container : containerList) {
+    for (Meta m : metaList) {
 
-      if (id.equals(container.getMeta().getId())) {
+      if (id.equals(m.getId())) {
         idCount += 1;
       }
     }

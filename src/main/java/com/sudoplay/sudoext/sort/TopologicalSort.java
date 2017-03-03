@@ -43,8 +43,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class TopologicalSort implements
-    IDirectedGraphSort {
+public final class TopologicalSort<T> implements
+    IDirectedGraphSort<T> {
 
   private static final Logger LOG = LoggerFactory.getLogger(TopologicalSort.class);
 
@@ -59,7 +59,7 @@ public final class TopologicalSort implements
    */
   @NotNull
   @Override
-  public <T> List<T> sort(@NotNull DirectedGraph<T> g) throws CyclicGraphException {
+  public List<T> sort(@NotNull DirectedGraph<T> g) throws CyclicGraphException {
         /* Construct the reverse graph from the input graph. */
     DirectedGraph<T> gRev = reverseGraph(g);
 
@@ -97,7 +97,7 @@ public final class TopologicalSort implements
    * @param visited  A set of nodes that have already been visited.
    * @param expanded A set of nodes that have been fully expanded.
    */
-  private <T> void explore(
+  private void explore(
       T node, DirectedGraph<T> g,
       List<T> ordering,
       Set<T> visited,
@@ -152,7 +152,7 @@ public final class TopologicalSort implements
    * @param g A graph to reverse.
    * @return The reverse of that graph.
    */
-  private <T> DirectedGraph<T> reverseGraph(DirectedGraph<T> g) {
+  private DirectedGraph<T> reverseGraph(DirectedGraph<T> g) {
     DirectedGraph<T> result = new DirectedGraph<>();
 
         /* Add all the nodes from the original graph. */

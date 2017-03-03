@@ -1,8 +1,6 @@
 package com.sudoplay.sudoext.meta.validator.element;
 
-import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.meta.Dependency;
-import com.sudoplay.sudoext.meta.DependencyContainer;
 import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.meta.validator.IMetaValidator;
 import com.sudoplay.sudoext.versioning.ArtifactVersion;
@@ -11,7 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by codetaylor on 2/24/2017.
@@ -22,92 +23,81 @@ public class DependsOnValidator implements
   private static final Logger LOG = LoggerFactory.getLogger(DependsOnValidator.class);
 
   @Override
-  public boolean isValid(Meta meta, Path path, List<Container> containerList) {
-    return this.validateDependsOn(meta.getId(), meta.getDependencyContainer(), containerList);
+  public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
+
+    Map<String, Meta> metaMap = new LinkedHashMap<>();
+
+    for (Meta m : metaList) {
+      metaMap.put(m.getId(), m);
+    }
+
+    boolean isValid;
+    String id = meta.getId();
+
+    isValid = this.validateRequired(id, meta.getRequiredDependencySet(), metaMap);
+    isValid = this.validateSoft(id, meta.getLoadAfterDependencySet(), metaMap) && isValid;
+    isValid = this.validateSoft(id, meta.getLoadBeforeDependencySet(), metaMap) && isValid;
+
+    return isValid;
   }
 
-  private boolean validateDependsOn(
+  /* package */ boolean validateRequired(
       String id,
-      DependencyContainer dependencyContainer,
-      List<Container> containerList
+      Collection<Dependency> dependencyCollection,
+      Map<String, Meta> metaMap
   ) {
     boolean isValid = true;
 
-    for (Dependency dependency : dependencyContainer.getRequired()) {
+    for (Dependency dependency : dependencyCollection) {
       String dependencyId = dependency.getId();
       VersionRange versionRange = dependency.getVersionRange();
-      isValid = this.validateRequiredDependency(id, containerList, dependencyId, versionRange) && isValid;
-    }
+      Meta meta = metaMap.get(dependencyId);
 
-    for (Dependency dependency : dependencyContainer.getDependencyList()) {
-      String dependencyId = dependency.getId();
-      VersionRange versionRange = dependency.getVersionRange();
-      isValid = this.validateSoftDependency(id, containerList, dependencyId, versionRange) && isValid;
-    }
+      if (meta != null) {
+        ArtifactVersion version = meta.getVersion();
 
-    for (Dependency dependency : dependencyContainer.getDependentList()) {
-      String dependencyId = dependency.getId();
-      VersionRange versionRange = dependency.getVersionRange();
-      isValid = this.validateSoftDependency(id, containerList, dependencyId, versionRange) && isValid;
+        if (!versionRange.containsVersion(version)) {
+          isValid = false;
+          LOG.error(
+              "[{}] requires version {} of [{}], found incompatible version [{}]",
+              id, versionRange, meta.getId(), version
+          );
+        }
+
+      } else {
+        isValid = false;
+        LOG.error("[{}] is missing a required dependency, [{}]", id, dependencyId);
+      }
     }
 
     return isValid;
   }
 
-  private boolean validateRequiredDependency(
+  /* package */ boolean validateSoft(
       String id,
-      List<Container> containerList,
-      String dependencyId,
-      VersionRange versionRange
+      Collection<Dependency> dependencyCollection,
+      Map<String, Meta> metaMap
   ) {
+    boolean isValid = true;
 
-    for (Container container : containerList) {
-      String candidateId = container.getMeta().getId();
+    for (Dependency dependency : dependencyCollection) {
+      String dependencyId = dependency.getId();
+      VersionRange versionRange = dependency.getVersionRange();
+      Meta meta = metaMap.get(dependencyId);
 
-      if (dependencyId.equals(candidateId)) {
-        ArtifactVersion candidateVersion = container.getMeta().getVersion();
+      if (meta != null) {
+        ArtifactVersion version = meta.getVersion();
 
-        if (versionRange.containsVersion(candidateVersion)) {
-          return true;
-
-        } else {
-          LOG.error("[{}] requires version {} of [{}], found incompatible version [{}]",
-              id, versionRange, dependencyId, candidateVersion
+        if (!versionRange.containsVersion(version)) {
+          isValid = false;
+          LOG.error(
+              "[{}] requires version {} of [{}], found incompatible version [{}]",
+              id, versionRange, meta.getId(), version
           );
-          return false;
         }
       }
     }
 
-    LOG.error("[{}] is missing a required dependency, [{}]", id, dependencyId);
-    return false;
-  }
-
-  private boolean validateSoftDependency(
-      String id,
-      List<Container> containerList,
-      String dependencyId,
-      VersionRange versionRange
-  ) {
-
-    for (Container container : containerList) {
-      String candidateId = container.getMeta().getId();
-
-      if (dependencyId.equals(candidateId)) {
-        ArtifactVersion candidateVersion = container.getMeta().getVersion();
-
-        if (versionRange.containsVersion(candidateVersion)) {
-          return true;
-
-        } else {
-          LOG.error("[{}] requires version {} of [{}], found incompatible version [{}]",
-              id, versionRange, dependencyId, candidateVersion
-          );
-          return false;
-        }
-      }
-    }
-
-    return true;
+    return isValid;
   }
 }

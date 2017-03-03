@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext.classloader;
 
-import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
+import com.sudoplay.sudoext.container.Container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 /* package */ class DependencyClassLoader extends
     ClassLoader implements
-    IClassLoader,
+    ISEClassLoader,
     ISandboxClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(DependencyClassLoader.class);
@@ -52,13 +52,12 @@ import java.util.List;
 
         // invoke dependency class loaders
         for (Container container : this.containerList) {
-          IClassLoader classLoader = container.getClassLoader();
 
           try {
-            c = classLoader.loadClassWithoutDependencyCheck(name);
+            c = container.loadClassWithoutDependencyCheck(name);
 
           } catch (ClassNotFoundException e) {
-            LOG.trace("Class [{}] not found by [{}]", name, classLoader.getClass());
+            LOG.trace("Class [{}] not found by [{}]", name, container);
           }
 
           if (c != null) {
@@ -91,8 +90,8 @@ import java.util.List;
 
         if (parent != null) {
 
-          if (parent instanceof IClassLoader) {
-            c = ((IClassLoader) parent).loadClassWithoutDependencyCheck(name);
+          if (parent instanceof ISEClassLoader) {
+            c = ((ISEClassLoader) parent).loadClassWithoutDependencyCheck(name);
 
           } else {
             c = parent.loadClass(name);
@@ -103,6 +102,10 @@ import java.util.List;
       }
 
       // skip dependency check
+
+      if (c == null) {
+        throw new ClassNotFoundException(name);
+      }
 
       return c;
     }

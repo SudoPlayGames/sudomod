@@ -19,6 +19,7 @@ public class PluginReference<P extends Plugin> {
   }
 
   public P get() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+    this.container.getCallbackDelegate().reset();
     return this.container.get(this.resourceString, this.pClass);
   }
 }

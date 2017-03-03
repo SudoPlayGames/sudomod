@@ -4,13 +4,11 @@ import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.filter.IClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.intercept.IClassInterceptorFactory;
 import com.sudoplay.sudoext.container.Container;
-import com.sudoplay.sudoext.meta.Dependency;
-import com.sudoplay.sudoext.meta.Meta;
 import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 2/23/2017.
@@ -37,29 +35,17 @@ public class ClassLoaderFactoryProvider implements
 
   @Override
   public IClassLoaderFactory create(
-      Container container,
-      Map<String, Container> containerMap
+      String id,
+      Path path,
+      Set<String> jarFileSet,
+      List<Container> dependencyList
   ) {
-    Meta meta = container.getMeta();
-
-    // build the dependency list
-    List<Container> dependencyList = new ArrayList<>();
-
-    for (Dependency dependency : meta.getDependencyContainer().getDependencyList()) {
-      String dependencyId = dependency.getId();
-      Container dependencyContainer = containerMap.get(dependencyId);
-
-      if (dependencyContainer != null) {
-        dependencyList.add(dependencyContainer);
-      }
-    }
-
     return new ClassLoaderFactory(
-        container.getPath(),
-        meta.getJarFileSet(),
+        path,
+        jarFileSet,
         dependencyList,
         this.filteredClassLoaderPredicate,
-        this.classInterceptorFactory.create(container),
+        this.classInterceptorFactory.create(id),
         this.byteCodeTransformer,
         this.inputStreamByteArrayConverter
     );

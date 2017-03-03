@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * This cache maintains a LRU cache for all plugins loaded.
+ * This cache maintains a LRU cache for all plugins loaded in a container.
  * <p>
  * Created by codetaylor on 2/22/2017.
  */

@@ -178,6 +178,7 @@ public class BudgetCallbackDelegate implements
 
   private long getClassAllocation(String type) {
     LOG.debug("getClassAllocation(): " + type);
+    // TODO
     return 8;
   }
 
@@ -272,7 +273,7 @@ public class BudgetCallbackDelegate implements
 
   @Override
   public void callback_TRYCATCH(String type) {
-    throw new RestrictedUseException("Usage of try/catch block is prohibited in extensions");
+    //throw new RestrictedUseException("Usage of try/catch block is prohibited in extensions");
   }
 
   @Override

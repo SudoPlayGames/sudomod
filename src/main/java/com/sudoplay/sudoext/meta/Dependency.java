@@ -11,10 +11,6 @@ public class Dependency {
   private LoadOrder loadOrder;
   private VersionRange versionRange;
 
-  public Dependency(String id, LoadOrder loadOrder) {
-    this(id, loadOrder, null);
-  }
-
   public Dependency(String id, LoadOrder loadOrder, VersionRange versionRange) {
     this.id = id;
     this.loadOrder = loadOrder;

@@ -1,58 +1,45 @@
 package com.sudoplay.sudoext.container;
 
 import com.sudoplay.sudoext.api.Plugin;
-import com.sudoplay.sudoext.classloader.IClassLoader;
+import com.sudoplay.sudoext.classloader.ISEClassLoader;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactory;
-import com.sudoplay.sudoext.meta.Meta;
-
-import java.nio.file.Path;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
 
 /**
  * Created by codetaylor on 2/20/2017.
  */
 public class Container {
 
-  private Path path;
+  private String id;
   private IContainerCacheFactory containerCacheFactory;
-
-  private Meta meta;
   private IClassLoaderFactory classLoaderFactory;
-  private IClassLoader classLoader;
+  private PluginInstantiator pluginInstantiator;
+  private ICallbackDelegate callbackDelegate;
+  private ISEClassLoader classLoader;
   private IContainerCache cache;
-  private boolean valid;
 
   public Container(
-      Path path,
-      IContainerCacheFactory containerCacheFactory
+      String id,
+      IContainerCacheFactory containerCacheFactory,
+      PluginInstantiator pluginInstantiator,
+      ICallbackDelegate callbackDelegate
   ) {
-    this.path = path;
+    this.id = id;
     this.containerCacheFactory = containerCacheFactory;
-    this.valid = false;
+    this.pluginInstantiator = pluginInstantiator;
+    this.callbackDelegate = callbackDelegate;
   }
 
-  public boolean isValid() {
-    return this.valid;
+  public String getId() {
+    return this.id;
   }
 
-  public void setValid(boolean valid) {
-    this.valid = valid;
+  public ICallbackDelegate getCallbackDelegate() {
+    return this.callbackDelegate;
   }
 
-  public Path getPath() {
-    return this.path;
-  }
-
-  public void setMeta(Meta meta) {
-    this.meta = meta;
-  }
-
-  public Meta getMeta() {
-    return this.meta;
-  }
-
-  public void setClassLoaderFactory(IClassLoaderFactory classLoaderFactory) {
+  /* package */ void setClassLoaderFactory(IClassLoaderFactory classLoaderFactory) {
     this.classLoaderFactory = classLoaderFactory;
-    this.reload();
   }
 
   public void reload() {
@@ -60,36 +47,36 @@ public class Container {
     this.classLoader = this.classLoaderFactory.create();
   }
 
-  public IClassLoader getClassLoader() {
-    return this.classLoader;
+  public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
+    return this.classLoader.loadClassWithoutDependencyCheck(name);
   }
 
-  public <T extends Plugin> T get(String resourceString, Class<T> tClass) throws ClassNotFoundException,
+  public <P extends Plugin> P get(String resourceString, Class<P> tClass) throws ClassNotFoundException,
       IllegalAccessException, InstantiationException {
     return this.get(resourceString, tClass, true);
   }
 
-  public <T extends Plugin> T get(String resourceString, Class<T> tClass, boolean useDependencyCheck) throws
+  public <P extends Plugin> P get(String resourceString, Class<P> pClass, boolean useDependencyCheck) throws
       ClassNotFoundException, IllegalAccessException, InstantiationException {
 
-    Class<T> aClass;
+    Class<P> aClass;
 
     if (useDependencyCheck) {
       //noinspection unchecked
-      aClass = (Class<T>) this.classLoader.loadClass(resourceString);
+      aClass = (Class<P>) this.classLoader.loadClass(resourceString);
 
     } else {
       //noinspection unchecked
-      aClass = (Class<T>) this.classLoader.loadClassWithoutDependencyCheck(resourceString);
+      aClass = (Class<P>) this.classLoader.loadClassWithoutDependencyCheck(resourceString);
     }
 
     Object obj;
 
     if ((obj = this.cache.get(aClass)) != null) {
-      return tClass.cast(obj);
+      return pClass.cast(obj);
     }
 
-    T newPluginInstance = aClass.newInstance();
+    P newPluginInstance = this.pluginInstantiator.instantiate(aClass);
 
     this.cache.put(aClass, newPluginInstance);
 
@@ -98,6 +85,6 @@ public class Container {
 
   @Override
   public String toString() {
-    return "Container[" + (this.meta == null ? "?" : this.meta.getId()) + "]";
+    return "Container[" + this.id + "]";
   }
 }

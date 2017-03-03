@@ -3,12 +3,20 @@ package com.sudoplay.sudoext.meta;
 import com.sudoplay.sudoext.versioning.ArtifactVersion;
 import com.sudoplay.sudoext.versioning.VersionRange;
 
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * Created by codetaylor on 2/18/2017.
  */
 public class Meta {
+
+  private Path parentPath;
+  private Path path;
+
+  private boolean valid;
 
   private String id;
   private String name;
@@ -17,8 +25,36 @@ public class Meta {
   private String description;
   private String website;
   private VersionRange apiVersionRange;
-  private DependencyContainer dependencyContainer;
+
   private Set<String> jarFileSet;
+  private Set<Dependency> requiredDependencySet;
+  private Set<Dependency> loadAfterDependencySet;
+  private Set<Dependency> loadBeforeDependencySet;
+
+  public Meta(Path parentPath, Path path) {
+    this.parentPath = parentPath;
+    this.path = path;
+    this.valid = true;
+    this.requiredDependencySet = new LinkedHashSet<>();
+    this.loadAfterDependencySet = new LinkedHashSet<>();
+    this.loadBeforeDependencySet = new LinkedHashSet<>();
+  }
+
+  public Path getParentPath() {
+    return this.parentPath;
+  }
+
+  public Path getPath() {
+    return this.path;
+  }
+
+  public boolean isValid() {
+    return this.valid;
+  }
+
+  public void setValid(boolean valid) {
+    this.valid = valid;
+  }
 
   public void setId(String id) {
     this.id = id;
@@ -46,10 +82,6 @@ public class Meta {
 
   public void setWebsite(String website) {
     this.website = website;
-  }
-
-  public void setDependencyContainer(DependencyContainer dependencyContainer) {
-    this.dependencyContainer = dependencyContainer;
   }
 
   public void setJarFileSet(Set<String> jarFileSet) {
@@ -84,8 +116,50 @@ public class Meta {
     return this.website;
   }
 
-  public DependencyContainer getDependencyContainer() {
-    return this.dependencyContainer;
+  public void addDependency(Dependency dependency) {
+    LoadOrder loadOrder = dependency.getLoadOrder();
+
+    switch (loadOrder) {
+      case RequiredBefore:
+        this.requiredDependencySet.add(dependency);
+        this.loadBeforeDependencySet.add(dependency);
+        break;
+
+      case RequiredAfter:
+        this.requiredDependencySet.add(dependency);
+        this.loadAfterDependencySet.add(dependency);
+        break;
+
+      case Before:
+        this.loadBeforeDependencySet.add(dependency);
+        break;
+
+      case After:
+        this.loadAfterDependencySet.add(dependency);
+        break;
+
+      default:
+        // should never happen
+        throw new IllegalArgumentException(String.format("Unrecognized load order enum: %s", loadOrder));
+    }
+  }
+
+  public Set<Dependency> getRequiredDependencySet() {
+    return this.requiredDependencySet;
+  }
+
+  public Set<Dependency> getLoadAfterDependencySet() {
+    return this.loadAfterDependencySet;
+  }
+
+  public Set<Dependency> getLoadBeforeDependencySet() {
+    return this.loadBeforeDependencySet;
+  }
+
+  public <C extends Collection<Dependency>> C getAllDependencies(C store) {
+    store.addAll(this.loadBeforeDependencySet);
+    store.addAll(this.loadAfterDependencySet);
+    return store;
   }
 
   public Set<String> getJarFileSet() {
@@ -94,16 +168,6 @@ public class Meta {
 
   @Override
   public String toString() {
-    return "Meta{" +
-        "id='" + this.id + '\'' +
-        ", name='" + this.name + '\'' +
-        ", author='" + this.author + '\'' +
-        ", version=" + this.version +
-        ", description='" + this.description + '\'' +
-        ", apiVersionRange=" + this.apiVersionRange +
-        ", website='" + this.website + '\'' +
-        ", dependencyContainer=" + this.dependencyContainer +
-        ", jarFileSet=" + this.jarFileSet +
-        '}';
+    return this.id;
   }
 }

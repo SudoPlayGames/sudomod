@@ -3,13 +3,8 @@ package com.sudoplay.sudoext.service;
 import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventPlugin;
-import com.sudoplay.sudoext.meta.Dependency;
-import com.sudoplay.sudoext.meta.Meta;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by codetaylor on 2/20/2017.
@@ -17,7 +12,6 @@ import java.util.Set;
 public class SEService {
 
   private final IFolderLifecycleEventPlugin folderLifecycleEventPlugin;
-
   private final Map<String, Container> containerMap;
 
   @SuppressWarnings("WeakerAccess")
@@ -31,6 +25,7 @@ public class SEService {
 
   public void initialize() throws SEServiceInitializationException {
     this.folderLifecycleEventPlugin.initialize();
+    this.reloadAllContainers();
   }
 
   public void dispose() {
@@ -41,39 +36,10 @@ public class SEService {
     this.containerMap.values().forEach(Container::reload);
   }
 
-  public void reloadContainer(String id, boolean reloadDependents) {
+  public void reloadContainer(String id) {
     Container container;
-
     container = this.getContainer(id);
-
-    if (reloadDependents) {
-      this.reloadContainerWithDependents(container, new HashSet<>());
-
-    } else {
-      container.reload();
-    }
-  }
-
-  private void reloadContainerWithDependents(Container container, Set<String> reloaded) {
-    Meta meta;
-    List<Dependency> dependentList;
-
-    meta = container.getMeta();
-    dependentList = meta.getDependencyContainer().getDependentList();
-
     container.reload();
-    reloaded.add(meta.getId());
-
-    for (Dependency dependent : dependentList) {
-
-      if (!reloaded.contains(dependent.getId())) {
-        this.reloadContainerWithDependents(this.getContainer(dependent.getId()), reloaded);
-      }
-    }
-  }
-
-  public <M extends Meta> M getMeta(String containerId, Class<M> metaClass) {
-    return metaClass.cast(this.getContainer(containerId).getMeta());
   }
 
   public <T extends Plugin> PluginReference<T> getPlugin(String resourceString, Class<T> tClass) {
@@ -82,8 +48,6 @@ public class SEService {
 
   private <T extends Plugin> PluginReference<T> getPlugin(ResourceLocation resourceLocation, Class<T> tClass) {
     Container container;
-
-    // TODO: swap out id if overridden
 
     container = this.getContainer(resourceLocation.getId());
     return new PluginReference<>(tClass, resourceLocation.getResource(), container);

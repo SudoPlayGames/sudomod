@@ -13,7 +13,7 @@ import java.net.URLClassLoader;
  */
 /* package */ class JarClassLoader extends
     URLClassLoader implements
-    IClassLoader,
+    ISEClassLoader,
     ISandboxClassLoader {
 
   private final IByteCodeTransformer byteCodeTransformer;

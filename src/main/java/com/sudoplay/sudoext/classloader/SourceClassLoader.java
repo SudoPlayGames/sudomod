@@ -17,7 +17,7 @@ import java.util.Map;
  */
 /* package */ class SourceClassLoader extends
     JavaSourceClassLoader implements
-    IClassLoader,
+    ISEClassLoader,
     ISandboxClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(SourceClassLoader.class);
@@ -55,8 +55,8 @@ import java.util.Map;
 
           if (parent != null) {
 
-            if (parent instanceof IClassLoader) {
-              c = ((IClassLoader) parent).loadClassWithoutDependencyCheck(name);
+            if (parent instanceof ISEClassLoader) {
+              c = ((ISEClassLoader) parent).loadClassWithoutDependencyCheck(name);
 
             } else {
               c = parent.loadClass(name);

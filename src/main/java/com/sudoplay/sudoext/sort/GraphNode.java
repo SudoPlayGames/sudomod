@@ -3,7 +3,7 @@ package com.sudoplay.sudoext.sort;
 /**
  * Created by codetaylor on 2/21/2017.
  */
-public class GraphNode {
+public class GraphNode<T> {
 
   private Object wrappedObject;
 
@@ -15,7 +15,7 @@ public class GraphNode {
     this.wrappedObject = wrappedObject;
   }
 
-  public <T> T get() {
+  public T get() {
     //noinspection unchecked
     return (T) this.wrappedObject;
   }

@@ -14,9 +14,10 @@ Meta:
   ☐ Rename meta parsers to adapters; also rename variable names in tests
 
 Security:
-  ☐ Should we attempt bytecode transformation to further sandbox the plugin code?
+  ✔ Should we attempt bytecode transformation to further sandbox the plugin code? Yes. @done (17-03-03 15:25)
     http://www.java-gaming.org/index.php?;topic=31183.0
     https://github.com/lihaoyi/6858
+  ☐ Finish class byte usage in budget callback delegate
 
 File Access:
   ☐ Sandbox mod file access into the data folder
@@ -27,6 +28,7 @@ Configuration:
   ☐ Provide simple configuration file framework
     We're going to go with json. Using the modified org.json classes, json config files can support comments.
     Where should the config files be stored?
+      We'll do a read-only json file access api targeted at the containers path. Mods can ship with a config file that can be edited by the end-user.
   ✔ Move "mod-plugin" @done (17-02-24 11:34)
     A mod-plugin is simply an extension of plugin and should be treated as such.
   ✔ Split Config and builder into (SEConfig / SEConfigBuilder) and SEServiceBuilder @done (17-02-24 11:34)
