@@ -33,16 +33,15 @@ public class InitializedContainerMapProvider implements
   @Override
   public Map<String, Container> getContainerMap() {
     Map<String, Container> containerMap;
-    String id;
 
     containerMap = this.containerMapProvider.getContainerMap();
 
     for (Meta meta : this.metaListProvider.getMetaList()) {
-      id = meta.getId();
+      Container container = containerMap.get(meta.getId());
 
       // set the class loader factory
-      containerMap.get(id).setClassLoaderFactory(this.classLoaderFactoryProvider.create(
-          id,
+      container.setClassLoaderFactory(this.classLoaderFactoryProvider.create(
+          container,
           meta.getParentPath(),
           meta.getJarFileSet(),
           this.dependencyContainerListMapper.getDependencyContainerList(

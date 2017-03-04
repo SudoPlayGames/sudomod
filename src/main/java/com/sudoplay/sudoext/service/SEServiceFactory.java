@@ -3,7 +3,8 @@ package com.sudoplay.sudoext.service;
 import com.sudoplay.sudoext.candidate.CandidateListProvider;
 import com.sudoplay.sudoext.candidate.ICandidateProvider;
 import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
-import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
+import com.sudoplay.sudoext.classloader.asm.callback.InjectedCallback;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
@@ -35,7 +36,7 @@ import java.nio.charset.Charset;
       IContainerCacheFactory containerCacheFactory,
       IClassFilter[] classLoaderClassFilters,
       ClassIntercept[] classIntercepts,
-      ICallbackDelegateFactory callbackDelegateFactory,
+      ICallbackDelegate callbackDelegate,
       IByteCodeTransformer byteCodeTransformer,
       IFolderLifecycleEventHandler[] folderLifecycleEventHandlers,
       Charset charset,
@@ -46,6 +47,7 @@ import java.nio.charset.Charset;
     ChainedMetaListProcessor processor;
     IContainerMapProvider containerMapProvider;
 
+    // adapts meta
     processor = new AdaptedMetaListProcessor(
         null,
         new MetaAdapter(
@@ -55,11 +57,11 @@ import java.nio.charset.Charset;
             new DefaultStringLoader(
                 charset
             ),
-            new DefaultJsonAdapter(),
-            metaFilename
+            new DefaultJsonAdapter()
         )
     );
 
+    // validates meta
     processor = new ValidatedMetaListProcessor(
         processor,
         new MetaValidator(
@@ -67,19 +69,23 @@ import java.nio.charset.Charset;
         )
     );
 
+    // sorts meta
     processor = new SortedMetaListProcessor(
         processor,
         new TopologicalSort<>()
     );
 
+    // validates dependencies
     processor = new DependencyValidatedMetaListProcessor(
         processor
     );
 
+    // prunes invalid meta
     processor = new PruneInvalidMetaListProcessor(
         processor
     );
 
+    // turns candidate into meta
     metaListProvider = new MetaListProvider(
         new CandidateListProvider(
             candidateLocators
@@ -88,16 +94,21 @@ import java.nio.charset.Charset;
         metaFilename
     );
 
+    // caches the meta list for multiple calls to this provider
     metaListProvider = new CachedMetaListProvider(
         metaListProvider
     );
 
+    // creates container map
     containerMapProvider = new ContainerMapCreator(
         metaListProvider,
-        containerCacheFactory,
-        new PluginInstantiator()
+        new ContainerFactory(
+            containerCacheFactory,
+            new PluginInstantiator()
+        )
     );
 
+    // assigns container classloader factories
     containerMapProvider = new InitializedContainerMapProvider(
         metaListProvider,
         containerMapProvider,
@@ -114,11 +125,20 @@ import java.nio.charset.Charset;
         new DependencyContainerListMapper()
     );
 
-    return new SEService(
+    // creates the service
+    SEService service = new SEService(
         new FolderLifecycleEventPlugin(
             folderLifecycleEventHandlers
         ),
         containerMapProvider.getContainerMap()
     );
+
+    // initializes each containers cache and classloader
+    service.reloadAllContainers();
+
+    // initialize the callback delegate
+    InjectedCallback.DELEGATE = callbackDelegate;
+
+    return service;
   }
 }

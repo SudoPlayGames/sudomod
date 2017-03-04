@@ -4,7 +4,9 @@ import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventPlugin;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by codetaylor on 2/20/2017.
@@ -42,14 +44,25 @@ public class SEService {
     container.reload();
   }
 
-  public <T extends Plugin> PluginReference<T> getPlugin(String resourceString, Class<T> tClass) {
+  public <P extends Plugin> List<PluginReference<P>> getRegisteredPlugins(String name, Class<P> pClass) {
+    return this.containerMap.values()
+        .stream()
+        .filter(container -> container.hasRegisteredPlugin(name))
+        .map(container ->
+            new PluginReference<>(
+                pClass,
+                container.getRegisteredPluginResourceString(name),
+                container
+            ))
+        .collect(Collectors.toList());
+  }
+
+  public <P extends Plugin> PluginReference<P> getPlugin(String resourceString, Class<P> tClass) {
     return this.getPlugin(this.createResourceLocation(resourceString), tClass);
   }
 
-  private <T extends Plugin> PluginReference<T> getPlugin(ResourceLocation resourceLocation, Class<T> tClass) {
-    Container container;
-
-    container = this.getContainer(resourceLocation.getId());
+  private <P extends Plugin> PluginReference<P> getPlugin(ResourceLocation resourceLocation, Class<P> tClass) {
+    Container container = this.getContainer(resourceLocation.getId());
     return new PluginReference<>(tClass, resourceLocation.getResource(), container);
   }
 

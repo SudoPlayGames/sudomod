@@ -27,6 +27,8 @@ public class SEByteCodeTransformerBuilder {
   private List<IClassFilter> classFilterList;
   private List<IClassFilter> catchExceptionClassFilterList;
 
+  private boolean prohibitTryCatchBlocks;
+
   public SEByteCodeTransformerBuilder() {
     this.classFilterList = new ArrayList<>();
     this.catchExceptionClassFilterList = new ArrayList<>();
@@ -46,6 +48,13 @@ public class SEByteCodeTransformerBuilder {
     this.defaultCatchExceptionClassFilterList.addAll(Arrays.asList(
         new RestrictedTryCatchExceptionClassFilter()
     ));
+
+    this.prohibitTryCatchBlocks = false;
+  }
+
+  public SEByteCodeTransformerBuilder setProhibitTryCatchBlocks() {
+    this.prohibitTryCatchBlocks = true;
+    return this;
   }
 
   public SEByteCodeTransformerBuilder setClassReaderFactory(IClassReaderFactory factory) {
@@ -139,7 +148,8 @@ public class SEByteCodeTransformerBuilder {
                 ),
                 new ClassFilterPredicate(
                     this.getCatchExceptionClassFilters()
-                )
+                ),
+                this.prohibitTryCatchBlocks
             )
         ),
         this.getClassWriterFactory(),

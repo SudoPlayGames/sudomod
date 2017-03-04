@@ -12,7 +12,7 @@ import java.util.List;
  */
 /* package */ class DependencyClassLoader extends
     ClassLoader implements
-    ISEClassLoader,
+    IContainerClassLoader,
     ISandboxClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(DependencyClassLoader.class);
@@ -31,56 +31,34 @@ import java.util.List;
   }
 
   @Override
-  protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-    synchronized (getClassLoadingLock(name)) {
+  protected Class<?> findClass(String name) throws ClassNotFoundException {
+    Class<?> c = null;
 
-      Class<?> c = null;
-
-      ClassLoader parent = this.getParent();
+    // invoke dependency class loaders
+    for (Container container : this.containerList) {
 
       try {
-
-        if (parent != null) {
-          c = parent.loadClass(name);
-        }
+        c = container.loadClassWithoutDependencyCheck(name);
 
       } catch (ClassNotFoundException e) {
-        LOG.trace("Class [{}] not found by [{}]", name, parent.getClass());
+        LOG.trace("Class [{}] not found by [{}]", name, container);
       }
 
-      if (c == null) {
-
-        // invoke dependency class loaders
-        for (Container container : this.containerList) {
-
-          try {
-            c = container.loadClassWithoutDependencyCheck(name);
-
-          } catch (ClassNotFoundException e) {
-            LOG.trace("Class [{}] not found by [{}]", name, container);
-          }
-
-          if (c != null) {
-            break;
-          }
-        }
+      if (c != null) {
+        break;
       }
-
-      if (c == null) {
-        throw new ClassNotFoundException(name);
-      }
-
-      if (resolve) {
-        this.resolveClass(c);
-      }
-
-      return c;
     }
+
+    if (c == null) {
+      throw new ClassNotFoundException(name);
+    }
+
+    return c;
   }
 
   @Override
   public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
-    synchronized (getClassLoadingLock(name)) {
+    synchronized (this.getClassLoadingLock(name)) {
 
       Class<?> c = null;
 
@@ -90,11 +68,8 @@ import java.util.List;
 
         if (parent != null) {
 
-          if (parent instanceof ISEClassLoader) {
-            c = ((ISEClassLoader) parent).loadClassWithoutDependencyCheck(name);
-
-          } else {
-            c = parent.loadClass(name);
+          if (parent instanceof IContainerClassLoader) {
+            c = ((IContainerClassLoader) parent).loadClassWithoutDependencyCheck(name);
           }
         }
       } catch (ClassNotFoundException e) {

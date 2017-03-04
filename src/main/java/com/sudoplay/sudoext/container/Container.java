@@ -1,41 +1,40 @@
 package com.sudoplay.sudoext.container;
 
 import com.sudoplay.sudoext.api.Plugin;
-import com.sudoplay.sudoext.classloader.ISEClassLoader;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactory;
-import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
+import com.sudoplay.sudoext.classloader.IContainerClassLoader;
+import com.sudoplay.sudoext.util.PreCondition;
+
+import java.util.Map;
 
 /**
  * Created by codetaylor on 2/20/2017.
  */
 public class Container {
 
-  private String id;
-  private IContainerCacheFactory containerCacheFactory;
+  private final String id;
+  private final IContainerCacheFactory containerCacheFactory;
+  private final PluginInstantiator pluginInstantiator;
+  private final Map<String, String> registeredPluginMap;
+
   private IClassLoaderFactory classLoaderFactory;
-  private PluginInstantiator pluginInstantiator;
-  private ICallbackDelegate callbackDelegate;
-  private ISEClassLoader classLoader;
+  private IContainerClassLoader classLoader;
   private IContainerCache cache;
 
   public Container(
       String id,
       IContainerCacheFactory containerCacheFactory,
       PluginInstantiator pluginInstantiator,
-      ICallbackDelegate callbackDelegate
+      Map<String, String> registeredPluginMap
   ) {
     this.id = id;
     this.containerCacheFactory = containerCacheFactory;
     this.pluginInstantiator = pluginInstantiator;
-    this.callbackDelegate = callbackDelegate;
+    this.registeredPluginMap = registeredPluginMap;
   }
 
   public String getId() {
     return this.id;
-  }
-
-  public ICallbackDelegate getCallbackDelegate() {
-    return this.callbackDelegate;
   }
 
   /* package */ void setClassLoaderFactory(IClassLoaderFactory classLoaderFactory) {
@@ -51,12 +50,32 @@ public class Container {
     return this.classLoader.loadClassWithoutDependencyCheck(name);
   }
 
-  public <P extends Plugin> P get(String resourceString, Class<P> tClass) throws ClassNotFoundException,
-      IllegalAccessException, InstantiationException {
-    return this.get(resourceString, tClass, true);
+  public boolean hasRegisteredPlugin(String name) {
+    return this.registeredPluginMap.containsKey(name);
   }
 
-  public <P extends Plugin> P get(String resourceString, Class<P> pClass, boolean useDependencyCheck) throws
+  public String getRegisteredPluginResourceString(String name) {
+    return this.registeredPluginMap.get(name);
+  }
+
+  public <P extends Plugin> P getRegisteredPlugin(String name, Class<P> pClass) throws IllegalAccessException,
+      InstantiationException, ClassNotFoundException {
+    return this.getPlugin(
+        PreCondition.notNull(this.registeredPluginMap.get(name)),
+        PreCondition.notNull(pClass)
+    );
+  }
+
+  public <P extends Plugin> P getPlugin(String resourceString, Class<P> pClass) throws ClassNotFoundException,
+      IllegalAccessException, InstantiationException {
+    return this.getPlugin(
+        PreCondition.notNull(resourceString),
+        PreCondition.notNull(pClass),
+        true
+    );
+  }
+
+  private <P extends Plugin> P getPlugin(String resourceString, Class<P> pClass, boolean useDependencyCheck) throws
       ClassNotFoundException, IllegalAccessException, InstantiationException {
 
     Class<P> aClass;

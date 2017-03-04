@@ -1,5 +1,7 @@
 package com.sudoplay.sudoext.classloader.intercept;
 
+import com.sudoplay.sudoext.container.Container;
+
 /**
  * Created by codetaylor on 2/23/2017.
  */
@@ -13,7 +15,7 @@ public class DefaultClassInterceptorFactory implements
   }
 
   @Override
-  public IClassInterceptor create(String id) {
-    return new DefaultClassInterceptor(id, this.classIntercepts);
+  public IClassInterceptor create(Container container) {
+    return new DefaultClassInterceptor(container, this.classIntercepts);
   }
 }

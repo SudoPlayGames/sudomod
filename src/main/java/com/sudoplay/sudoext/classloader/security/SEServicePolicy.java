@@ -10,8 +10,8 @@ import java.security.ProtectionDomain;
 public class SEServicePolicy extends
     Policy {
 
-  private IPermissionCollectionProvider applicationPermissionsProvider;
-  private IPermissionCollectionProvider sandboxPermissionsProvider;
+  private final IPermissionCollectionProvider applicationPermissionsProvider;
+  private final IPermissionCollectionProvider sandboxPermissionsProvider;
 
   public SEServicePolicy(
       IPermissionCollectionProvider applicationPermissionsProvider,

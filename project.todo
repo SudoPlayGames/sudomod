@@ -5,13 +5,19 @@ Naming Conventions:
 
 Test:
   ✔ Setup for integration tests @done (17-02-24 13:31)
-  ☐ Test that the recursive delete helper doesn't follow symlinks
+  ✔ Test that the recursive delete helper doesn't follow symlinks @done (17-03-04 11:19)
+    According to the source of Files.walkFileTree: "In other words, it does not follow symbolic links, and visits all levels of the file tree."
+  ✔ Test that extension can't have dependency on itself @done (17-03-04 11:04)
 
 Meta:
   ✔ Should we switch to a more mature json lib that allows comments? @done (17-02-26 12:15)
     ie. https://github.com/stleary/JSON-java
     Switched to a modified version of the above found in Google's Android. Licensed under Apache 2.
-  ☐ Rename meta parsers to adapters; also rename variable names in tests
+  ✔ Rename meta parsers to adapters; also rename variable names in tests @done (17-03-04 11:19)
+  ✔ Registered plugins @done (17-03-04 15:49)
+    Optionally allow extensions to register plugins with a name. These plugins will be can later be retrieved by the system developer; ie. retrieving all 'main-plugin' from each extension which would act as an entry point.
+  ☐ Overrides
+  ☐ Preload
 
 Security:
   ✔ Should we attempt bytecode transformation to further sandbox the plugin code? Yes. @done (17-03-03 15:25)

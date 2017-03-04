@@ -3,6 +3,8 @@ package com.sudoplay.sudoext.classloader;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
 import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -13,8 +15,10 @@ import java.net.URLClassLoader;
  */
 /* package */ class JarClassLoader extends
     URLClassLoader implements
-    ISEClassLoader,
+    IContainerClassLoader,
     ISandboxClassLoader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(JarClassLoader.class);
 
   private final IByteCodeTransformer byteCodeTransformer;
   private final InputStreamByteArrayConverter inputStreamByteArrayConverter;
@@ -36,10 +40,28 @@ import java.net.URLClassLoader;
 
       Class<?> c = findLoadedClass(name);
 
-      // skip parent check
+      if (c == null) {
+        ClassLoader parent = this.getParent();
+
+        try {
+
+          if (parent != null) {
+
+            if (parent instanceof IContainerClassLoader) {
+              c = ((IContainerClassLoader) parent).loadClassWithoutDependencyCheck(name);
+            }
+          }
+        } catch (ClassNotFoundException e) {
+          LOG.trace("Class [{}] not found by [{}]", name, parent.getClass());
+        }
+
+        if (c == null) {
+          c = findClass(name);
+        }
+      }
 
       if (c == null) {
-        c = findClass(name);
+        throw new ClassNotFoundException(name);
       }
 
       return c;

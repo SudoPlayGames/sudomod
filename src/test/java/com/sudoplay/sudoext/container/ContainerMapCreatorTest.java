@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +34,11 @@ public class ContainerMapCreatorTest {
         metaB
     )));
 
-    ContainerMapCreator containerMapCreator = new ContainerMapCreator(listProvider, null, null);
+    IContainerFactory containerFactory = mock(IContainerFactory.class);
+    when(containerFactory.create(eq("metaA"), any())).thenReturn(new Container("metaA", null, null, null));
+    when(containerFactory.create(eq("metaB"), any())).thenReturn(new Container("metaB", null, null, null));
+
+    ContainerMapCreator containerMapCreator = new ContainerMapCreator(listProvider, containerFactory);
 
     Map<String, Container> containerMap = containerMapCreator.getContainerMap();
 

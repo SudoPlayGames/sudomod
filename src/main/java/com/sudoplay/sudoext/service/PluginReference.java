@@ -1,6 +1,7 @@
 package com.sudoplay.sudoext.service;
 
 import com.sudoplay.sudoext.api.Plugin;
+import com.sudoplay.sudoext.classloader.asm.callback.InjectedCallback;
 import com.sudoplay.sudoext.container.Container;
 
 /**
@@ -19,7 +20,7 @@ public class PluginReference<P extends Plugin> {
   }
 
   public P get() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-    this.container.getCallbackDelegate().reset();
-    return this.container.get(this.resourceString, this.pClass);
+    InjectedCallback.DELEGATE.reset();
+    return this.container.getPlugin(this.resourceString, this.pClass);
   }
 }

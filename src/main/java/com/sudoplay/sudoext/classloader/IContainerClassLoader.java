@@ -3,7 +3,7 @@ package com.sudoplay.sudoext.classloader;
 /**
  * Created by codetaylor on 2/22/2017.
  */
-public interface ISEClassLoader {
+public interface IContainerClassLoader {
 
   Class<?> loadClass(String name) throws ClassNotFoundException;
 

@@ -10,13 +10,16 @@ public class SEMethodVisitorFactory implements IMethodVisitorFactory {
 
   private IClassFilterPredicate classFilterPredicate;
   private IClassFilterPredicate catchExceptionClassFilterPredicate;
+  private boolean prohibitTryCatchBlocks;
 
   public SEMethodVisitorFactory(
       IClassFilterPredicate classFilterPredicate,
-      IClassFilterPredicate catchExceptionClassFilterPredicate
+      IClassFilterPredicate catchExceptionClassFilterPredicate,
+      boolean prohibitTryCatchBlocks
   ) {
     this.classFilterPredicate = classFilterPredicate;
     this.catchExceptionClassFilterPredicate = catchExceptionClassFilterPredicate;
+    this.prohibitTryCatchBlocks = prohibitTryCatchBlocks;
   }
 
   @Override
@@ -26,7 +29,8 @@ public class SEMethodVisitorFactory implements IMethodVisitorFactory {
     visitor = new SEClassFilterMethodVisitor(
         visitor,
         this.classFilterPredicate,
-        this.catchExceptionClassFilterPredicate
+        this.catchExceptionClassFilterPredicate,
+        this.prohibitTryCatchBlocks
     );
     return visitor;
   }

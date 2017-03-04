@@ -16,20 +16,17 @@ public class DefaultMetaJsonLoader implements
 
   private IStringLoader stringLoader;
   private IJsonAdapter jsonAdapter;
-  private String metaFilename;
 
   public DefaultMetaJsonLoader(
       IStringLoader stringLoader,
-      IJsonAdapter jsonAdapter,
-      String metaFilename
+      IJsonAdapter jsonAdapter
   ) {
     this.stringLoader = stringLoader;
     this.jsonAdapter = jsonAdapter;
-    this.metaFilename = metaFilename;
   }
 
   @Override
-  public JSONObject load(Path containerPath) throws IOException, JSONException {
-    return this.jsonAdapter.adapt(this.stringLoader.load(containerPath.resolve(this.metaFilename)));
+  public JSONObject load(Path jsonPath) throws IOException, JSONException {
+    return this.jsonAdapter.adapt(this.stringLoader.load(jsonPath));
   }
 }

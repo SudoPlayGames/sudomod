@@ -1,6 +1,5 @@
 package com.sudoplay.sudoext.container;
 
-import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.meta.IMetaListProvider;
 import com.sudoplay.sudoext.meta.Meta;
 
@@ -15,18 +14,15 @@ public class ContainerMapCreator implements
     IContainerMapProvider {
 
   private IMetaListProvider metaListProvider;
-  private IContainerCacheFactory containerCacheFactory;
-  private ICallbackDelegateFactory callbackDelegateFactory;
-  private PluginInstantiator pluginInstantiator;
+  private IContainerFactory containerFactory;
+
 
   public ContainerMapCreator(
       IMetaListProvider metaListProvider,
-      IContainerCacheFactory containerCacheFactory,
-      PluginInstantiator pluginInstantiator
+      IContainerFactory containerFactory
   ) {
     this.metaListProvider = metaListProvider;
-    this.containerCacheFactory = containerCacheFactory;
-    this.pluginInstantiator = pluginInstantiator;
+    this.containerFactory = containerFactory;
   }
 
   @Override
@@ -39,13 +35,7 @@ public class ContainerMapCreator implements
     // create containers
     for (Meta meta : this.metaListProvider.getMetaList()) {
       String id = meta.getId();
-      Container container = new Container(
-          id,
-          this.containerCacheFactory,
-          this.pluginInstantiator,
-          this.callbackDelegateFactory.create()
-      );
-      containerMap.put(id, container);
+      containerMap.put(id, this.containerFactory.create(id, meta.getRegisteredPluginMap()));
     }
 
     return Collections.unmodifiableMap(containerMap);

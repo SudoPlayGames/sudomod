@@ -17,7 +17,7 @@ import java.util.Map;
  */
 /* package */ class SourceClassLoader extends
     JavaSourceClassLoader implements
-    ISEClassLoader,
+    IContainerClassLoader,
     ISandboxClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(SourceClassLoader.class);
@@ -44,9 +44,9 @@ import java.util.Map;
 
   @Override
   public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
-    synchronized (getClassLoadingLock(name)) {
+    synchronized (this.getClassLoadingLock(name)) {
 
-      Class<?> c = findLoadedClass(name);
+      Class<?> c = this.findLoadedClass(name);
 
       if (c == null) {
         ClassLoader parent = this.getParent();
@@ -55,11 +55,8 @@ import java.util.Map;
 
           if (parent != null) {
 
-            if (parent instanceof ISEClassLoader) {
-              c = ((ISEClassLoader) parent).loadClassWithoutDependencyCheck(name);
-
-            } else {
-              c = parent.loadClass(name);
+            if (parent instanceof IContainerClassLoader) {
+              c = ((IContainerClassLoader) parent).loadClassWithoutDependencyCheck(name);
             }
           }
         } catch (ClassNotFoundException e) {
@@ -69,6 +66,10 @@ import java.util.Map;
         if (c == null) {
           c = findClass(name);
         }
+      }
+
+      if (c == null) {
+        throw new ClassNotFoundException(name);
       }
 
       return c;

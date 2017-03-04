@@ -12,7 +12,7 @@ import java.util.Set;
 public interface IClassLoaderFactoryProvider {
 
   IClassLoaderFactory create(
-      String id,
+      Container container,
       Path path,
       Set<String> jarFileSet,
       List<Container> dependencyList);

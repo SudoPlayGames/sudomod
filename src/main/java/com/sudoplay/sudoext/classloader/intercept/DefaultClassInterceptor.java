@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.classloader.intercept;
 
-import com.sudoplay.sudoext.meta.Meta;
+import com.sudoplay.sudoext.container.Container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +17,12 @@ public class DefaultClassInterceptor implements
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultClassInterceptor.class);
 
-  private String id;
+  private Container container;
   private Set<String> classNameSet;
   private Map<String, IClassInterceptProcessor> processorMap;
 
-  public DefaultClassInterceptor(String id, ClassIntercept[] classIntercepts) {
-    this.id = id;
+  public DefaultClassInterceptor(Container container, ClassIntercept[] classIntercepts) {
+    this.container = container;
     this.classNameSet = new HashSet<>();
     this.processorMap = new HashMap<>();
 
@@ -47,6 +47,6 @@ public class DefaultClassInterceptor implements
       return;
     }
 
-    processor.process(aClass, this.id);
+    processor.process(aClass, this.container);
   }
 }

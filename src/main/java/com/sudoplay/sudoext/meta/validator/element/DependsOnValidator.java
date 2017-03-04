@@ -53,7 +53,11 @@ public class DependsOnValidator implements
       VersionRange versionRange = dependency.getVersionRange();
       Meta meta = metaMap.get(dependencyId);
 
-      if (meta != null) {
+      if (id.equals(dependencyId)) {
+        isValid = false;
+        LOG.error("[{}] can't depend on itself", id);
+
+      } else if (meta != null) {
         ArtifactVersion version = meta.getVersion();
 
         if (!versionRange.containsVersion(version)) {
@@ -85,7 +89,11 @@ public class DependsOnValidator implements
       VersionRange versionRange = dependency.getVersionRange();
       Meta meta = metaMap.get(dependencyId);
 
-      if (meta != null) {
+      if (id.equals(dependencyId)) {
+        isValid = false;
+        LOG.error("[{}] can't depend on itself", id);
+
+      } else if (meta != null) {
         ArtifactVersion version = meta.getVersion();
 
         if (!versionRange.containsVersion(version)) {

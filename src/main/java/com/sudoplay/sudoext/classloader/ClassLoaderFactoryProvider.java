@@ -35,7 +35,7 @@ public class ClassLoaderFactoryProvider implements
 
   @Override
   public IClassLoaderFactory create(
-      String id,
+      Container container,
       Path path,
       Set<String> jarFileSet,
       List<Container> dependencyList
@@ -45,7 +45,7 @@ public class ClassLoaderFactoryProvider implements
         jarFileSet,
         dependencyList,
         this.filteredClassLoaderPredicate,
-        this.classInterceptorFactory.create(id),
+        this.classInterceptorFactory.create(container),
         this.byteCodeTransformer,
         this.inputStreamByteArrayConverter
     );

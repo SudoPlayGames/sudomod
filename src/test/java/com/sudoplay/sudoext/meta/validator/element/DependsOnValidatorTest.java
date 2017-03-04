@@ -21,8 +21,47 @@ import static org.mockito.Mockito.when;
 public class DependsOnValidatorTest {
 
   @Test
-  public void isValid() throws Exception {
+  public void validateRequiredShouldReturnFalseWhenDependsOnSelf() throws Exception {
+    DependsOnValidator validator = new DependsOnValidator();
 
+    List<Dependency> dependencyList = new ArrayList<>();
+    dependencyList.add(new Dependency("meta-a", null, null));
+
+    Meta meta = mock(Meta.class);
+    when(meta.getVersion()).thenReturn(new DefaultArtifactVersion("1.5"));
+
+    Map<String, Meta> metaMap = new HashMap<>();
+    metaMap.put("meta-a", meta);
+
+    boolean result = validator.validateRequired(
+        "meta-a",
+        dependencyList,
+        metaMap
+    );
+
+    Assert.assertFalse(result);
+  }
+
+  @Test
+  public void validateSoftShouldReturnFalseWhenDependsOnSelf() throws Exception {
+    DependsOnValidator validator = new DependsOnValidator();
+
+    List<Dependency> dependencyList = new ArrayList<>();
+    dependencyList.add(new Dependency("meta-a", null, null));
+
+    Meta meta = mock(Meta.class);
+    when(meta.getVersion()).thenReturn(new DefaultArtifactVersion("1.5"));
+
+    Map<String, Meta> metaMap = new HashMap<>();
+    metaMap.put("meta-a", meta);
+
+    boolean result = validator.validateSoft(
+        "meta-a",
+        dependencyList,
+        metaMap
+    );
+
+    Assert.assertFalse(result);
   }
 
   @Test
@@ -30,16 +69,16 @@ public class DependsOnValidatorTest {
     DependsOnValidator validator = new DependsOnValidator();
 
     List<Dependency> dependencyList = new ArrayList<>();
-    dependencyList.add(new Dependency("id", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
+    dependencyList.add(new Dependency("meta-a", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
 
     Meta meta = mock(Meta.class);
     when(meta.getVersion()).thenReturn(new DefaultArtifactVersion("1.5"));
 
     Map<String, Meta> metaMap = new HashMap<>();
-    metaMap.put("id", meta);
+    metaMap.put("meta-a", meta);
 
     boolean result = validator.validateRequired(
-        null,
+        "meta-b",
         dependencyList,
         metaMap
     );
@@ -52,16 +91,16 @@ public class DependsOnValidatorTest {
     DependsOnValidator validator = new DependsOnValidator();
 
     List<Dependency> dependencyList = new ArrayList<>();
-    dependencyList.add(new Dependency("id", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
+    dependencyList.add(new Dependency("meta-a", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
 
     Meta meta = mock(Meta.class);
     when(meta.getVersion()).thenReturn(new DefaultArtifactVersion("3.5"));
 
     Map<String, Meta> metaMap = new HashMap<>();
-    metaMap.put("id", meta);
+    metaMap.put("meta-a", meta);
 
     boolean result = validator.validateRequired(
-        null,
+        "meta-b",
         dependencyList,
         metaMap
     );
@@ -74,12 +113,12 @@ public class DependsOnValidatorTest {
     DependsOnValidator validator = new DependsOnValidator();
 
     List<Dependency> dependencyList = new ArrayList<>();
-    dependencyList.add(new Dependency("id", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
+    dependencyList.add(new Dependency("meta-a", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
 
     Map<String, Meta> metaMap = new HashMap<>();
 
     boolean result = validator.validateRequired(
-        null,
+        "meta-b",
         dependencyList,
         metaMap
     );
@@ -93,16 +132,16 @@ public class DependsOnValidatorTest {
     DependsOnValidator validator = new DependsOnValidator();
 
     List<Dependency> dependencyList = new ArrayList<>();
-    dependencyList.add(new Dependency("id", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
+    dependencyList.add(new Dependency("meta-a", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
 
     Meta meta = mock(Meta.class);
     when(meta.getVersion()).thenReturn(new DefaultArtifactVersion("1.5"));
 
     Map<String, Meta> metaMap = new HashMap<>();
-    metaMap.put("id", meta);
+    metaMap.put("meta-a", meta);
 
     boolean result = validator.validateSoft(
-        null,
+        "meta-b",
         dependencyList,
         metaMap
     );
@@ -116,12 +155,12 @@ public class DependsOnValidatorTest {
     DependsOnValidator validator = new DependsOnValidator();
 
     List<Dependency> dependencyList = new ArrayList<>();
-    dependencyList.add(new Dependency("id", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
+    dependencyList.add(new Dependency("meta-a", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
 
     Map<String, Meta> metaMap = new HashMap<>();
 
     boolean result = validator.validateSoft(
-        null,
+        "meta-b",
         dependencyList,
         metaMap
     );
@@ -135,16 +174,16 @@ public class DependsOnValidatorTest {
     DependsOnValidator validator = new DependsOnValidator();
 
     List<Dependency> dependencyList = new ArrayList<>();
-    dependencyList.add(new Dependency("id", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
+    dependencyList.add(new Dependency("meta-a", null, VersionRange.createFromVersionSpec("[1.0,2.0]")));
 
     Meta meta = mock(Meta.class);
     when(meta.getVersion()).thenReturn(new DefaultArtifactVersion("3.5"));
 
     Map<String, Meta> metaMap = new HashMap<>();
-    metaMap.put("id", meta);
+    metaMap.put("meta-a", meta);
 
     boolean result = validator.validateSoft(
-        null,
+        "meta-b",
         dependencyList,
         metaMap
     );

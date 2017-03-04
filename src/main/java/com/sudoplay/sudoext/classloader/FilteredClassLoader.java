@@ -55,10 +55,6 @@ public class FilteredClassLoader extends
         throw new ClassNotFoundException(name);
       }
 
-      if (resolve) {
-        resolveClass(c);
-      }
-
       return c;
     }
   }

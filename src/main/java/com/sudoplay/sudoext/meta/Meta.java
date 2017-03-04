@@ -4,9 +4,7 @@ import com.sudoplay.sudoext.versioning.ArtifactVersion;
 import com.sudoplay.sudoext.versioning.VersionRange;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by codetaylor on 2/18/2017.
@@ -30,6 +28,7 @@ public class Meta {
   private Set<Dependency> requiredDependencySet;
   private Set<Dependency> loadAfterDependencySet;
   private Set<Dependency> loadBeforeDependencySet;
+  private Map<String, String> registeredPluginMap;
 
   public Meta(Path parentPath, Path path) {
     this.parentPath = parentPath;
@@ -38,6 +37,15 @@ public class Meta {
     this.requiredDependencySet = new LinkedHashSet<>();
     this.loadAfterDependencySet = new LinkedHashSet<>();
     this.loadBeforeDependencySet = new LinkedHashSet<>();
+    this.registeredPluginMap = new LinkedHashMap<>();
+  }
+
+  public void registerPlugin(String name, String plugin) {
+    this.registeredPluginMap.put(name, plugin);
+  }
+
+  public Map<String, String> getRegisteredPluginMap() {
+    return this.registeredPluginMap;
   }
 
   public Path getParentPath() {

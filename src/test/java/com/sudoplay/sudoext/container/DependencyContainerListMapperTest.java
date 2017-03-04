@@ -14,9 +14,9 @@ public class DependencyContainerListMapperTest {
   @Test
   public void getDependencyContainerListShouldReturnContainerList() throws Exception {
 
-    Container containerA = new Container(null, null, null, this.callbackDelegateFactory.create());
-    Container containerB = new Container(null, null, null, this.callbackDelegateFactory.create());
-    Container containerC = new Container(null, null, null, this.callbackDelegateFactory.create());
+    Container containerA = new Container(null, null, null, null);
+    Container containerB = new Container(null, null, null, null);
+    Container containerC = new Container(null, null, null, null);
 
     Map<String, Container> containerMap = new HashMap<>();
 
