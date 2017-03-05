@@ -2,7 +2,7 @@ package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.api.AncillaryPlugin;
 import com.sudoplay.sudoext.api.Plugin;
-import com.sudoplay.sudoext.api.TestModPlugin;
+import com.sudoplay.sudoext.api.ModPlugin;
 import com.sudoplay.sudoext.api.logging.ILoggerAPIProvider;
 import com.sudoplay.sudoext.api.logging.LoggerAPI;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
@@ -147,7 +147,7 @@ public class WhitelistClassFilter implements
 
     // ugh
     this.whitelist.addAll(Arrays.asList(
-        TestModPlugin.class.getName(),
+        ModPlugin.class.getName(),
         AncillaryPlugin.class.getName(),
 
         // not happy about allowing these
