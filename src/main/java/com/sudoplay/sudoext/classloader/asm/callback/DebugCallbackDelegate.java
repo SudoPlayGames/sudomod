@@ -32,7 +32,7 @@ public class DebugCallbackDelegate implements
   }
 
   @Override
-  public String report() {
+  public String getReport() {
 
     StringBuilder stringBuilder = new StringBuilder("{ ");
 
@@ -118,6 +118,12 @@ public class DebugCallbackDelegate implements
   public void callback_TRYCATCH(String type) {
     LOG.debug("callback_TRYCATCH(" + type + ")");
     this.increment("callback_TRYCATCH");
+  }
+
+  @Override
+  public void callback_LDC(String s) {
+    LOG.debug("callback_LDC(" + s + ")");
+    this.increment("callback_LDC");
   }
 
   @Override

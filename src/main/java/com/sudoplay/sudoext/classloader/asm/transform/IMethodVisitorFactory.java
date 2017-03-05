@@ -7,5 +7,12 @@ import org.objectweb.asm.MethodVisitor;
  */
 public interface IMethodVisitorFactory {
 
-  MethodVisitor create(MethodVisitor methodVisitor);
+  MethodVisitor create(
+      MethodVisitor methodVisitor,
+      int access,
+      String name,
+      String desc,
+      String signature,
+      String[] exceptions
+  );
 }

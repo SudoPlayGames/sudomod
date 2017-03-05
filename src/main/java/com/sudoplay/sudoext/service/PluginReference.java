@@ -27,18 +27,33 @@ public class PluginReference<P extends Plugin> {
     this.container = container;
   }
 
-  public void invokeVoid(InvokeVoidHandler<P> handler) throws IllegalAccessException,
-      ClassNotFoundException, InstantiationException {
-    handler.invoke(this.get());
+  public void invoke(InvokeVoidHandler<P> handler) throws PluginException {
+
+    try {
+      InjectedCallback.DELEGATE = this.container.getCallbackDelegate();
+      handler.invoke(this.get());
+
+    } catch (Exception e) {
+      throw new PluginException("Plugin exception caught", e);
+    }
   }
 
-  public <R> R invokeReturn(InvokeReturnHandler<P, R> handler) throws IllegalAccessException,
-      ClassNotFoundException, InstantiationException {
-    return handler.invoke(this.get());
+  public <R> R invoke(Class<R> rClass, InvokeReturnHandler<P, R> handler) throws PluginException {
+
+    try {
+      InjectedCallback.DELEGATE = this.container.getCallbackDelegate();
+      return handler.invoke(this.get());
+
+    } catch (Exception e) {
+      throw new PluginException("Plugin exception caught", e);
+    }
+  }
+
+  public String getReport() {
+    return InjectedCallback.DELEGATE.getReport();
   }
 
   private P get() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-    InjectedCallback.DELEGATE.reset();
     return this.container.getPlugin(this.resourceString, this.pClass);
   }
 }

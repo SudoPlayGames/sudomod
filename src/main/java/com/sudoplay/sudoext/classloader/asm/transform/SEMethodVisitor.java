@@ -360,6 +360,17 @@ public class SEMethodVisitor extends
   }
 
   @Override
+  public void visitLdcInsn(Object cst) {
+
+    if (cst instanceof String) {
+      this.mv.visitLdcInsn(cst);
+      this.injectCallback("callback_LDC", "(Ljava/lang/String;)V");
+    }
+
+    this.mv.visitLdcInsn(cst);
+  }
+
+  @Override
   public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
     // {params}
 

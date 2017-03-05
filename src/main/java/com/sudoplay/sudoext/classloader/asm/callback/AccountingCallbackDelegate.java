@@ -1,11 +1,16 @@
 package com.sudoplay.sudoext.classloader.asm.callback;
 
+import com.sudoplay.sudoext.classloader.IContainerClassLoader;
+import com.sudoplay.sudoext.classloader.asm.ClassAllocation;
 import com.sudoplay.sudoext.classloader.asm.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,16 +19,17 @@ import java.util.Queue;
 /**
  * Created by codetaylor on 2/27/2017.
  */
-public class BudgetCallbackDelegate implements
+public class AccountingCallbackDelegate implements
     ICallbackDelegate {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BudgetCallbackDelegate.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AccountingCallbackDelegate.class);
 
   private static final long DEFAULT_MAX_MEMORY_BYTES = 10 * 1024 * 1024;
   private static final long DEFAULT_MAX_INSTRUCTION_SIZE = 5000000;
   private static final int DEFAULT_MAX_ARRAY_SIZE = 1024;
   private static final int DEFAULT_MAX_ARRAY_DIMENSIONS = 4;
   private static final long DEFAULT_MAX_TIME_MILLISECONDS = 10 * 1000;
+  private static final long DEFAULT_MAX_CONSTANT_STRING_POOL_SIZE = 250000;
 
   private Queue<Long> lastAllocationQueue;
   private Map<Object, Long> allocationMap;
@@ -36,42 +42,55 @@ public class BudgetCallbackDelegate implements
   private int maxArraySize;
   private int maxArrayDimensions;
   private long maxTimeMilliseconds;
+  private long maxConstantStringPoolSize;
 
   private long currentMemoryBytes;
   private long currentInstructions;
   private long startTimeMilliseconds;
+  private long currentConstantStringPoolSize;
 
-  public BudgetCallbackDelegate() {
+  private IContainerClassLoader classLoader;
+
+  public AccountingCallbackDelegate(
+      IContainerClassLoader classLoader
+  ) {
+    this.classLoader = classLoader;
     this.setMaxMemoryBytes(DEFAULT_MAX_MEMORY_BYTES);
     this.setMaxInstructions(DEFAULT_MAX_INSTRUCTION_SIZE);
     this.setMaxArraySize(DEFAULT_MAX_ARRAY_SIZE);
     this.setMaxArrayDimensions(DEFAULT_MAX_ARRAY_DIMENSIONS);
     this.setMaxTimeMilliseconds(DEFAULT_MAX_TIME_MILLISECONDS);
+    this.setMaxConstantStringPoolSize(DEFAULT_MAX_CONSTANT_STRING_POOL_SIZE);
     this.reset();
   }
 
-  public BudgetCallbackDelegate setMaxInstructions(long value) {
+  public AccountingCallbackDelegate setMaxInstructions(long value) {
     this.maxInstructions = value;
     return this;
   }
 
-  public BudgetCallbackDelegate setMaxArraySize(int value) {
+  public AccountingCallbackDelegate setMaxArraySize(int value) {
     this.maxArraySize = value;
     return this;
   }
 
-  public BudgetCallbackDelegate setMaxArrayDimensions(int value) {
+  public AccountingCallbackDelegate setMaxArrayDimensions(int value) {
     this.maxArrayDimensions = value;
     return this;
   }
 
-  public BudgetCallbackDelegate setMaxTimeMilliseconds(long value) {
+  public AccountingCallbackDelegate setMaxTimeMilliseconds(long value) {
     this.maxTimeMilliseconds = value;
     return this;
   }
 
-  public BudgetCallbackDelegate setMaxMemoryBytes(long value) {
+  public AccountingCallbackDelegate setMaxMemoryBytes(long value) {
     this.maxMemoryBytes = value;
+    return this;
+  }
+
+  public AccountingCallbackDelegate setMaxConstantStringPoolSize(long value) {
+    this.maxConstantStringPoolSize = value;
     return this;
   }
 
@@ -86,8 +105,20 @@ public class BudgetCallbackDelegate implements
   }
 
   @Override
-  public String report() {
-    return null; // TODO
+  public String getReport() {
+    StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append("Memory:       ")
+        .append(this.currentMemoryBytes).append(" / ")
+        .append(this.maxMemoryBytes).append("\n");
+    stringBuilder.append("Instructions: ")
+        .append(this.currentInstructions).append(" / ")
+        .append(this.maxInstructions).append("\n");
+    stringBuilder.append("String Pool:  ").append(this.currentConstantStringPoolSize).append(" / ")
+        .append(this.maxConstantStringPoolSize).append("\n");
+    long time = System.currentTimeMillis() - this.startTimeMilliseconds;
+    stringBuilder.append("Time:         ").append(time).append(" / ")
+        .append(this.maxTimeMilliseconds);
+    return stringBuilder.toString();
   }
 
   private void checkTime() {
@@ -137,6 +168,17 @@ public class BudgetCallbackDelegate implements
     }
   }
 
+  private void checkConstantStringPool(long size) {
+    this.currentConstantStringPoolSize += size;
+
+    if (this.currentConstantStringPoolSize > this.maxConstantStringPoolSize) {
+      throw new ConstantStringPoolLimitException(String.format(
+          "Constant string pool limit of [%s] exceeded",
+          this.maxConstantStringPoolSize
+      ));
+    }
+  }
+
   private void incrementAllocation(long memorySize) {
     memorySize = align(memorySize);
 
@@ -177,8 +219,26 @@ public class BudgetCallbackDelegate implements
   }
 
   private long getClassAllocation(String type) {
-    LOG.debug("getClassAllocation(): " + type);
-    // TODO
+    int count = ClassAllocation.get(type);
+
+    if (count > -1) {
+      return 8 * count;
+    }
+
+    try {
+
+      AccessController.doPrivileged((PrivilegedExceptionAction<Long>) () -> {
+        String name = type.replace("/", ".");
+        Class<?> aClass = this.classLoader.loadClass(name);
+        Field[] declaredFields = aClass.getDeclaredFields();
+        ClassAllocation.put(type, declaredFields.length);
+        return (long) (8 * declaredFields.length);
+      });
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
     return 8;
   }
 
@@ -274,6 +334,11 @@ public class BudgetCallbackDelegate implements
   @Override
   public void callback_TRYCATCH(String type) {
     //throw new RestrictedUseException("Usage of try/catch block is prohibited in extensions");
+  }
+
+  @Override
+  public void callback_LDC(String s) {
+    this.checkConstantStringPool(s.length());
   }
 
   @Override

@@ -18,7 +18,7 @@ public class NoOpCallbackDelegate implements
   }
 
   @Override
-  public String report() {
+  public String getReport() {
     return "";
   }
 
@@ -79,6 +79,11 @@ public class NoOpCallbackDelegate implements
 
   @Override
   public void callback_TRYCATCH(String type) {
+    // no-op
+  }
+
+  @Override
+  public void callback_LDC(String s) {
     // no-op
   }
 

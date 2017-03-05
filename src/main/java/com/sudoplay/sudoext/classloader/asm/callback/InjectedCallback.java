@@ -55,6 +55,10 @@ public class InjectedCallback {
     DELEGATE.callback_TRYCATCH(type);
   }
 
+  public static void callback_LDC(String s) {
+    DELEGATE.callback_LDC(s);
+  }
+
   public static void registerObject(Object o) {
     DELEGATE.registerObject(o);
   }

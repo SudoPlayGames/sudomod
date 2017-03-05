@@ -7,7 +7,7 @@ public interface ICallbackDelegate {
 
   void reset();
 
-  String report();
+  String getReport();
 
   void callback_NEW(String type);
 
@@ -32,6 +32,8 @@ public interface ICallbackDelegate {
   void callback_ATHROW();
 
   void callback_TRYCATCH(String type);
+
+  void callback_LDC(String s);
 
   void registerObject(Object o);
 

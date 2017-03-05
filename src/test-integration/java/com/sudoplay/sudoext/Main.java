@@ -1,8 +1,9 @@
 package com.sudoplay.sudoext;
 
-import com.sudoplay.sudoext.api.AncillaryPlugin;
 import com.sudoplay.sudoext.api.ModPlugin;
+import com.sudoplay.sudoext.classloader.asm.filter.AllowedJavaUtilClassFilter;
 import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuilder;
+import com.sudoplay.sudoext.classloader.asm.transform.StdOutByteCodePrinter;
 import com.sudoplay.sudoext.classloader.filter.AllowAllClassFilter;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.security.SEServicePolicy;
@@ -49,7 +50,8 @@ public class Main {
         .addClassLoaderClassFilter(new AllowAllClassFilter())
 
         .setByteCodeTransformer(new SEByteCodeTransformerBuilder()
-            //.setByteCodePrinter(new StdOutByteCodePrinter())
+            .setByteCodePrinter(new StdOutByteCodePrinter())
+            .addClassFilter(new AllowedJavaUtilClassFilter())
             .addClassFilter(new IClassFilter() {
               @Override
               public boolean isAllowed(String name) {
@@ -60,26 +62,32 @@ public class Main {
 
         .create();
 
+    PluginReference<ModPlugin> pluginA = service.getPlugin("test-mod-a:mod.ModPluginA", ModPlugin.class);
+
     try {
-      PluginReference<ModPlugin> pluginA = service.getPlugin("test-mod-a:mod.ModPluginA", ModPlugin.class);
-      PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);
-      PluginReference<ModPlugin> pluginC = service.getPlugin("test-mod-c:mod.ModPluginC", ModPlugin.class);
+      pluginA.invoke(ModPlugin::onGreeting);
 
-      PluginReference<AncillaryPlugin> wrapper = service.getPlugin(
-          "test-mod-b:mod.BlueAncillaryPlugin",
-          AncillaryPlugin.class
-      );
-
-      pluginA.invokeVoid(ModPlugin::onGreeting);
-      pluginB.invokeVoid(ModPlugin::onGreeting);
-      pluginC.invokeVoid(ModPlugin::onGreeting);
-
-      int result = wrapper.invokeReturn(plugin -> plugin.addValues(5, 11));
-      System.out.println(result);
-
-    } catch (Exception | Error e) {
+    } catch (PluginException e) {
       LOG.error("", e);
+
+    } finally {
+      System.out.println(pluginA.getReport());
     }
+
+          /*PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);
+      pluginB.invoke(ModPlugin::onGreeting);
+      System.out.println(pluginB.getReport());
+
+      PluginReference<ModPlugin> pluginC = service.getPlugin("test-mod-c:mod.ModPluginC", ModPlugin.class);
+      pluginC.invoke(ModPlugin::onGreeting);
+      System.out.println(pluginC.getReport());
+
+      List<PluginReference<AncillaryPlugin>> list = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
+
+      for (PluginReference<AncillaryPlugin> plugin : list) {
+        System.out.println(plugin.invoke(int.class, p -> p.addValues(5, 11)));
+        System.out.println(plugin.getReport());
+      }*/
 
     service.dispose();
   }

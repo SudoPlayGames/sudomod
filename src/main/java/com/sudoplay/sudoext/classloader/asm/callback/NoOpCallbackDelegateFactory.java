@@ -1,5 +1,7 @@
 package com.sudoplay.sudoext.classloader.asm.callback;
 
+import com.sudoplay.sudoext.classloader.IContainerClassLoader;
+
 /**
  * Created by codetaylor on 3/3/2017.
  */
@@ -13,7 +15,7 @@ public class NoOpCallbackDelegateFactory implements
   }
 
   @Override
-  public ICallbackDelegate create() {
+  public ICallbackDelegate create(IContainerClassLoader classLoader) {
     return NoOpCallbackDelegate.INSTANCE;
   }
 }

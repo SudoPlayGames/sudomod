@@ -3,6 +3,8 @@ package com.sudoplay.sudoext.container;
 import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactory;
 import com.sudoplay.sudoext.classloader.IContainerClassLoader;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.util.PreCondition;
 
 import java.util.Map;
@@ -14,6 +16,7 @@ public class Container {
 
   private final String id;
   private final IContainerCacheFactory containerCacheFactory;
+  private final ICallbackDelegateFactory callbackDelegateFactory;
   private final PluginInstantiator pluginInstantiator;
   private final Map<String, String> registeredPluginMap;
 
@@ -24,11 +27,13 @@ public class Container {
   public Container(
       String id,
       IContainerCacheFactory containerCacheFactory,
+      ICallbackDelegateFactory callbackDelegateFactory,
       PluginInstantiator pluginInstantiator,
       Map<String, String> registeredPluginMap
   ) {
     this.id = id;
     this.containerCacheFactory = containerCacheFactory;
+    this.callbackDelegateFactory = callbackDelegateFactory;
     this.pluginInstantiator = pluginInstantiator;
     this.registeredPluginMap = registeredPluginMap;
   }
@@ -39,6 +44,10 @@ public class Container {
 
   /* package */ void setClassLoaderFactory(IClassLoaderFactory classLoaderFactory) {
     this.classLoaderFactory = classLoaderFactory;
+  }
+
+  public ICallbackDelegate getCallbackDelegate() {
+    return this.callbackDelegateFactory.create(this.classLoader);
   }
 
   public void reload() {

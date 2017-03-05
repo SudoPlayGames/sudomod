@@ -3,8 +3,7 @@ package com.sudoplay.sudoext.service;
 import com.sudoplay.sudoext.candidate.CandidateListProvider;
 import com.sudoplay.sudoext.candidate.ICandidateProvider;
 import com.sudoplay.sudoext.classloader.ClassLoaderFactoryProvider;
-import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
-import com.sudoplay.sudoext.classloader.asm.callback.InjectedCallback;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
@@ -36,7 +35,7 @@ import java.nio.charset.Charset;
       IContainerCacheFactory containerCacheFactory,
       IClassFilter[] classLoaderClassFilters,
       ClassIntercept[] classIntercepts,
-      ICallbackDelegate callbackDelegate,
+      ICallbackDelegateFactory callbackDelegateFactory,
       IByteCodeTransformer byteCodeTransformer,
       IFolderLifecycleEventHandler[] folderLifecycleEventHandlers,
       Charset charset,
@@ -104,6 +103,7 @@ import java.nio.charset.Charset;
         metaListProvider,
         new ContainerFactory(
             containerCacheFactory,
+            callbackDelegateFactory,
             new PluginInstantiator()
         )
     );
@@ -135,9 +135,6 @@ import java.nio.charset.Charset;
 
     // initializes each containers cache and classloader
     service.reloadAllContainers();
-
-    // initialize the callback delegate
-    InjectedCallback.DELEGATE = callbackDelegate;
 
     return service;
   }

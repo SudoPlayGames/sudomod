@@ -51,7 +51,7 @@ public class InterceptClassLoader extends
           throw new ClassNotFoundException(name);
         }
 
-        final Class<?> cc = c;
+        /*final Class<?> cc = c;
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
           // this is privileged because the static callbacks injected via asm are
           // loaded within the context of the sandbox and consequently fail
@@ -59,7 +59,8 @@ public class InterceptClassLoader extends
           this.classInterceptor.intercept(cc);
           return null;
         });
-        c = cc;
+        c = cc;*/
+        this.classInterceptor.intercept(c);
       }
 
       if (c != null) {
@@ -74,12 +75,13 @@ public class InterceptClassLoader extends
 
     String path = name.replace(".", "/").concat(".class");
 
-    InputStream inputStream = AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> {
+    /*InputStream inputStream = AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> {
       // this is privileged because the static callbacks injected via asm are
       // loaded within the context of the sandbox and consequently fail
       // to read the filesystem
       return InterceptClassLoader.this.getResourceAsStream(path);
-    });
+    });*/
+    InputStream inputStream = this.getResourceAsStream(path);
 
     if (inputStream == null) {
       throw new ClassNotFoundException(name);

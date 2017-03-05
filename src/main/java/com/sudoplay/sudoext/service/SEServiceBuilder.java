@@ -5,8 +5,8 @@ import com.sudoplay.sudoext.api.logging.Slf4jLoggerAPIProvider;
 import com.sudoplay.sudoext.candidate.*;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
-import com.sudoplay.sudoext.classloader.asm.callback.BudgetCallbackDelegate;
-import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
+import com.sudoplay.sudoext.classloader.asm.callback.AccountingCallbackDelegateFactory;
+import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
@@ -41,7 +41,7 @@ public class SEServiceBuilder {
 
   private SEConfig config;
 
-  private ICallbackDelegate callbackDelegate;
+  private ICallbackDelegateFactory callbackDelegateFactory;
   private IContainerCacheFactory containerCacheFactory;
   private IByteCodeTransformer byteCodeTransformer;
 
@@ -64,11 +64,11 @@ public class SEServiceBuilder {
     // adds the default class filter
     this.defaultClassLoaderClassFilterList = new ArrayList<>();
 
-    this.callbackDelegate = new BudgetCallbackDelegate();
+    this.callbackDelegateFactory = new AccountingCallbackDelegateFactory();
   }
 
-  public SEServiceBuilder setCallbackDelegate(@NotNull ICallbackDelegate callbackDelegate) {
-    this.callbackDelegate = PreCondition.notNull(callbackDelegate);
+  public SEServiceBuilder setCallbackDelegateFactory(@NotNull ICallbackDelegateFactory callbackDelegateFactory) {
+    this.callbackDelegateFactory = PreCondition.notNull(callbackDelegateFactory);
     return this;
   }
 
@@ -177,7 +177,7 @@ public class SEServiceBuilder {
                 )
             )
         },
-        this.callbackDelegate,
+        this.callbackDelegateFactory,
         this.byteCodeTransformer,
         new IFolderLifecycleEventHandler[]{
             new DefaultFolderLifecycleInitializeEventHandler(
