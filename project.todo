@@ -15,7 +15,7 @@ Meta:
     Switched to a modified version of the above found in Google's Android. Licensed under Apache 2.
   ✔ Rename meta parsers to adapters; also rename variable names in tests @done (17-03-04 11:19)
   ✔ Registered plugins @done (17-03-04 15:49)
-    Optionally allow extensions to register plugins with a name. These plugins will be can later be retrieved by the system developer; ie. retrieving all 'main-plugin' from each extension which would act as an entry point.
+    Optionally allow extensions to register plugins with a name. These plugins can later be retrieved by the system developer; ie. retrieving all 'main-plugin' from each extension which would act as an entry point.
   ☐ Overrides
   ☐ Preload
 
@@ -23,7 +23,7 @@ Security:
   ✔ Should we attempt bytecode transformation to further sandbox the plugin code? Yes. @done (17-03-03 15:25)
     http://www.java-gaming.org/index.php?;topic=31183.0
     https://github.com/lihaoyi/6858
-  ☐ Finish class byte usage in budget callback delegate
+  ✔ Finish class byte usage in budget callback delegate @done (17-03-05 14:56)
 
 File Access:
   ☐ Sandbox mod file access into the data folder

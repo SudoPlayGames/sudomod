@@ -27,7 +27,7 @@ public class SEMethodVisitor extends
   public void visitTypeInsn(int opcode, String type) {
 
     if (opcode == Opcodes.NEW) {
-      this.visitLdcInsn(type);
+      this.mv.visitLdcInsn(type);
       // type
 
       this.injectCallback("callback_NEW", "(Ljava/lang/String;)V");
@@ -44,7 +44,7 @@ public class SEMethodVisitor extends
       this.mv.visitInsn(Opcodes.DUP);
       // size, size
 
-      this.visitIntInsn(Opcodes.BIPUSH, this.sizeOfAType(this.arrayTypeToOperand(type)));
+      this.mv.visitIntInsn(Opcodes.BIPUSH, this.sizeOfAType(this.arrayTypeToOperand(type)));
       // size, size, memorySize
 
       this.injectCallback("callback_ANEWARRAY", "(II)V");

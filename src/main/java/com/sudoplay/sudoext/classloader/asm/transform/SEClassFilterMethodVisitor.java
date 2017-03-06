@@ -17,18 +17,15 @@ public class SEClassFilterMethodVisitor extends
 
   private final IClassFilterPredicate classFilterPredicate;
   private final IClassFilterPredicate catchExceptionClassFilterPredicate;
-  private final boolean prohibitTryCatchBlocks;
 
   public SEClassFilterMethodVisitor(
       MethodVisitor mv,
       IClassFilterPredicate classFilterPredicate,
-      IClassFilterPredicate catchExceptionClassFilterPredicate,
-      boolean prohibitTryCatchBlocks
+      IClassFilterPredicate catchExceptionClassFilterPredicate
   ) {
     super(ASM5, mv);
     this.classFilterPredicate = classFilterPredicate;
     this.catchExceptionClassFilterPredicate = catchExceptionClassFilterPredicate;
-    this.prohibitTryCatchBlocks = prohibitTryCatchBlocks;
   }
 
   @Override
@@ -69,10 +66,6 @@ public class SEClassFilterMethodVisitor extends
 
   @Override
   public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
-
-    if (this.prohibitTryCatchBlocks) {
-      throw new RestrictedUseException("Usage of try/catch blocks is prohibited");
-    }
     this.checkCatchExceptionClassFilters(type);
   }
 

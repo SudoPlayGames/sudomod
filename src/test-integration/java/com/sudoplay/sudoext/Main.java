@@ -50,7 +50,7 @@ public class Main {
         .addClassLoaderClassFilter(new AllowAllClassFilter())
 
         .setByteCodeTransformer(new SEByteCodeTransformerBuilder()
-            .setByteCodePrinter(new StdOutByteCodePrinter())
+            //.setByteCodePrinter(new StdOutByteCodePrinter())
             .addClassFilter(new AllowedJavaUtilClassFilter())
             .addClassFilter(new IClassFilter() {
               @Override
@@ -65,13 +65,20 @@ public class Main {
     PluginReference<ModPlugin> pluginA = service.getPlugin("test-mod-a:mod.ModPluginA", ModPlugin.class);
 
     try {
-      pluginA.invoke(ModPlugin::onGreeting);
+
+      long start = System.currentTimeMillis();
+      pluginA.preLoad();
+      System.out.println("Time: " + (System.currentTimeMillis() - start));
+      System.out.println("---");
+
+      for (int i = 0; i < 4; i++) {
+        pluginA.invoke(ModPlugin::onGreeting);
+        System.out.println(pluginA.getReport());
+      }
 
     } catch (PluginException e) {
       LOG.error("", e);
 
-    } finally {
-      System.out.println(pluginA.getReport());
     }
 
           /*PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);

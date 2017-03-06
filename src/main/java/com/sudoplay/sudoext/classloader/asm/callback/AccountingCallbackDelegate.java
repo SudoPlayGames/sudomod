@@ -236,7 +236,7 @@ public class AccountingCallbackDelegate implements
       });
 
     } catch (Exception e) {
-      e.printStackTrace();
+      LOG.debug("Error loading class [{}] for allocation", type, e);
     }
 
     return 8;

@@ -27,6 +27,16 @@ public class PluginReference<P extends Plugin> {
     this.container = container;
   }
 
+  public void preLoad() throws PluginException {
+
+    try {
+      this.get();
+
+    } catch (Exception e) {
+      throw new PluginException("Plugin exception caught", e);
+    }
+  }
+
   public void invoke(InvokeVoidHandler<P> handler) throws PluginException {
 
     try {
