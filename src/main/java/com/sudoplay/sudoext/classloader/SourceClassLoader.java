@@ -1,5 +1,6 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.classloader.asm.exception.RestrictedUseException;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
 import org.codehaus.commons.nullanalysis.Nullable;
@@ -117,6 +118,11 @@ import java.util.Map;
       return this.defineClass(name, bytecode, 0, bytecode.length);
 
     } catch (Exception e) {
+
+      if (e instanceof RestrictedUseException) {
+        LOG.error(e.getMessage());
+      }
+
       throw new ClassNotFoundException(name, e);
     }
   }

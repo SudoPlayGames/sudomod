@@ -20,6 +20,7 @@ public class AllowedJavaLangClassFilter implements
     this.allowedSet.addAll(Arrays.asList(
 
         // classes
+        StringBuilder.class.getName(),
         Boolean.class.getName(),
         Byte.class.getName(),
         Character.class.getName(),
@@ -36,10 +37,15 @@ public class AllowedJavaLangClassFilter implements
 
         // exceptions
         ClassNotFoundException.class.getName(),
+        CloneNotSupportedException.class.getName(),
         Exception.class.getName(),
+        IllegalArgumentException.class.getName(),
         NoClassDefFoundError.class.getName(),
         RuntimeException.class.getName(),
         Throwable.class.getName(),
+
+        // error
+        AssertionError.class.getName(),
 
         // annotation
         Deprecated.class.getName(),

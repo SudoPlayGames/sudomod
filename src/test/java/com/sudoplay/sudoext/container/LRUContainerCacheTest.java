@@ -3,8 +3,6 @@ package com.sudoplay.sudoext.container;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by codetaylor on 3/3/2017.
  */
@@ -26,14 +24,14 @@ public class LRUContainerCacheTest {
     TestA testA = new TestA();
     TestB testB = new TestB();
 
-    cache.put(TestA.class, testA);
+    cache.put("TestA", testA);
 
-    Assert.assertTrue(testA == cache.get(TestA.class));
+    Assert.assertTrue(testA == cache.get("TestA"));
 
-    cache.put(TestB.class, testB);
+    cache.put("TestB", testB);
 
-    Assert.assertTrue(testB == cache.get(TestB.class));
-    Assert.assertTrue(null == cache.get(TestA.class));
+    Assert.assertTrue(testB == cache.get("TestB"));
+    Assert.assertTrue(null == cache.get("TestA"));
   }
 
 }

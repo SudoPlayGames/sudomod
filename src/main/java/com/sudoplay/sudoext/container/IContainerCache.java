@@ -5,8 +5,8 @@ package com.sudoplay.sudoext.container;
  */
 public interface IContainerCache {
 
-  <T> void put(Class<T> tClass, T object);
+  <T> void put(String resourceString, T object);
 
-  <T> T get(Class<T> tClass);
+  <T> T get(String resourceString);
 
 }

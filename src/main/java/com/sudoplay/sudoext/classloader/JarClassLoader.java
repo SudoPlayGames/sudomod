@@ -1,7 +1,9 @@
 package com.sudoplay.sudoext.classloader;
 
+import com.sudoplay.sudoext.classloader.asm.exception.RestrictedUseException;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.security.ISandboxClassLoader;
+import com.sudoplay.sudoext.util.CloseUtil;
 import com.sudoplay.sudoext.util.InputStreamByteArrayConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +88,15 @@ import java.net.URLClassLoader;
       return defineClass(name, bytecode, 0, bytecode.length);
 
     } catch (Exception e) {
+
+      if (e instanceof RestrictedUseException) {
+        LOG.error(e.getMessage());
+      }
+
       throw new ClassNotFoundException(name, e);
+
+    } finally {
+      CloseUtil.close(inputStream, LOG);
     }
   }
 }

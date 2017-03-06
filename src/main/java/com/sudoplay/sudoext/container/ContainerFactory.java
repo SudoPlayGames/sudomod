@@ -3,6 +3,7 @@ package com.sudoplay.sudoext.container;
 import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 3/4/2017.
@@ -26,14 +27,16 @@ public class ContainerFactory implements IContainerFactory {
   @Override
   public Container create(
       String id,
-      Map<String, String> registeredPluginMap
+      Map<String, String> registeredPluginMap,
+      Set<String> preloadSet
   ) {
     return new Container(
         id,
         this.containerCacheFactory,
         this.callbackDelegateFactory,
         this.pluginInstantiator,
-        registeredPluginMap
+        registeredPluginMap,
+        preloadSet
     );
   }
 

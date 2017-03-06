@@ -1,9 +1,9 @@
 package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.api.ModPlugin;
+import com.sudoplay.sudoext.api.Plugin;
 import com.sudoplay.sudoext.classloader.asm.filter.AllowedJavaUtilClassFilter;
 import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuilder;
-import com.sudoplay.sudoext.classloader.asm.transform.StdOutByteCodePrinter;
 import com.sudoplay.sudoext.classloader.filter.AllowAllClassFilter;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 import com.sudoplay.sudoext.classloader.security.SEServicePolicy;
@@ -55,7 +55,9 @@ public class Main {
             .addClassFilter(new IClassFilter() {
               @Override
               public boolean isAllowed(String name) {
-                return name.startsWith("mod.") || name.startsWith("com.sudoplay.sudoext.api.");
+                return name.startsWith("mod.")
+                    || name.startsWith("com.sudoplay.sudoext.api.")
+                    || name.startsWith("com.sudoplay.math.");
               }
             })
         )
@@ -63,40 +65,40 @@ public class Main {
         .create();
 
     PluginReference<ModPlugin> pluginA = service.getPlugin("test-mod-a:mod.ModPluginA", ModPlugin.class);
+    PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);
+    PluginReference<Plugin> pluginC = service.getPlugin("test-mod-c:mod.ModPluginC", Plugin.class);
 
     try {
 
-      long start = System.currentTimeMillis();
-      pluginA.preLoad();
-      System.out.println("Time: " + (System.currentTimeMillis() - start));
-      System.out.println("---");
+      System.out.println("--- Preload ---");
+      service.preload((containerId, resource, percentage, timeMilliseconds, throwable) -> {
+        System.out.println(String.format(
+            "%s:%s %f %d", containerId, resource, percentage, timeMilliseconds
+        ));
+
+        if (throwable != null) {
+          throwable.printStackTrace();
+        }
+      });
+      System.out.println("--- End Preload ---");
 
       for (int i = 0; i < 4; i++) {
         pluginA.invoke(ModPlugin::onGreeting);
-        System.out.println(pluginA.getReport());
       }
+      System.out.println(pluginA.getReport());
+      System.out.println("---");
+
+      for (int i = 0; i < 4; i++) {
+        pluginB.invoke(ModPlugin::onGreeting);
+      }
+      System.out.println(pluginB.getReport());
 
     } catch (PluginException e) {
       LOG.error("", e);
 
     }
 
-          /*PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);
-      pluginB.invoke(ModPlugin::onGreeting);
-      System.out.println(pluginB.getReport());
-
-      PluginReference<ModPlugin> pluginC = service.getPlugin("test-mod-c:mod.ModPluginC", ModPlugin.class);
-      pluginC.invoke(ModPlugin::onGreeting);
-      System.out.println(pluginC.getReport());
-
-      List<PluginReference<AncillaryPlugin>> list = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
-
-      for (PluginReference<AncillaryPlugin> plugin : list) {
-        System.out.println(plugin.invoke(int.class, p -> p.addValues(5, 11)));
-        System.out.println(plugin.getReport());
-      }*/
-
-    service.dispose();
+    service.disposeFolders();
   }
 
 }

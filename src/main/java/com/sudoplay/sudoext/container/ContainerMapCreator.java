@@ -34,8 +34,18 @@ public class ContainerMapCreator implements
 
     // create containers
     for (Meta meta : this.metaListProvider.getMetaList()) {
-      String id = meta.getId();
-      containerMap.put(id, this.containerFactory.create(id, meta.getRegisteredPluginMap()));
+      String id;
+      Container container;
+
+      id = meta.getId();
+
+      container = this.containerFactory.create(
+          id,
+          meta.getRegisteredPluginMap(),
+          meta.getPreloadSet()
+      );
+
+      containerMap.put(id, container);
     }
 
     return Collections.unmodifiableMap(containerMap);

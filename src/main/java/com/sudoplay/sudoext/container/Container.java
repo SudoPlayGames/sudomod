@@ -7,7 +7,9 @@ import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
 import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.util.PreCondition;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by codetaylor on 2/20/2017.
@@ -19,6 +21,7 @@ public class Container {
   private final ICallbackDelegateFactory callbackDelegateFactory;
   private final PluginInstantiator pluginInstantiator;
   private final Map<String, String> registeredPluginMap;
+  private Set<String> preloadSet;
 
   private IClassLoaderFactory classLoaderFactory;
   private IContainerClassLoader classLoader;
@@ -29,17 +32,23 @@ public class Container {
       IContainerCacheFactory containerCacheFactory,
       ICallbackDelegateFactory callbackDelegateFactory,
       PluginInstantiator pluginInstantiator,
-      Map<String, String> registeredPluginMap
+      Map<String, String> registeredPluginMap,
+      Set<String> preloadSet
   ) {
     this.id = id;
     this.containerCacheFactory = containerCacheFactory;
     this.callbackDelegateFactory = callbackDelegateFactory;
     this.pluginInstantiator = pluginInstantiator;
     this.registeredPluginMap = registeredPluginMap;
+    this.preloadSet = preloadSet;
   }
 
   public String getId() {
     return this.id;
+  }
+
+  public Set<String> getPreloadSet() {
+    return Collections.unmodifiableSet(this.preloadSet);
   }
 
   /* package */ void setClassLoaderFactory(IClassLoaderFactory classLoaderFactory) {
@@ -100,13 +109,13 @@ public class Container {
 
     Object obj;
 
-    if ((obj = this.cache.get(aClass)) != null) {
+    if ((obj = this.cache.get(resourceString)) != null) {
       return pClass.cast(obj);
     }
 
     P newPluginInstance = this.pluginInstantiator.instantiate(aClass);
 
-    this.cache.put(aClass, newPluginInstance);
+    this.cache.put(resourceString, newPluginInstance);
 
     return newPluginInstance;
   }

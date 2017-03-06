@@ -71,7 +71,7 @@ public class OptionalDependsOnAdapter implements
 
       if (value == null || ((String) value).isEmpty()) {
         throw new MetaAdaptException(String.format(
-            "Array [%s] must contain non-empty strings only, got: %s", key, value
+            "Array [%s] must contain non-empty strings only, got: '%s'", key, value
         ));
       }
 

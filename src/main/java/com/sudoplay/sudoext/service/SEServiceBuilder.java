@@ -105,6 +105,15 @@ public class SEServiceBuilder {
 
   public SEService create() throws SEServiceInitializationException {
 
+    RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
+    PluginFinder pluginFinder;
+
+    recursiveFileRemovalProcessor = new RecursiveFileRemovalProcessor();
+
+    pluginFinder = new PluginFinder(
+        new ZipSearch()
+    );
+
     return new SEServiceFactory().create(
         new ICandidateProvider[]{
             new FileSystemCandidateProvider(
@@ -133,7 +142,7 @@ public class SEServiceBuilder {
                         this.config.getCompressedFileExtension()
                     ),
                     new DefaultInputStreamProvider(),
-                    new RecursiveFileRemovalProcessor()
+                    recursiveFileRemovalProcessor
                 )
             )
         },
@@ -147,7 +156,8 @@ public class SEServiceBuilder {
             new OptionalApiVersionAdapter(),
             new OptionalDependsOnAdapter(),
             new OptionalJarAdapter(),
-            new OptionalRegisterAdapter()
+            new OptionalRegisterAdapter(),
+            new OptionalPreloadAdapter()
         },
         new IMetaValidator[]{
             new IdValidator(),
@@ -155,7 +165,10 @@ public class SEServiceBuilder {
             new DependsOnValidator(),
             new JarValidator(),
             new RegisterValidator(
-                new ZipSearch()
+                pluginFinder
+            ),
+            new PreloadValidator(
+                pluginFinder
             )
         },
         this.containerCacheFactory,
@@ -188,7 +201,7 @@ public class SEServiceBuilder {
             ),
             new TempFolderLifecycleEventHandler(
                 this.config.getTempLocation(),
-                new RecursiveFileRemovalProcessor()
+                recursiveFileRemovalProcessor
             )
         },
         this.config.getCharset(),

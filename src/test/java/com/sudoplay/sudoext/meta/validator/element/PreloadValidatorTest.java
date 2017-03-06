@@ -5,16 +5,13 @@ import org.junit.Test;
 
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
 /**
  * Created by codetaylor on 3/4/2017.
  */
-public class RegisterValidatorTest {
+public class PreloadValidatorTest {
 
   @Test
   public void isValidShouldReturnTrueWhenAllPluginsFound() throws Exception {
@@ -23,7 +20,7 @@ public class RegisterValidatorTest {
     when(pluginFinder.hasPlugin(eq("TestA"), any(), any())).thenReturn(true);
     when(pluginFinder.hasPlugin(eq("TestB"), any(), any())).thenReturn(true);
 
-    boolean result = new RegisterValidator(pluginFinder).isValid(
+    boolean result = new PreloadValidator(pluginFinder).isValid(
         Paths.get("src/test/resources"),
         Arrays.asList(
             "TestA",
@@ -42,7 +39,7 @@ public class RegisterValidatorTest {
     when(pluginFinder.hasPlugin(eq("TestA"), any(), any())).thenReturn(true);
     when(pluginFinder.hasPlugin(eq("TestB"), any(), any())).thenReturn(false);
 
-    boolean result = new RegisterValidator(pluginFinder).isValid(
+    boolean result = new PreloadValidator(pluginFinder).isValid(
         Paths.get("src/test/resources"),
         Arrays.asList(
             "TestA",

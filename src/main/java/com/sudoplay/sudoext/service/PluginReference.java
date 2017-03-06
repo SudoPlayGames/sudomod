@@ -27,7 +27,7 @@ public class PluginReference<P extends Plugin> {
     this.container = container;
   }
 
-  public void preLoad() throws PluginException {
+  /* package */ void preLoad() throws PluginException {
 
     try {
       this.get();

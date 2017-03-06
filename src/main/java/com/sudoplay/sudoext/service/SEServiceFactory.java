@@ -130,11 +130,15 @@ import java.nio.charset.Charset;
         new FolderLifecycleEventPlugin(
             folderLifecycleEventHandlers
         ),
+        new PluginPreLoader(),
         containerMapProvider.getContainerMap()
     );
 
-    // initializes each containers cache and classloader
-    service.reloadAllContainers();
+    // initializes folders
+    service.initializeFolders();
+
+    // initializes each container's cache and classloader
+    service.reload();
 
     return service;
   }

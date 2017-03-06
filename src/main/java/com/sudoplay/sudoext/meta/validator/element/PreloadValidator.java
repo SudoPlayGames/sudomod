@@ -11,33 +11,29 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by codetaylor on 3/4/2017.
+ * Created by codetaylor on 3/6/2017.
  */
-public class RegisterValidator implements
+public class PreloadValidator implements
     IMetaValidator {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RegisterValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PreloadValidator.class);
 
   private PluginFinder pluginFinder;
 
-  public RegisterValidator(PluginFinder pluginFinder) {
+  public PreloadValidator(PluginFinder pluginFinder) {
     this.pluginFinder = pluginFinder;
   }
 
   @Override
   public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
-    return isValid(
-        path,
-        meta.getRegisteredPluginMap().values(),
-        meta.getJarFileSet()
-    );
+    return isValid(path, meta.getPreloadSet(), meta.getJarFileSet());
   }
 
-  /* package */ boolean isValid(Path path, Collection<String> values, Set<String> jarFileSet) {
+  /* package */ boolean isValid(Path path, Collection<String> preloadCollection, Set<String> jarFileSet) {
 
     boolean isValid = true;
 
-    for (String value : values) {
+    for (String value : preloadCollection) {
 
       if (!this.pluginFinder.hasPlugin(value, path, jarFileSet)) {
         LOG.error("Failed to locate plugin [{}]", value);

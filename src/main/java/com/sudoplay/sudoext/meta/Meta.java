@@ -29,6 +29,7 @@ public class Meta {
   private Set<Dependency> loadAfterDependencySet;
   private Set<Dependency> loadBeforeDependencySet;
   private Map<String, String> registeredPluginMap;
+  private Set<String> preloadSet;
 
   public Meta(Path parentPath, Path path) {
     this.parentPath = parentPath;
@@ -38,6 +39,11 @@ public class Meta {
     this.loadAfterDependencySet = new LinkedHashSet<>();
     this.loadBeforeDependencySet = new LinkedHashSet<>();
     this.registeredPluginMap = new LinkedHashMap<>();
+    this.preloadSet = new LinkedHashSet<>();
+  }
+
+  public void addPreload(String name) {
+    this.preloadSet.add(name);
   }
 
   public void registerPlugin(String name, String plugin) {
@@ -172,6 +178,10 @@ public class Meta {
 
   public Set<String> getJarFileSet() {
     return this.jarFileSet;
+  }
+
+  public Set<String> getPreloadSet() {
+    return this.preloadSet;
   }
 
   @Override
