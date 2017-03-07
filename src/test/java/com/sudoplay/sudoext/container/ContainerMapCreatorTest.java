@@ -35,8 +35,10 @@ public class ContainerMapCreatorTest {
     )));
 
     IContainerFactory containerFactory = mock(IContainerFactory.class);
-    when(containerFactory.create(eq("metaA"), any(), any())).thenReturn(new Container("metaA", null, null, null, null, null));
-    when(containerFactory.create(eq("metaB"), any(), any())).thenReturn(new Container("metaB", null, null, null, null, null));
+    when(containerFactory.create(eq("metaA"), any(), any(), any())).thenReturn(new Container("metaA", null, null,
+        null, null, null, null));
+    when(containerFactory.create(eq("metaB"), any(), any(), any())).thenReturn(new Container("metaB", null, null,
+        null, null, null, null));
 
     ContainerMapCreator containerMapCreator = new ContainerMapCreator(listProvider, containerFactory);
 

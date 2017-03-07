@@ -45,6 +45,7 @@ public class SourceClassLoaderTest {
     PassThruClassLoader containerClassLoader = spy(new PassThruClassLoader(this.getClass().getClassLoader()));
 
     SourceClassLoader sourceClassLoader = new SourceClassLoader(
+        null,
         containerClassLoader,
         new JavaSourceIClassLoader(
             new PathResourceFinder(new File[]{Paths.get("src/test/resources").toFile()}),
@@ -72,6 +73,7 @@ public class SourceClassLoaderTest {
     when(byteCodeTransformer.transform(any())).thenCallRealMethod();
 
     SourceClassLoader sourceClassLoader = new SourceClassLoader(
+        null,
         this.getClass().getClassLoader(),
         new JavaSourceIClassLoader(
             new PathResourceFinder(new File[]{Paths.get("src/test/resources").toFile()}),

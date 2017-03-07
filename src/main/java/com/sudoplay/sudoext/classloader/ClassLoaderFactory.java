@@ -25,6 +25,7 @@ import java.util.Set;
 
   private final URL[] urls;
   private File[] sourcePath;
+  private final Path path;
   private List<Container> dependencyList;
   private IClassFilterPredicate classFilterPredicate;
   private IClassInterceptor classInterceptor;
@@ -40,6 +41,7 @@ import java.util.Set;
       IByteCodeTransformer byteCodeTransformer,
       InputStreamByteArrayConverter inputStreamByteArrayConverter
   ) {
+    this.path = path;
     this.dependencyList = dependencyList;
     this.classFilterPredicate = classFilterPredicate;
     this.classInterceptor = classInterceptor;
@@ -72,11 +74,13 @@ import java.util.Set;
     );
 
     InterceptClassLoader interceptClassLoader = new InterceptClassLoader(
+        this.path,
         filteredClassLoader,
         this.classInterceptor
     );
 
     JarClassLoader jarClassLoader = new JarClassLoader(
+        this.path,
         this.urls,
         interceptClassLoader,
         this.byteCodeTransformer,
@@ -84,11 +88,13 @@ import java.util.Set;
     );
 
     DependencyClassLoader dependencyClassLoader = new DependencyClassLoader(
+        this.path,
         jarClassLoader,
         this.dependencyList
     );
 
     SourceClassLoader sourceClassLoader = new SourceClassLoader(
+        this.path,
         dependencyClassLoader,
         new JavaSourceIClassLoader(
             new PathResourceFinder(this.sourcePath),

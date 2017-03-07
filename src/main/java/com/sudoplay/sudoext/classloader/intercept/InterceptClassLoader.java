@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.nio.file.Path;
 
 /**
  * Created by codetaylor on 2/23/2017.
@@ -20,13 +19,16 @@ public class InterceptClassLoader extends
 
   private static final Logger LOG = LoggerFactory.getLogger(InterceptClassLoader.class);
 
+  private Path path;
   private IClassInterceptor classInterceptor;
 
   public InterceptClassLoader(
+      Path path,
       ClassLoader parent,
       IClassInterceptor classInterceptor
   ) {
     super(parent);
+    this.path = path;
 
     SecurityManager security = System.getSecurityManager();
 
@@ -38,37 +40,65 @@ public class InterceptClassLoader extends
   }
 
   @Override
+  public Path getPath() {
+    return this.path;
+  }
+
+  @Override
   protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
     synchronized (getClassLoadingLock(name)) {
 
+      // check if we've intercepted the class previously
       Class<?> c = this.findLoadedClass(name);
 
-      if (c == null && this.classInterceptor.canIntercept(name)) {
-        byte[] classBytes = this.getClassBytes(name);
-        c = super.defineClass(null, classBytes, 0, classBytes.length);
+      if (c == null) {
+        ClassLoader parent = this.getParent();
 
-        if (!c.getName().equals(name)) {
-          throw new ClassNotFoundException(name);
+        if (parent != null) {
+
+          try {
+            // load the class upstream
+            c = parent.loadClass(name);
+
+          } catch (ClassNotFoundException e) {
+            //
+          }
+
+          // if it is an annotated class, intercept it
+          if (c != null && c.getDeclaredAnnotation(InterceptClass.class) != null) {
+            c = this.intercept(name);
+          }
         }
-
-        /*final Class<?> cc = c;
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-          // this is privileged because the static callbacks injected via asm are
-          // loaded within the context of the sandbox and consequently fail
-          // interception due to the reflection involved
-          this.classInterceptor.intercept(cc);
-          return null;
-        });
-        c = cc;*/
-        this.classInterceptor.intercept(c);
       }
 
-      if (c != null) {
-        return c;
+      if (c == null) {
+        throw new ClassNotFoundException(name);
       }
 
-      return super.loadClass(name, resolve);
+      return c;
     }
+  }
+
+  private Class<?> intercept(String name) throws ClassNotFoundException {
+    byte[] classBytes = this.getClassBytes(name);
+    Class<?> c = super.defineClass(null, classBytes, 0, classBytes.length);
+
+    if (!c.getName().equals(name)) {
+      throw new ClassNotFoundException(name);
+    }
+
+    /*final Class<?> cc = c;
+    AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+      // this is privileged because the static callbacks injected via asm are
+      // loaded within the context of the sandbox and consequently fail
+      // interception due to the reflection involved
+      this.classInterceptor.intercept(cc);
+      return null;
+    });
+    c = cc;*/
+    this.classInterceptor.intercept(c);
+
+    return c;
   }
 
   private byte[] getClassBytes(String name) throws ClassNotFoundException {

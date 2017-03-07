@@ -3,12 +3,10 @@ package com.sudoplay.sudoext.classloader;
 import com.sudoplay.sudoext.container.Container;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -36,6 +34,7 @@ public class DependencyClassLoaderTest {
     when(classLoader.loadClass("java.lang.Object")).thenThrow(ClassNotFoundException.class);
 
     DependencyClassLoader dependencyClassLoader = new DependencyClassLoader(
+        null,
         classLoader,
         containerList
     );
@@ -73,6 +72,7 @@ public class DependencyClassLoaderTest {
     when(classLoader.loadClass("java.lang.Object")).thenThrow(ClassNotFoundException.class);
 
     DependencyClassLoader dependencyClassLoader = new DependencyClassLoader(
+        null,
         classLoader,
         containerList
     );

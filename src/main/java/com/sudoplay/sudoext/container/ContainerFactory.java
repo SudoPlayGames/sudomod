@@ -2,6 +2,7 @@ package com.sudoplay.sudoext.container;
 
 import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,11 +28,13 @@ public class ContainerFactory implements IContainerFactory {
   @Override
   public Container create(
       String id,
+      Path path,
       Map<String, String> registeredPluginMap,
       Set<String> preloadSet
   ) {
     return new Container(
         id,
+        path,
         this.containerCacheFactory,
         this.callbackDelegateFactory,
         this.pluginInstantiator,

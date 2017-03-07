@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 
 /**
  * Created by codetaylor on 2/22/2017.
@@ -22,18 +23,26 @@ import java.net.URLClassLoader;
 
   private static final Logger LOG = LoggerFactory.getLogger(JarClassLoader.class);
 
+  private final Path path;
   private final IByteCodeTransformer byteCodeTransformer;
   private final InputStreamByteArrayConverter inputStreamByteArrayConverter;
 
   /* package */ JarClassLoader(
+      Path path,
       URL[] urls,
       ClassLoader parent,
       IByteCodeTransformer byteCodeTransformer,
       InputStreamByteArrayConverter inputStreamByteArrayConverter
   ) {
     super(urls, parent);
+    this.path = path;
     this.byteCodeTransformer = byteCodeTransformer;
     this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
+  }
+
+  @Override
+  public Path getPath() {
+    return this.path;
   }
 
   @Override

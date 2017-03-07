@@ -11,11 +11,11 @@ public class SEServicePolicy extends
     Policy {
 
   private final IPermissionCollectionProvider applicationPermissionsProvider;
-  private final IPermissionCollectionProvider sandboxPermissionsProvider;
+  private final ISandboxPermissionCollectionProvider sandboxPermissionsProvider;
 
   public SEServicePolicy(
       IPermissionCollectionProvider applicationPermissionsProvider,
-      IPermissionCollectionProvider sandboxPermissionsProvider
+      ISandboxPermissionCollectionProvider sandboxPermissionsProvider
   ) {
     this.applicationPermissionsProvider = applicationPermissionsProvider;
     this.sandboxPermissionsProvider = sandboxPermissionsProvider;
@@ -23,9 +23,12 @@ public class SEServicePolicy extends
 
   @Override
   public PermissionCollection getPermissions(ProtectionDomain domain) {
+    ClassLoader classLoader = domain.getClassLoader();
 
-    if (domain.getClassLoader() instanceof ISandboxClassLoader) {
-      return this.sandboxPermissionsProvider.getPermissionCollection();
+    if (classLoader instanceof ISandboxClassLoader) {
+      return this.sandboxPermissionsProvider.getPermissionCollection(
+          ((ISandboxClassLoader) classLoader).getPath()
+      );
 
     } else {
       return this.applicationPermissionsProvider.getPermissionCollection();

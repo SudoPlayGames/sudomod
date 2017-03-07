@@ -1,7 +1,8 @@
 package com.sudoplay.sudoext.service;
 
-import com.sudoplay.sudoext.api.ContainerAPI;
-import com.sudoplay.sudoext.api.logging.Slf4jLoggerAPIProvider;
+import com.sudoplay.sudoext.api.internal.ILogAPIProvider;
+import com.sudoplay.sudoext.api.internal.PathProvider;
+import com.sudoplay.sudoext.api.internal.Slf4JLogAPIProvider;
 import com.sudoplay.sudoext.candidate.*;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoext.candidate.extractor.ZipFileExtractor;
@@ -10,10 +11,7 @@ import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
-import com.sudoplay.sudoext.classloader.intercept.ClassIntercept;
-import com.sudoplay.sudoext.classloader.intercept.DelegateClassInterceptProcessor;
-import com.sudoplay.sudoext.classloader.intercept.IClassInterceptProcessor;
-import com.sudoplay.sudoext.classloader.intercept.StaticFieldClassInterceptProcessor;
+import com.sudoplay.sudoext.classloader.intercept.StaticInjector;
 import com.sudoplay.sudoext.container.Container;
 import com.sudoplay.sudoext.container.IContainerCacheFactory;
 import com.sudoplay.sudoext.container.LRUContainerCacheFactory;
@@ -48,11 +46,15 @@ public class SEServiceBuilder {
   private List<IClassFilter> defaultClassLoaderClassFilterList;
   private List<IClassFilter> classLoaderClassFilterList;
 
+  private List<StaticInjector<?>> defaultStaticInjectorList;
+  private List<StaticInjector<?>> staticInjectorList;
+
   public SEServiceBuilder(SEConfigBuilder configBuilder) {
     this.config = PreCondition.notNull(configBuilder).getConfig();
 
     // init user-defined lists
     this.classLoaderClassFilterList = new ArrayList<>();
+    this.staticInjectorList = new ArrayList<>();
 
     // init component objects
     this.containerCacheFactory = new LRUContainerCacheFactory(64);
@@ -61,10 +63,40 @@ public class SEServiceBuilder {
     this.byteCodeTransformer = new SEByteCodeTransformerBuilder()
         .create();
 
-    // adds the default class filter
+    // adds the default class filters
     this.defaultClassLoaderClassFilterList = new ArrayList<>();
 
+    // adds the default static injectors
+    this.defaultStaticInjectorList = new ArrayList<>();
+    this.defaultStaticInjectorList.add(new StaticInjector<>(
+        ILogAPIProvider.class,
+        container -> new Slf4JLogAPIProvider(container.getId())
+    ));
+    this.defaultStaticInjectorList.add(new StaticInjector<>(
+        String.class,
+        "container-id",
+        Container::getId
+    ));
+    this.defaultStaticInjectorList.add(new StaticInjector<>(
+        PathProvider.class,
+        container -> new PathProvider(container.getPath())
+    ));
+
     this.callbackDelegateFactory = new AccountingCallbackDelegateFactory();
+  }
+
+  public SEServiceBuilder addStaticInjector(@NotNull StaticInjector<?> staticInjector) {
+    this.staticInjectorList.add(PreCondition.notNull(staticInjector));
+    return this;
+  }
+
+  public SEServiceBuilder removeAllDefaultStaticInjectors() {
+    this.defaultStaticInjectorList.clear();
+    return this;
+  }
+
+  public SEServiceBuilder removeDefaultStaticInjector(@NotNull Class<? extends StaticInjector<?>> aClass) {
+    return this.removeByClass(PreCondition.notNull(aClass), this.defaultStaticInjectorList);
   }
 
   public SEServiceBuilder setCallbackDelegateFactory(@NotNull ICallbackDelegateFactory callbackDelegateFactory) {
@@ -101,6 +133,13 @@ public class SEServiceBuilder {
     list.addAll(this.defaultClassLoaderClassFilterList);
     list.addAll(this.classLoaderClassFilterList);
     return list.toArray(new IClassFilter[list.size()]);
+  }
+
+  private StaticInjector<?>[] getStaticInjectors() {
+    List<StaticInjector<?>> list = new ArrayList<>();
+    list.addAll(this.defaultStaticInjectorList);
+    list.addAll(this.staticInjectorList);
+    return list.toArray(new StaticInjector<?>[list.size()]);
   }
 
   public SEService create() throws SEServiceInitializationException {
@@ -173,23 +212,7 @@ public class SEServiceBuilder {
         },
         this.containerCacheFactory,
         this.getClassLoaderClassFilters(),
-        new ClassIntercept[]{
-            new ClassIntercept(
-                ContainerAPI.class,
-                new DelegateClassInterceptProcessor(
-                    new IClassInterceptProcessor[]{
-                        new StaticFieldClassInterceptProcessor(
-                            "LOGGING_API_PROVIDER",
-                            container -> new Slf4jLoggerAPIProvider(container.getId())
-                        ),
-                        new StaticFieldClassInterceptProcessor(
-                            "ID",
-                            Container::getId
-                        )
-                    }
-                )
-            )
-        },
+        this.getStaticInjectors(),
         this.callbackDelegateFactory,
         this.byteCodeTransformer,
         new IFolderLifecycleEventHandler[]{

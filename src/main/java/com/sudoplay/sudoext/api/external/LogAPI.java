@@ -1,9 +1,9 @@
-package com.sudoplay.sudoext.api.logging;
+package com.sudoplay.sudoext.api.external;
 
 /**
  * Created by codetaylor on 2/22/2017.
  */
-public interface LoggerAPI {
+public interface LogAPI {
 
   String getName();
 

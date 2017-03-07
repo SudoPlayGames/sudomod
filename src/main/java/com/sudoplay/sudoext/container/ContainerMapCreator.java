@@ -16,7 +16,6 @@ public class ContainerMapCreator implements
   private IMetaListProvider metaListProvider;
   private IContainerFactory containerFactory;
 
-
   public ContainerMapCreator(
       IMetaListProvider metaListProvider,
       IContainerFactory containerFactory
@@ -41,9 +40,9 @@ public class ContainerMapCreator implements
 
       container = this.containerFactory.create(
           id,
+          meta.getParentPath(),
           meta.getRegisteredPluginMap(),
-          meta.getPreloadSet()
-      );
+          meta.getPreloadSet());
 
       containerMap.put(id, container);
     }

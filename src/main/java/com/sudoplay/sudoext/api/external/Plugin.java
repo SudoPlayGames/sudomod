@@ -1,4 +1,4 @@
-package com.sudoplay.sudoext.api;
+package com.sudoplay.sudoext.api.external;
 
 /**
  * Created by codetaylor on 2/21/2017.

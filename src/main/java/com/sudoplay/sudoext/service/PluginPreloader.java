@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.service;
 
-import com.sudoplay.sudoext.api.Plugin;
+import com.sudoplay.sudoext.api.external.Plugin;
 
 import java.util.List;
 

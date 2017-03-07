@@ -1,6 +1,6 @@
 package com.sudoplay.sudoext.container;
 
-import com.sudoplay.sudoext.api.Plugin;
+import com.sudoplay.sudoext.api.external.Plugin;
 
 /**
  * Created by codetaylor on 3/3/2017.

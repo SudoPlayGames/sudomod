@@ -8,14 +8,14 @@ import com.sudoplay.sudoext.container.Container;
 public class DefaultClassInterceptorFactory implements
     IClassInterceptorFactory {
 
-  private ClassIntercept[] classIntercepts;
+  private StaticInjector<?>[] staticInjectors;
 
-  public DefaultClassInterceptorFactory(ClassIntercept[] classIntercepts) {
-    this.classIntercepts = classIntercepts;
+  public DefaultClassInterceptorFactory(StaticInjector<?>[] staticInjectors) {
+    this.staticInjectors = staticInjectors;
   }
 
   @Override
   public IClassInterceptor create(Container container) {
-    return new DefaultClassInterceptor(container, this.classIntercepts);
+    return new DefaultClassInterceptor(container, this.staticInjectors);
   }
 }

@@ -1,12 +1,13 @@
 package com.sudoplay.sudoext.container;
 
-import com.sudoplay.sudoext.api.Plugin;
+import com.sudoplay.sudoext.api.external.Plugin;
 import com.sudoplay.sudoext.classloader.IClassLoaderFactory;
 import com.sudoplay.sudoext.classloader.IContainerClassLoader;
 import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegate;
 import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.util.PreCondition;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import java.util.Set;
 public class Container {
 
   private final String id;
+  private final Path path;
   private final IContainerCacheFactory containerCacheFactory;
   private final ICallbackDelegateFactory callbackDelegateFactory;
   private final PluginInstantiator pluginInstantiator;
@@ -29,6 +31,7 @@ public class Container {
 
   public Container(
       String id,
+      Path path,
       IContainerCacheFactory containerCacheFactory,
       ICallbackDelegateFactory callbackDelegateFactory,
       PluginInstantiator pluginInstantiator,
@@ -36,6 +39,7 @@ public class Container {
       Set<String> preloadSet
   ) {
     this.id = id;
+    this.path = path;
     this.containerCacheFactory = containerCacheFactory;
     this.callbackDelegateFactory = callbackDelegateFactory;
     this.pluginInstantiator = pluginInstantiator;
@@ -45,6 +49,10 @@ public class Container {
 
   public String getId() {
     return this.id;
+  }
+
+  public Path getPath() {
+    return this.path;
   }
 
   public Set<String> getPreloadSet() {

@@ -1,7 +1,7 @@
 package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.api.ModPlugin;
-import com.sudoplay.sudoext.api.Plugin;
+import com.sudoplay.sudoext.api.external.Plugin;
 import com.sudoplay.sudoext.classloader.asm.filter.AllowedJavaUtilClassFilter;
 import com.sudoplay.sudoext.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoext.classloader.filter.AllowAllClassFilter;
@@ -11,9 +11,11 @@ import com.sudoplay.sudoext.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FilePermission;
 import java.nio.file.Paths;
 import java.security.AllPermission;
 import java.security.Permissions;
+import java.security.Policy;
 
 /**
  * Created by codetaylor on 2/18/2017.
@@ -21,14 +23,18 @@ import java.security.Permissions;
 public class Main {
 
   static {
-    java.security.Policy.setPolicy(
+    Policy.setPolicy(
         new SEServicePolicy(
             () -> {
               Permissions permissions = new Permissions();
               permissions.add(new AllPermission());
               return permissions;
             },
-            Permissions::new
+            path -> {
+              Permissions permissions = new Permissions();
+              permissions.add(new FilePermission(path.toString() + "/-", "read"));
+              return permissions;
+            }
         )
     );
     System.setSecurityManager(new SecurityManager());
@@ -56,7 +62,7 @@ public class Main {
               @Override
               public boolean isAllowed(String name) {
                 return name.startsWith("mod.")
-                    || name.startsWith("com.sudoplay.sudoext.api.")
+                    || name.startsWith("com.sudoplay.sudoext.api.external.")
                     || name.startsWith("com.sudoplay.math.");
               }
             })
@@ -68,8 +74,7 @@ public class Main {
     PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);
     PluginReference<Plugin> pluginC = service.getPlugin("test-mod-c:mod.ModPluginC", Plugin.class);
 
-    try {
-
+    wrap(() -> {
       System.out.println("--- Preload ---");
       service.preload((containerId, resource, percentage, timeMilliseconds, throwable) -> {
         System.out.println(String.format(
@@ -81,24 +86,33 @@ public class Main {
         }
       });
       System.out.println("--- End Preload ---");
+    });
 
-      for (int i = 0; i < 4; i++) {
-        pluginA.invoke(ModPlugin::onGreeting);
-      }
+    wrap(() -> {
+      pluginA.invoke(ModPlugin::onGreeting);
       System.out.println(pluginA.getReport());
       System.out.println("---");
+    });
 
-      for (int i = 0; i < 4; i++) {
-        pluginB.invoke(ModPlugin::onGreeting);
-      }
+    wrap(() -> {
+      pluginB.invoke(ModPlugin::onGreeting);
       System.out.println(pluginB.getReport());
-
-    } catch (PluginException e) {
-      LOG.error("", e);
-
-    }
+    });
 
     service.disposeFolders();
+  }
+
+  private interface RunnableException {
+    void run() throws Exception;
+  }
+
+  private static void wrap(RunnableException runnable) {
+
+    try {
+      runnable.run();
+    } catch (Exception e) {
+      LOG.error("", e);
+    }
   }
 
 }

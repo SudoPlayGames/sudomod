@@ -39,7 +39,7 @@ public class JarClassLoaderTest {
 
     PassThruClassLoader containerClassLoader = spy(new PassThruClassLoader(null));
 
-    JarClassLoader jarClassLoader = new JarClassLoader(new URL[0], containerClassLoader, null, null);
+    JarClassLoader jarClassLoader = new JarClassLoader(null, new URL[0], containerClassLoader, null, null);
 
     try {
       jarClassLoader.loadClassWithoutDependencyCheck("MissingClass");
@@ -60,7 +60,7 @@ public class JarClassLoaderTest {
 
     InputStreamByteArrayConverter inputStreamByteArrayConverter = new InputStreamByteArrayConverter();
 
-    JarClassLoader jarClassLoader = new JarClassLoader(new URL[]{Paths.get("src/test/resources").toUri().toURL()},
+    JarClassLoader jarClassLoader = new JarClassLoader(null, new URL[]{Paths.get("src/test/resources").toUri().toURL()},
         null, byteCodeTransformer, inputStreamByteArrayConverter);
 
     try {

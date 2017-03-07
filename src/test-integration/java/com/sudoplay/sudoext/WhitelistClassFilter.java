@@ -1,10 +1,10 @@
 package com.sudoplay.sudoext;
 
 import com.sudoplay.sudoext.api.AncillaryPlugin;
-import com.sudoplay.sudoext.api.Plugin;
+import com.sudoplay.sudoext.api.external.Plugin;
 import com.sudoplay.sudoext.api.ModPlugin;
-import com.sudoplay.sudoext.api.logging.ILoggerAPIProvider;
-import com.sudoplay.sudoext.api.logging.LoggerAPI;
+import com.sudoplay.sudoext.api.internal.ILogAPIProvider;
+import com.sudoplay.sudoext.api.external.LogAPI;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
 
 import java.io.Serializable;
@@ -140,8 +140,8 @@ public class WhitelistClassFilter implements
 
     // com.sudoplay.sudoext
     this.whitelist.addAll(Arrays.asList(
-        ILoggerAPIProvider.class.getName(),
-        LoggerAPI.class.getName(),
+        ILogAPIProvider.class.getName(),
+        LogAPI.class.getName(),
         Plugin.class.getName()
     ));
 

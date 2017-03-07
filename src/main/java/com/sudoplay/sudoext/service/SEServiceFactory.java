@@ -7,8 +7,8 @@ import com.sudoplay.sudoext.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoext.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoext.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoext.classloader.filter.IClassFilter;
-import com.sudoplay.sudoext.classloader.intercept.ClassIntercept;
 import com.sudoplay.sudoext.classloader.intercept.DefaultClassInterceptorFactory;
+import com.sudoplay.sudoext.classloader.intercept.StaticInjector;
 import com.sudoplay.sudoext.container.*;
 import com.sudoplay.sudoext.folder.FolderLifecycleEventPlugin;
 import com.sudoplay.sudoext.folder.IFolderLifecycleEventHandler;
@@ -34,7 +34,7 @@ import java.nio.charset.Charset;
       IMetaValidator[] metaValidators,
       IContainerCacheFactory containerCacheFactory,
       IClassFilter[] classLoaderClassFilters,
-      ClassIntercept[] classIntercepts,
+      StaticInjector<?>[] staticInjectors,
       ICallbackDelegateFactory callbackDelegateFactory,
       IByteCodeTransformer byteCodeTransformer,
       IFolderLifecycleEventHandler[] folderLifecycleEventHandlers,
@@ -117,7 +117,7 @@ import java.nio.charset.Charset;
                 classLoaderClassFilters
             ),
             new DefaultClassInterceptorFactory(
-                classIntercepts
+                staticInjectors
             ),
             byteCodeTransformer,
             new InputStreamByteArrayConverter()

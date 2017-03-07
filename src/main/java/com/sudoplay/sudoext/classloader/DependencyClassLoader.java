@@ -5,6 +5,7 @@ import com.sudoplay.sudoext.container.Container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -16,10 +17,17 @@ import java.util.List;
     ISandboxClassLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(DependencyClassLoader.class);
+
+  private Path path;
   private List<Container> containerList;
 
-  /* package */ DependencyClassLoader(ClassLoader parent, List<Container> containerList) {
+  /* package */ DependencyClassLoader(
+      Path path,
+      ClassLoader parent,
+      List<Container> containerList
+  ) {
     super(parent);
+    this.path = path;
 
     SecurityManager security = System.getSecurityManager();
 
@@ -28,6 +36,11 @@ import java.util.List;
     }
 
     this.containerList = containerList;
+  }
+
+  @Override
+  public Path getPath() {
+    return this.path;
   }
 
   @Override

@@ -10,6 +10,7 @@ import org.codehaus.janino.JavaSourceIClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,16 +24,19 @@ import java.util.Map;
 
   private static final Logger LOG = LoggerFactory.getLogger(SourceClassLoader.class);
 
+  private final Path path;
   private final Map<String, byte[]> precompiledClasses = new HashMap<>();
 
   private IByteCodeTransformer byteCodeTransformer;
 
   /* package */ SourceClassLoader(
+      Path path,
       ClassLoader parentClassLoader,
       JavaSourceIClassLoader iClassLoader,
       IByteCodeTransformer byteCodeTransformer
   ) {
     super(parentClassLoader, iClassLoader);
+    this.path = path;
 
     SecurityManager security = System.getSecurityManager();
 
@@ -41,6 +45,11 @@ import java.util.Map;
     }
 
     this.byteCodeTransformer = byteCodeTransformer;
+  }
+
+  @Override
+  public Path getPath() {
+    return this.path;
   }
 
   @Override

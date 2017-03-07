@@ -5,7 +5,5 @@ package com.sudoplay.sudoext.classloader.intercept;
  */
 public interface IClassInterceptor {
 
-  boolean canIntercept(String name);
-
   void intercept(Class<?> aClass);
 }
