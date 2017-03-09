@@ -8,7 +8,7 @@ Test:
   ✔ Test that the recursive delete helper doesn't follow symlinks @done (17-03-04 11:19)
     According to the source of Files.walkFileTree: "In other words, it does not follow symbolic links, and visits all levels of the file tree."
   ✔ Test that extension can't have dependency on itself @done (17-03-04 11:04)
-  ☐ Class can implement non-whitelisted class...?
+  ☐ Class can implement or extend non-whitelisted class...?
 
 Meta:
   ✔ Should we switch to a more mature json lib that allows comments? @done (17-02-26 12:15)

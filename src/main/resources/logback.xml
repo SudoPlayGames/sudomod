@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.sudoplay.sudoext.ext.classloader" level="DEBUG"/>
+    <logger name="com.sudoplay.sudoxt.ext.classloader" level="DEBUG"/>
     <logger name="mod" level="TRACE"/>
 
     <root level="DEBUG">
