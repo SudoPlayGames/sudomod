@@ -1,4 +1,4 @@
-package com.sudoplay.sudoxt.api.common;
+package testapi;
 
 import com.sudoplay.sudoxt.classloader.intercept.InjectStaticField;
 import com.sudoplay.sudoxt.classloader.intercept.InterceptClass;

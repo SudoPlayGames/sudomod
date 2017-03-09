@@ -1,6 +1,6 @@
-package com.sudoplay.sudoxt.api.internal;
+package com.sudoplay.sudoxt.api;
 
-import com.sudoplay.sudoxt.api.common.LoggerAPI;
+import testapi.LoggerAPI;
 
 /**
  * Created by codetaylor on 2/22/2017.

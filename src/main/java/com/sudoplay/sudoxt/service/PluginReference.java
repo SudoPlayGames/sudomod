@@ -32,7 +32,7 @@ public class PluginReference<P extends Plugin> {
       this.get();
 
     } catch (Exception e) {
-      throw new PluginException("Plugin exception caught", e);
+      throw this.getException(e);
     }
   }
 
@@ -43,8 +43,19 @@ public class PluginReference<P extends Plugin> {
       handler.invoke(this.get());
 
     } catch (Exception e) {
-      throw new PluginException("Plugin exception caught", e);
+      throw this.getException(e);
     }
+  }
+
+  private PluginException getException(Exception e) {
+    return new PluginException(
+        String.format(
+            "[%s]: %s",
+            e.getClass().getSimpleName(),
+            e.getMessage()
+        ),
+        e
+    );
   }
 
   public <R> R invoke(Class<R> rClass, InvokeReturnHandler<P, R> handler) throws PluginException {
@@ -54,7 +65,7 @@ public class PluginReference<P extends Plugin> {
       return handler.invoke(this.get());
 
     } catch (Exception e) {
-      throw new PluginException("Plugin exception caught", e);
+      throw this.getException(e);
     }
   }
 

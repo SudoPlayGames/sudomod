@@ -1,4 +1,4 @@
-package com.sudoplay.sudoxt.api.common;
+package testapi;
 
 /**
  * Created by codetaylor on 2/22/2017.

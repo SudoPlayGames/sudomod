@@ -1,8 +1,5 @@
 package com.sudoplay.sudoxt.service;
 
-import com.sudoplay.sudoxt.api.internal.ILoggerAPIProvider;
-import com.sudoplay.sudoxt.container.SandboxPathProvider;
-import com.sudoplay.sudoxt.api.internal.LoggerAPIProvider;
 import com.sudoplay.sudoxt.candidate.*;
 import com.sudoplay.sudoxt.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoxt.candidate.extractor.ZipFileExtractor;
@@ -11,8 +8,8 @@ import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoxt.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
+import com.sudoplay.sudoxt.classloader.intercept.SandboxPathProviderStaticInjector;
 import com.sudoplay.sudoxt.classloader.intercept.StaticInjector;
-import com.sudoplay.sudoxt.container.Container;
 import com.sudoplay.sudoxt.container.IContainerCacheFactory;
 import com.sudoplay.sudoxt.container.LRUContainerCacheFactory;
 import com.sudoplay.sudoxt.folder.DefaultFolderLifecycleInitializeEventHandler;
@@ -68,19 +65,7 @@ public class SEServiceBuilder {
 
     // adds the default static injectors
     this.defaultStaticInjectorList = new ArrayList<>();
-    this.defaultStaticInjectorList.add(new StaticInjector<>(
-        ILoggerAPIProvider.class,
-        container -> new LoggerAPIProvider(container.getId())
-    ));
-    this.defaultStaticInjectorList.add(new StaticInjector<>(
-        String.class,
-        "container-id",
-        Container::getId
-    ));
-    this.defaultStaticInjectorList.add(new StaticInjector<>(
-        SandboxPathProvider.class,
-        container -> new SandboxPathProvider(container.getPath())
-    ));
+    this.defaultStaticInjectorList.add(new SandboxPathProviderStaticInjector());
 
     this.callbackDelegateFactory = new AccountingCallbackDelegateFactory();
   }

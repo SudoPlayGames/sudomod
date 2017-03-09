@@ -3,8 +3,8 @@ package com.sudoplay.sudoxt;
 import testapi.AncillaryPlugin;
 import com.sudoplay.sudoxt.service.Plugin;
 import testapi.ModPlugin;
-import com.sudoplay.sudoxt.api.internal.ILoggerAPIProvider;
-import com.sudoplay.sudoxt.api.common.LoggerAPI;
+import com.sudoplay.sudoxt.api.ILoggerAPIProvider;
+import testapi.LoggerAPI;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 
 import java.io.Serializable;

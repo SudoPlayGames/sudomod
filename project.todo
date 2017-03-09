@@ -1,3 +1,5 @@
+http://misko.hevery.com/code-reviewers-guide/
+
 Naming Conventions:
   * Extension - a group of plugins, like a 'mod'
   * Plugin - an abstract class in the API, extended by a class in the extension
@@ -8,7 +10,9 @@ Test:
   ✔ Test that the recursive delete helper doesn't follow symlinks @done (17-03-04 11:19)
     According to the source of Files.walkFileTree: "In other words, it does not follow symbolic links, and visits all levels of the file tree."
   ✔ Test that extension can't have dependency on itself @done (17-03-04 11:04)
-  ☐ Class can implement or extend non-whitelisted class...?
+  ✔ Class can implement or extend non-whitelisted class...? @done (17-03-09 09:40)
+    Fixed by checking class superclass and implemented interfaces against the same class filters used in the method visitor.
+
 
 Meta:
   ✔ Should we switch to a more mature json lib that allows comments? @done (17-02-26 12:15)
@@ -27,9 +31,10 @@ Security:
   ✔ Finish class byte usage in budget callback delegate @done (17-03-05 14:56)
 
 File Access:
-  ☐ Sandbox mod file access into the data folder
+  ✔ Sandbox mod file access into the data folder @done (17-03-09 09:41)
     Should grant extensions read-only access to certain files in the mod's home folder: json, csv (any others?).
     Should grant the mod read/write access to a NBT data file in the data folder, albeit via API.
+  ☐ Json api wrapper
 
 Configuration:
   ☐ Provide simple configuration file framework
@@ -46,5 +51,5 @@ Configuration:
   ✔ Change remove default methods to say removeAll... @done (17-02-24 11:33)
 
 Events:
-  ☐ Provide a self-contained, service level event system:
-    Do we even need events?
+  ✔ Provide a self-contained, service level event system: @done (17-03-09 09:41)
+    Do we even need events? Not going to implement this.
