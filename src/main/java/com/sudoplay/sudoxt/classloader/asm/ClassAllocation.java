@@ -8,7 +8,6 @@ import java.util.Map;
  */
 public class ClassAllocation {
 
-  // injected
   private static final Map<String, Integer> CLASS_FIELD_COUNT_MAP = new HashMap<>();
 
   public static int get(String name) {

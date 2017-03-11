@@ -25,7 +25,7 @@ Meta:
   ✔ Rename meta parsers to adapters; also rename variable names in tests @done (17-03-04 11:19)
   ✔ Registered plugins @done (17-03-04 15:49)
     Optionally allow extensions to register plugins with a name. These plugins can later be retrieved by the system developer; ie. retrieving all 'main-plugin' from each extension which would act as an entry point.
-  ☐ Overrides
+  ✔ Overrides @done (17-03-11 12:54)
   ✔ Preload @done (17-03-06 13:29)
 
 Security:

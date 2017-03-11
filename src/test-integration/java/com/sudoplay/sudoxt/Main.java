@@ -9,6 +9,7 @@ import com.sudoplay.sudoxt.classloader.filter.AllowAllClassFilter;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.security.SEServicePolicy;
 import com.sudoplay.sudoxt.service.*;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class Main {
             .setApiVersion("1.0"))
         .addStaticInjector(new LoggerStaticInjector())
         .addClassLoaderClassFilter(new AllowAllClassFilter())
-        .setCallbackDelegateFactory(NoOpCallbackDelegateFactory.INSTANCE) // testing
+        //.setCallbackDelegateFactory(NoOpCallbackDelegateFactory.INSTANCE) // testing
         .setByteCodeTransformerBuilder(new SEByteCodeTransformerBuilder()
             //.setByteCodePrinter(new StdOutByteCodePrinter())
             .addClassFilter(new AllowedJavaUtilClassFilter())
@@ -76,6 +77,7 @@ public class Main {
 
     SXPluginReference<Plugin> pluginA = service.getPlugin("mod_a:mod.ModPlugin", Plugin.class);
     SXPluginReference<Plugin> pluginB = service.getPlugin("mod_b:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginC = service.getPlugin("mod_c:mod.ModPlugin", Plugin.class);
 
     List<SXPluginReference<AncillaryPlugin>> referenceList = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
 
@@ -99,6 +101,10 @@ public class Main {
     System.out.println(pluginB.getReport());
     System.out.println("---");
 
+    this.expect(() -> {
+      pluginC.invoke(Plugin::onGreeting);
+    });
+
     for (SXPluginReference<AncillaryPlugin> reference : referenceList) {
       reference.invoke(AncillaryPlugin::doStuff);
     }
@@ -114,7 +120,7 @@ public class Main {
 
     try {
       runnable.run();
-      //Assert.fail();
+      Assert.fail();
 
     } catch (Exception e) {
       // expected
