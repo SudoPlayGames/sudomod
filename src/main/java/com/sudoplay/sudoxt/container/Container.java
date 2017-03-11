@@ -1,6 +1,5 @@
 package com.sudoplay.sudoxt.container;
 
-import com.sudoplay.sudoxt.service.Plugin;
 import com.sudoplay.sudoxt.classloader.IClassLoaderFactory;
 import com.sudoplay.sudoxt.classloader.IContainerClassLoader;
 import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegate;
@@ -11,6 +10,8 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import static com.sudoplay.sudoxt.classloader.SXClassLoader.*;
 
 /**
  * Created by codetaylor on 2/20/2017.
@@ -24,6 +25,7 @@ public class Container {
   private final PluginInstantiator pluginInstantiator;
   private final Map<String, String> registeredPluginMap;
   private Set<String> preloadSet;
+  private ContainerOverrideProvider containerOverrideProvider;
 
   private IClassLoaderFactory classLoaderFactory;
   private IContainerClassLoader classLoader;
@@ -63,6 +65,10 @@ public class Container {
     this.classLoaderFactory = classLoaderFactory;
   }
 
+  /* package */ void setContainerOverrideProvider(ContainerOverrideProvider containerOverrideProvider) {
+    this.containerOverrideProvider = containerOverrideProvider;
+  }
+
   public ICallbackDelegate getCallbackDelegate() {
     return this.callbackDelegateFactory.create(this.classLoader);
   }
@@ -72,8 +78,8 @@ public class Container {
     this.classLoader = this.classLoaderFactory.create();
   }
 
-  public Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException {
-    return this.classLoader.loadClassWithoutDependencyCheck(name);
+  public Class<?> loadClass(String name, int flags) throws ClassNotFoundException {
+    return this.classLoader.loadClass(name, flags);
   }
 
   public boolean hasRegisteredPlugin(String name) {
@@ -84,15 +90,7 @@ public class Container {
     return this.registeredPluginMap.get(name);
   }
 
-  public <P extends Plugin> P getRegisteredPlugin(String name, Class<P> pClass) throws IllegalAccessException,
-      InstantiationException, ClassNotFoundException {
-    return this.getPlugin(
-        PreCondition.notNull(this.registeredPluginMap.get(name)),
-        PreCondition.notNull(pClass)
-    );
-  }
-
-  public <P extends Plugin> P getPlugin(String resourceString, Class<P> pClass) throws ClassNotFoundException,
+  public <P> P getPlugin(String resourceString, Class<P> pClass) throws ClassNotFoundException,
       IllegalAccessException, InstantiationException {
     return this.getPlugin(
         PreCondition.notNull(resourceString),
@@ -101,31 +99,35 @@ public class Container {
     );
   }
 
-  private <P extends Plugin> P getPlugin(String resourceString, Class<P> pClass, boolean useDependencyCheck) throws
+  private <P> P getPlugin(String resourceString, Class<P> pClass, boolean useDependencyCheck) throws
       ClassNotFoundException, IllegalAccessException, InstantiationException {
 
-    Class<P> aClass;
+    P plugin = this.containerOverrideProvider.getPlugin(resourceString, pClass);
 
-    if (useDependencyCheck) {
-      //noinspection unchecked
-      aClass = (Class<P>) this.classLoader.loadClass(resourceString);
+    if (plugin == null) {
+      Class<P> aClass;
 
-    } else {
-      //noinspection unchecked
-      aClass = (Class<P>) this.classLoader.loadClassWithoutDependencyCheck(resourceString);
+      if (useDependencyCheck) {
+        //noinspection unchecked
+        aClass = (Class<P>) this.classLoader.loadClass(resourceString, (JAR | SOURCE | DEPENDENCY));
+
+      } else {
+        //noinspection unchecked
+        aClass = (Class<P>) this.classLoader.loadClass(resourceString, (JAR | SOURCE));
+      }
+
+      Object obj;
+
+      if ((obj = this.cache.get(resourceString)) != null) {
+        return pClass.cast(obj);
+      }
+
+      plugin = this.pluginInstantiator.instantiate(aClass);
+
+      this.cache.put(resourceString, plugin);
     }
 
-    Object obj;
-
-    if ((obj = this.cache.get(resourceString)) != null) {
-      return pClass.cast(obj);
-    }
-
-    P newPluginInstance = this.pluginInstantiator.instantiate(aClass);
-
-    this.cache.put(resourceString, newPluginInstance);
-
-    return newPluginInstance;
+    return plugin;
   }
 
   @Override

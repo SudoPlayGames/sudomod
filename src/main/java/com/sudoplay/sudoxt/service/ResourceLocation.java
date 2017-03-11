@@ -1,5 +1,6 @@
 package com.sudoplay.sudoxt.service;
 
+import com.sudoplay.sudoxt.util.PreCondition;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,8 +18,8 @@ public class ResourceLocation {
   }
 
   public ResourceLocation(String id, String resource) {
-    this.id = id;
-    this.resource = resource;
+    this.id = PreCondition.notNull(id);
+    this.resource = PreCondition.notNull(resource);
   }
 
   public String getId() {
@@ -37,5 +38,29 @@ public class ResourceLocation {
       throw new ResourceStringParseException(String.format("Invalid resource string [%s]", resourceString));
     }
     return split;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    ResourceLocation that = (ResourceLocation) o;
+
+    if (!id.equals(that.id)) return false;
+    return resource.equals(that.resource);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id.hashCode();
+    result = 31 * result + resource.hashCode();
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    return this.id + ":" + this.resource;
   }
 }

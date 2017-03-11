@@ -36,11 +36,11 @@ public class OptionalJarAdapter implements
 
     for (int i = 0; i < jsonArray.length(); i++) {
 
-      Object value;
+      String value;
 
       value = jsonArray.getString(i);
 
-      if (value == null || ((String) value).isEmpty()) {
+      if (value == null || value.isEmpty()) {
         throw new MetaAdaptException(String.format(
             "Array [%s] must contain non-empty strings only, got: '%s'", key, value
         ));
@@ -50,7 +50,7 @@ public class OptionalJarAdapter implements
         throw new MetaAdaptException(String.format("Duplicate jar file [%s]", value));
       }
 
-      store.add((String) value);
+      store.add(value);
     }
 
     return store;

@@ -25,7 +25,7 @@ import java.util.List;
       start = System.currentTimeMillis();
 
       try {
-        service.getPlugin(resourceLocation, Plugin.class).preLoad();
+        service.getPlugin(resourceLocation, Object.class).preLoad();
 
       } catch (Exception e) {
         throwable = e;

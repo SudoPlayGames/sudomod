@@ -1,5 +1,6 @@
 package com.sudoplay.sudoxt.meta;
 
+import com.sudoplay.sudoxt.service.ResourceLocation;
 import com.sudoplay.sudoxt.versioning.ArtifactVersion;
 import com.sudoplay.sudoxt.versioning.VersionRange;
 
@@ -30,6 +31,7 @@ public class Meta {
   private Set<Dependency> loadBeforeDependencySet;
   private Map<String, String> registeredPluginMap;
   private Set<String> preloadSet;
+  private Map<ResourceLocation, ResourceLocation> overrideMap;
 
   public Meta(Path parentPath, Path path) {
     this.parentPath = parentPath;
@@ -40,6 +42,11 @@ public class Meta {
     this.loadBeforeDependencySet = new LinkedHashSet<>();
     this.registeredPluginMap = new LinkedHashMap<>();
     this.preloadSet = new LinkedHashSet<>();
+    this.overrideMap = new HashMap<>();
+  }
+
+  public void addOverride(ResourceLocation remote, ResourceLocation local) {
+    this.overrideMap.put(remote, local);
   }
 
   public void addPreload(String name) {
@@ -128,6 +135,10 @@ public class Meta {
 
   public String getWebsite() {
     return this.website;
+  }
+
+  public Map<ResourceLocation, ResourceLocation> getOverrideMap() {
+    return this.overrideMap;
   }
 
   public void addDependency(Dependency dependency) {

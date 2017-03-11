@@ -1,18 +1,18 @@
 package com.sudoplay.sudoxt;
 
+import com.sudoplay.sudoxt.api.AncillaryPlugin;
 import com.sudoplay.sudoxt.api.LoggerStaticInjector;
+import com.sudoplay.sudoxt.classloader.asm.callback.NoOpCallbackDelegateFactory;
 import com.sudoplay.sudoxt.classloader.asm.filter.AllowedJavaUtilClassFilter;
 import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.AllowAllClassFilter;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.security.SEServicePolicy;
 import com.sudoplay.sudoxt.service.*;
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import testapi.AncillaryPlugin;
-import testapi.ModPlugin;
+import com.sudoplay.sudoxt.api.Plugin;
 
 import java.io.FilePermission;
 import java.nio.file.Paths;
@@ -49,16 +49,18 @@ public class Main {
   @Test
   public void test() throws SEServiceInitializationException, PluginException {
 
-    SEService service = new SEServiceBuilder(new SEConfigBuilder()
-        .setCompressedFileExtension(".lsm")
-        .setLocation(Paths.get("../sudomod-test/src/mods"))
-        .setDataLocation(Paths.get("mod-data"))
-        .setTempLocation(Paths.get("mods-temp"))
-        .setMetaFilename("mod-info.json")
-        .setApiVersion("1.0"))
+    SEService service = new SEServiceBuilder(
+        new SEConfigBuilder()
+            .setCompressedFileExtension(".lsm")
+            .setLocation(Paths.get("../mods"))
+            .setDataLocation(Paths.get("mod-data"))
+            .setTempLocation(Paths.get("mods-temp"))
+            .setMetaFilename("mod-info.json")
+            .setApiVersion("1.0"))
         .addStaticInjector(new LoggerStaticInjector())
         .addClassLoaderClassFilter(new AllowAllClassFilter())
-        .setByteCodeTransformer(new SEByteCodeTransformerBuilder()
+        .setCallbackDelegateFactory(NoOpCallbackDelegateFactory.INSTANCE) // testing
+        .setByteCodeTransformerBuilder(new SEByteCodeTransformerBuilder()
             //.setByteCodePrinter(new StdOutByteCodePrinter())
             .addClassFilter(new AllowedJavaUtilClassFilter())
             .addClassFilter(new IClassFilter() {
@@ -66,17 +68,16 @@ public class Main {
               public boolean isAllowed(String name) {
                 return name.startsWith("mod.")
                     || name.startsWith("com.sudoplay.math.")
-                    || name.startsWith("testapi.");
+                    || name.startsWith("com.sudoplay.sudoxt.api.");
               }
             })
         )
         .create();
 
-    PluginReference<ModPlugin> pluginA = service.getPlugin("test-mod-a:mod.ModPluginA", ModPlugin.class);
-    PluginReference<ModPlugin> pluginB = service.getPlugin("test-mod-b:mod.ModPluginB", ModPlugin.class);
-    PluginReference<ModPlugin> pluginC = service.getPlugin("test-mod-c:mod.ModPluginC", ModPlugin.class);
+    PluginReference<Plugin> pluginA = service.getPlugin("mod_a:mod.ModPlugin", Plugin.class);
+    PluginReference<Plugin> pluginB = service.getPlugin("mod_b:mod.ModPlugin", Plugin.class);
 
-    List<PluginReference<AncillaryPlugin>> registeredPlugins = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
+    List<PluginReference<AncillaryPlugin>> referenceList = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
 
     System.out.println("--- Preload ---");
     service.preload((containerId, resource, percentage, timeMilliseconds, throwable) -> {
@@ -90,21 +91,16 @@ public class Main {
     });
     System.out.println("--- End Preload ---");
 
-    pluginA.invoke(ModPlugin::onGreeting);
+    pluginA.invoke(Plugin::onGreeting);
     System.out.println(pluginA.getReport());
     System.out.println("---");
 
-    pluginB.invoke(ModPlugin::onGreeting);
+    pluginB.invoke(Plugin::onGreeting);
     System.out.println(pluginB.getReport());
+    System.out.println("---");
 
-    expect(() -> {
-      pluginC.invoke(ModPlugin::onGreeting);
-      System.out.println(pluginC.getReport());
-    });
-
-    for (PluginReference<AncillaryPlugin> pluginReference : registeredPlugins) {
-      Integer integer = pluginReference.invoke(int.class, plugin -> plugin.addValues(42, 73));
-      LOG.info("addValues(42, 73): {}", integer);
+    for (PluginReference<AncillaryPlugin> reference : referenceList) {
+      reference.invoke(AncillaryPlugin::doStuff);
     }
 
     service.disposeFolders();
@@ -118,7 +114,7 @@ public class Main {
 
     try {
       runnable.run();
-      Assert.fail();
+      //Assert.fail();
 
     } catch (Exception e) {
       // expected

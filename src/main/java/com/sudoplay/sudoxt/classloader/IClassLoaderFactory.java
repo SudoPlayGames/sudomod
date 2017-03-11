@@ -5,5 +5,5 @@ package com.sudoplay.sudoxt.classloader;
  */
 public interface IClassLoaderFactory {
 
-  SourceClassLoader create();
+  IContainerClassLoader create();
 }

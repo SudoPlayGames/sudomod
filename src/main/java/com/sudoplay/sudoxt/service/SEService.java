@@ -59,7 +59,7 @@ public class SEService {
     this.containerMap.values().forEach(Container::reload);
   }
 
-  public <P extends Plugin> List<PluginReference<P>> getRegisteredPlugins(String name, Class<P> pClass) {
+  public <P> List<PluginReference<P>> getRegisteredPlugins(String name, Class<P> pClass) {
     return this.containerMap.values()
         .stream()
         .filter(container -> container.hasRegisteredPlugin(name))
@@ -72,11 +72,11 @@ public class SEService {
         .collect(Collectors.toList());
   }
 
-  public <P extends Plugin> PluginReference<P> getPlugin(String resourceString, Class<P> tClass) {
+  public <P> PluginReference<P> getPlugin(String resourceString, Class<P> tClass) {
     return this.getPlugin(this.createResourceLocation(resourceString), tClass);
   }
 
-  public <P extends Plugin> PluginReference<P> getPlugin(ResourceLocation resourceLocation, Class<P> tClass) {
+  public <P> PluginReference<P> getPlugin(ResourceLocation resourceLocation, Class<P> tClass) {
     Container container = this.getContainer(resourceLocation.getId());
     return new PluginReference<>(tClass, resourceLocation.getResource(), container);
   }

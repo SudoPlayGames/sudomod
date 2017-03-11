@@ -5,7 +5,5 @@ package com.sudoplay.sudoxt.classloader;
  */
 public interface IContainerClassLoader {
 
-  Class<?> loadClass(String name) throws ClassNotFoundException;
-
-  Class<?> loadClassWithoutDependencyCheck(String name) throws ClassNotFoundException;
+  Class<?> loadClass(String name, int flags) throws ClassNotFoundException;
 }

@@ -1,10 +1,9 @@
 package com.sudoplay.sudoxt;
 
-import testapi.AncillaryPlugin;
-import com.sudoplay.sudoxt.service.Plugin;
-import testapi.ModPlugin;
+import com.sudoplay.sudoxt.api.AncillaryPlugin;
 import com.sudoplay.sudoxt.api.ILoggerAPIProvider;
-import testapi.LoggerAPI;
+import com.sudoplay.sudoxt.api.LoggerAPI;
+import com.sudoplay.sudoxt.api.Plugin;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 
 import java.io.Serializable;
@@ -141,13 +140,12 @@ public class WhitelistClassFilter implements
     // com.sudoplay.sudoext
     this.whitelist.addAll(Arrays.asList(
         ILoggerAPIProvider.class.getName(),
-        LoggerAPI.class.getName(),
-        Plugin.class.getName()
+        LoggerAPI.class.getName()
     ));
 
     // ugh
     this.whitelist.addAll(Arrays.asList(
-        ModPlugin.class.getName(),
+        Plugin.class.getName(),
         AncillaryPlugin.class.getName(),
 
         // not happy about allowing these

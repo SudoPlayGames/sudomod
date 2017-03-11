@@ -5,7 +5,6 @@ import com.sudoplay.sudoxt.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoxt.candidate.extractor.ZipFileExtractor;
 import com.sudoplay.sudoxt.classloader.asm.callback.AccountingCallbackDelegateFactory;
 import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegateFactory;
-import com.sudoplay.sudoxt.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.intercept.SandboxPathProviderStaticInjector;
@@ -38,7 +37,7 @@ public class SEServiceBuilder {
 
   private ICallbackDelegateFactory callbackDelegateFactory;
   private IContainerCacheFactory containerCacheFactory;
-  private IByteCodeTransformer byteCodeTransformer;
+  private SEByteCodeTransformerBuilder byteCodeTransformerBuilder;
 
   private List<IClassFilter> defaultClassLoaderClassFilterList;
   private List<IClassFilter> classLoaderClassFilterList;
@@ -57,8 +56,7 @@ public class SEServiceBuilder {
     this.containerCacheFactory = new LRUContainerCacheFactory(64);
 
     // init the bytecode transformer
-    this.byteCodeTransformer = new SEByteCodeTransformerBuilder()
-        .create();
+    this.byteCodeTransformerBuilder = new SEByteCodeTransformerBuilder();
 
     // adds the default class filters
     this.defaultClassLoaderClassFilterList = new ArrayList<>();
@@ -108,8 +106,8 @@ public class SEServiceBuilder {
     return this;
   }
 
-  public SEServiceBuilder setByteCodeTransformer(@NotNull SEByteCodeTransformerBuilder builder) {
-    this.byteCodeTransformer = PreCondition.notNull(builder).create();
+  public SEServiceBuilder setByteCodeTransformerBuilder(@NotNull SEByteCodeTransformerBuilder builder) {
+    this.byteCodeTransformerBuilder = PreCondition.notNull(builder);
     return this;
   }
 
@@ -181,7 +179,8 @@ public class SEServiceBuilder {
             new OptionalDependsOnAdapter(),
             new OptionalJarAdapter(),
             new OptionalRegisterAdapter(),
-            new OptionalPreloadAdapter()
+            new OptionalPreloadAdapter(),
+            new OptionalOverrideAdapter()
         },
         new IMetaValidator[]{
             new IdValidator(),
@@ -193,13 +192,16 @@ public class SEServiceBuilder {
             ),
             new PreloadValidator(
                 pluginFinder
+            ),
+            new OverrideValidator(
+                pluginFinder
             )
         },
         this.containerCacheFactory,
         this.getClassLoaderClassFilters(),
         this.getStaticInjectors(),
         this.callbackDelegateFactory,
-        this.byteCodeTransformer,
+        this.byteCodeTransformerBuilder,
         new IFolderLifecycleEventHandler[]{
             new DefaultFolderLifecycleInitializeEventHandler(
                 this.config.getLocation()

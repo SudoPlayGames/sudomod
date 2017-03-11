@@ -33,6 +33,9 @@ public class IdValidatorTest {
 
     when(meta.getId()).thenReturn(";");
     Assert.assertFalse(validator.isValid(meta, null, Collections.emptyList()));
+
+    when(meta.getId()).thenReturn("-");
+    Assert.assertFalse(validator.isValid(meta, null, Collections.emptyList()));
   }
 
   @Test
@@ -45,7 +48,7 @@ public class IdValidatorTest {
     List<Meta> metaList = new ArrayList<>();
     metaList.add(meta);
 
-    when(meta.getId()).thenReturn("abcdefghijklmnopqrstuvwxyz0123456789-_");
+    when(meta.getId()).thenReturn("abcdefghijklmnopqrstuvwxyz0123456789_");
     Assert.assertTrue(validator.isValid(meta, null, metaList));
   }
 

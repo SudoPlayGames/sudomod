@@ -6,7 +6,7 @@ import com.sudoplay.sudoxt.container.Container;
 /**
  * Created by codetaylor on 2/22/2017.
  */
-public class PluginReference<P extends Plugin> {
+public class PluginReference<P> {
 
   public interface InvokeVoidHandler<P> {
     void invoke(P plugin);

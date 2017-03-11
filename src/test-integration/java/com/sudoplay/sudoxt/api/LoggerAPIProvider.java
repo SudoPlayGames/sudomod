@@ -1,6 +1,5 @@
 package com.sudoplay.sudoxt.api;
 
-import testapi.LoggerAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

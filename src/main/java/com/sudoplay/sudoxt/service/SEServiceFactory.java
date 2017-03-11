@@ -5,6 +5,7 @@ import com.sudoplay.sudoxt.candidate.ICandidateProvider;
 import com.sudoplay.sudoxt.classloader.ClassLoaderFactoryProvider;
 import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegateFactory;
 import com.sudoplay.sudoxt.classloader.asm.transform.IByteCodeTransformer;
+import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.intercept.DefaultClassInterceptorFactory;
@@ -36,7 +37,7 @@ import java.nio.charset.Charset;
       IClassFilter[] classLoaderClassFilters,
       StaticInjector<?>[] staticInjectors,
       ICallbackDelegateFactory callbackDelegateFactory,
-      IByteCodeTransformer byteCodeTransformer,
+      SEByteCodeTransformerBuilder byteCodeTransformerBuilder,
       IFolderLifecycleEventHandler[] folderLifecycleEventHandlers,
       Charset charset,
       String metaFilename
@@ -108,6 +109,9 @@ import java.nio.charset.Charset;
         )
     );
 
+    // TODO: add transformer class filters based on meta ids
+    // maybe...
+
     // assigns container classloader factories
     containerMapProvider = new InitializedContainerMapProvider(
         metaListProvider,
@@ -119,10 +123,16 @@ import java.nio.charset.Charset;
             new DefaultClassInterceptorFactory(
                 staticInjectors
             ),
-            byteCodeTransformer,
+            byteCodeTransformerBuilder.create(),
             new InputStreamByteArrayConverter()
         ),
         new DependencyContainerListMapper()
+    );
+
+    // assigns container override handlers
+    containerMapProvider = new OverrideContainerMapProvider(
+        metaListProvider,
+        containerMapProvider
     );
 
     // creates the service

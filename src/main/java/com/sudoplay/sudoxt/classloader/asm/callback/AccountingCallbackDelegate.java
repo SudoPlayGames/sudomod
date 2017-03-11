@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
+import static com.sudoplay.sudoxt.classloader.SXClassLoader.*;
+
 /**
  * Created by codetaylor on 2/27/2017.
  */
@@ -229,7 +231,7 @@ public class AccountingCallbackDelegate implements
 
       AccessController.doPrivileged((PrivilegedExceptionAction<Long>) () -> {
         String name = type.replace("/", ".");
-        Class<?> aClass = this.classLoader.loadClass(name);
+        Class<?> aClass = this.classLoader.loadClass(name, (JAR | SOURCE | DEPENDENCY));
         Field[] declaredFields = aClass.getDeclaredFields();
         ClassAllocation.put(type, declaredFields.length);
         return (long) (8 * declaredFields.length);

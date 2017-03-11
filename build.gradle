@@ -10,10 +10,19 @@ repositories {
 }
 
 sourceSets {
+    api {
+        java {
+            srcDir file('src/api/java/')
+            compileClasspath += sourceSets.main.runtimeClasspath
+            runtimeClasspath += sourceSets.main.runtimeClasspath
+        }
+    }
     testIntegration {
         java {
             compileClasspath += sourceSets.test.runtimeClasspath
+            compileClasspath += sourceSets.api.runtimeClasspath
             runtimeClasspath += sourceSets.test.runtimeClasspath
+            runtimeClasspath += sourceSets.api.runtimeClasspath
             srcDir file('src/test-integration/java')
         }
         resources.srcDir file('src/test-integration/resources')
@@ -34,7 +43,8 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'org.slf4j:slf4j-ext:1.7.7'
 
-    compile 'org.codehaus.janino:janino:3.0.6'
+    compile files('libs/janino-3.0.6-patch.jar')
+    compile 'org.codehaus.janino:commons-compiler:3.0.6'
     compile 'org.ow2.asm:asm-all:5.2'
     compile 'org.jetbrains:annotations:15.0'
 

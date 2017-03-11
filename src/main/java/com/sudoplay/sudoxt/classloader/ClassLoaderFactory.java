@@ -6,8 +6,6 @@ import com.sudoplay.sudoxt.classloader.intercept.IClassInterceptor;
 import com.sudoplay.sudoxt.classloader.intercept.InterceptClassLoader;
 import com.sudoplay.sudoxt.container.Container;
 import com.sudoplay.sudoxt.util.InputStreamByteArrayConverter;
-import org.codehaus.janino.ClassLoaderIClassLoader;
-import org.codehaus.janino.JavaSourceIClassLoader;
 import org.codehaus.janino.util.resource.PathResourceFinder;
 
 import java.io.File;
@@ -66,47 +64,33 @@ import java.util.Set;
   }
 
   @Override
-  public SourceClassLoader create() {
-
-    FilteredClassLoader filteredClassLoader = new FilteredClassLoader(
-        this.getClass().getClassLoader(),
-        this.classFilterPredicate
-    );
+  public IContainerClassLoader create() {
 
     InterceptClassLoader interceptClassLoader = new InterceptClassLoader(
         this.path,
-        filteredClassLoader,
+        this.getClass().getClassLoader(),
         this.classInterceptor
     );
 
-    JarClassLoader jarClassLoader = new JarClassLoader(
+    SXClassLoader classLoader = new SXClassLoader(
         this.path,
         this.urls,
         interceptClassLoader,
+        this.dependencyList,
         this.byteCodeTransformer,
-        this.inputStreamByteArrayConverter
+        this.inputStreamByteArrayConverter,
+        this.classFilterPredicate,
+        true
     );
 
-    DependencyClassLoader dependencyClassLoader = new DependencyClassLoader(
-        this.path,
-        jarClassLoader,
-        this.dependencyList
-    );
-
-    SourceClassLoader sourceClassLoader = new SourceClassLoader(
-        this.path,
-        dependencyClassLoader,
-        new JavaSourceIClassLoader(
+    classLoader.setJavaSourceIClassLoader(
+        new SXJavaSourceIClassLoader(
             new PathResourceFinder(this.sourcePath),
             null,
-            new ClassLoaderIClassLoader(dependencyClassLoader)
-        ),
-        this.byteCodeTransformer
+            new SXIClassLoader(classLoader)
+        )
     );
 
-    sourceClassLoader.setDebuggingInfo(true, true, true);
-
-    return sourceClassLoader;
+    return classLoader;
   }
-
 }
