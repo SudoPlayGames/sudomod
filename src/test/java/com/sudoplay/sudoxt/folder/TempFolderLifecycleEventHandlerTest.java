@@ -1,6 +1,6 @@
 package com.sudoplay.sudoxt.folder;
 
-import com.sudoplay.sudoxt.service.SEServiceInitializationException;
+import com.sudoplay.sudoxt.service.SXServiceInitializationException;
 import com.sudoplay.sudoxt.util.RecursiveFileRemovalProcessor;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class TempFolderLifecycleEventHandlerTest {
       // should call the file removal processor twice, once on init and once on dispose
       verify(fileRemovalProcessor, times(2)).deleteRecursively(path);
 
-    } catch (IOException | SEServiceInitializationException e) {
+    } catch (IOException | SXServiceInitializationException e) {
       e.printStackTrace();
       Assert.fail();
     }
@@ -71,7 +71,7 @@ public class TempFolderLifecycleEventHandlerTest {
       // should call the file removal processor
       verify(fileRemovalProcessor, times(1)).deleteRecursively(path);
 
-    } catch (IOException | SEServiceInitializationException e) {
+    } catch (IOException | SXServiceInitializationException e) {
       e.printStackTrace();
       Assert.fail();
     }

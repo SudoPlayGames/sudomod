@@ -12,7 +12,7 @@ import java.nio.file.Paths;
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class SEConfig {
+public class SXConfig {
 
   /* package */ Path dataLocation;
   /* package */ Path location;
@@ -25,7 +25,7 @@ public class SEConfig {
 
   /* package */ Charset charset;
 
-  /* package */ SEConfig() {
+  /* package */ SXConfig() {
 
     // init default paths
     this.dataLocation = Paths.get("plugins-data");

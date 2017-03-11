@@ -2,7 +2,7 @@ package com.sudoplay.sudoxt.meta.validator.element;
 
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.validator.IMetaValidator;
-import com.sudoplay.sudoxt.service.ResourceLocation;
+import com.sudoplay.sudoxt.service.SXResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class OverrideValidator implements
         .collect(Collectors.toSet());
 
     // if remote id exists, map local location to list
-    List<ResourceLocation> localResourceLocationList = meta
+    List<SXResourceLocation> localResourceLocationList = meta
         .getOverrideMap()
         .entrySet()
         .stream()
@@ -52,12 +52,12 @@ public class OverrideValidator implements
 
   /* package */ boolean isValidLocalResourceLocation(
       Path path,
-      List<ResourceLocation> resourceLocationList,
+      List<SXResourceLocation> resourceLocationList,
       Set<String> jarFileSet
   ) {
     boolean isValid = true;
 
-    for (ResourceLocation location : resourceLocationList) {
+    for (SXResourceLocation location : resourceLocationList) {
 
       if (!this.pluginFinder.hasPlugin(location.getResource(), path, jarFileSet)) {
         LOG.error("Missing local override [{}]", location);

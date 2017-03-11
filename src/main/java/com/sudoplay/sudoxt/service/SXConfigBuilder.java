@@ -12,51 +12,50 @@ import java.nio.file.Path;
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class SEConfigBuilder {
+public class SXConfigBuilder {
 
-  private SEConfig config;
+  private SXConfig config;
 
-  public SEConfigBuilder() {
-    this.config = new SEConfig();
+  public SXConfigBuilder() {
+    this.config = new SXConfig();
   }
 
-  public SEConfigBuilder setDataLocation(@NotNull Path dataLocation) {
+  public SXConfigBuilder setDataLocation(@NotNull Path dataLocation) {
     this.config.dataLocation = PreCondition.notNull(dataLocation);
     return this;
   }
 
-  public SEConfigBuilder setLocation(@NotNull Path location) {
+  public SXConfigBuilder setLocation(@NotNull Path location) {
     this.config.location = PreCondition.notNull(location);
     return this;
   }
 
-  public SEConfigBuilder setMetaFilename(@NotNull String filename) {
+  public SXConfigBuilder setMetaFilename(@NotNull String filename) {
     this.config.metaFilename = PreCondition.notNull(filename);
     return this;
   }
 
-  public SEConfigBuilder setTempLocation(@NotNull Path tempLocation) {
+  public SXConfigBuilder setTempLocation(@NotNull Path tempLocation) {
     this.config.tempLocation = PreCondition.notNull(tempLocation);
     return this;
   }
 
-  public SEConfigBuilder setCompressedFileExtension(@NotNull String compressedFileExtension) {
+  public SXConfigBuilder setCompressedFileExtension(@NotNull String compressedFileExtension) {
     this.config.compressedFileExtension = PreCondition.notNull(compressedFileExtension);
     return this;
   }
 
-  public SEConfigBuilder setApiVersion(@NotNull String apiVersionString) {
+  public SXConfigBuilder setApiVersion(@NotNull String apiVersionString) {
     this.config.apiVersion = new DefaultArtifactVersion(PreCondition.notNull(apiVersionString));
     return this;
   }
 
-  public SEConfigBuilder setCharset(@NotNull Charset charset) {
+  public SXConfigBuilder setCharset(@NotNull Charset charset) {
     this.config.charset = PreCondition.notNull(charset);
     return this;
   }
 
-  @NotNull
-  /* package */ SEConfig getConfig() {
+  @NotNull/* package */ SXConfig getConfig() {
     return this.config;
   }
 }

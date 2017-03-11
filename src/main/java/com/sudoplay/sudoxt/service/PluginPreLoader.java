@@ -9,14 +9,14 @@ import java.util.List;
 
   /* package */ void preload(
       IPreloadMonitor monitor,
-      List<ResourceLocation> preloadList,
-      SEService service
+      List<SXResourceLocation> preloadList,
+      SXService service
   ) {
 
     int listSize = preloadList.size();
 
     for (int i = 0; i < listSize; i++) {
-      ResourceLocation resourceLocation;
+      SXResourceLocation resourceLocation;
       Throwable throwable;
       long start;
 

@@ -7,25 +7,25 @@ package com.sudoplay.sudoxt.service;
  * <p>
  * Created by codetaylor on 2/18/2017.
  */
-public class SEServiceInitializationException extends
+public class SXServiceInitializationException extends
     Exception {
 
-  public SEServiceInitializationException() {
+  public SXServiceInitializationException() {
   }
 
-  public SEServiceInitializationException(String message) {
+  public SXServiceInitializationException(String message) {
     super(message);
   }
 
-  public SEServiceInitializationException(String message, Throwable cause) {
+  public SXServiceInitializationException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public SEServiceInitializationException(Throwable cause) {
+  public SXServiceInitializationException(Throwable cause) {
     super(cause);
   }
 
-  public SEServiceInitializationException(String message, Throwable cause, boolean enableSuppression, boolean
+  public SXServiceInitializationException(String message, Throwable cause, boolean enableSuppression, boolean
       writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }

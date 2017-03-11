@@ -1,6 +1,6 @@
 package com.sudoplay.sudoxt.folder;
 
-import com.sudoplay.sudoxt.service.SEServiceInitializationException;
+import com.sudoplay.sudoxt.service.SXServiceInitializationException;
 
 /**
  * Created by codetaylor on 2/20/2017.
@@ -8,5 +8,5 @@ import com.sudoplay.sudoxt.service.SEServiceInitializationException;
 public interface IFolderLifecycleInitializeEventHandler extends
     IFolderLifecycleEventHandler {
 
-  void onInitialize() throws SEServiceInitializationException;
+  void onInitialize() throws SXServiceInitializationException;
 }

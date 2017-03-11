@@ -1,6 +1,6 @@
 package com.sudoplay.sudoxt.folder;
 
-import com.sudoplay.sudoxt.service.SEServiceInitializationException;
+import com.sudoplay.sudoxt.service.SXServiceInitializationException;
 import com.sudoplay.sudoxt.util.RecursiveFileRemovalProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class TempFolderLifecycleEventHandler implements
   }
 
   @Override
-  public void onInitialize() throws SEServiceInitializationException {
+  public void onInitialize() throws SXServiceInitializationException {
 
     try {
 
@@ -47,7 +47,7 @@ public class TempFolderLifecycleEventHandler implements
 
     // check
     if (!Files.exists(this.folder)) {
-      SEServiceInitializationException e = new SEServiceInitializationException(String.format(
+      SXServiceInitializationException e = new SXServiceInitializationException(String.format(
           "Folder doesn't exist [%s]",
           this.folder
       ));

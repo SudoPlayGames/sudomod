@@ -6,7 +6,7 @@ import com.sudoplay.sudoxt.container.Container;
 /**
  * Created by codetaylor on 2/22/2017.
  */
-public class PluginReference<P> {
+public class SXPluginReference<P> {
 
   public interface InvokeVoidHandler<P> {
     void invoke(P plugin);
@@ -20,13 +20,13 @@ public class PluginReference<P> {
   private String resourceString;
   private Container container;
 
-  /* package */ PluginReference(Class<P> pClass, String resourceString, Container container) {
+  /* package */ SXPluginReference(Class<P> pClass, String resourceString, Container container) {
     this.pClass = pClass;
     this.resourceString = resourceString;
     this.container = container;
   }
 
-  /* package */ void preLoad() throws PluginException {
+  /* package */ void preLoad() throws SXPluginException {
 
     try {
       this.get();
@@ -36,7 +36,7 @@ public class PluginReference<P> {
     }
   }
 
-  public void invoke(InvokeVoidHandler<P> handler) throws PluginException {
+  public void invoke(InvokeVoidHandler<P> handler) throws SXPluginException {
 
     try {
       InjectedCallback.DELEGATE = this.container.getCallbackDelegate();
@@ -47,8 +47,8 @@ public class PluginReference<P> {
     }
   }
 
-  private PluginException getException(Exception e) {
-    return new PluginException(
+  private SXPluginException getException(Exception e) {
+    return new SXPluginException(
         String.format(
             "[%s]: %s",
             e.getClass().getSimpleName(),
@@ -58,7 +58,7 @@ public class PluginReference<P> {
     );
   }
 
-  public <R> R invoke(Class<R> rClass, InvokeReturnHandler<P, R> handler) throws PluginException {
+  public <R> R invoke(Class<R> rClass, InvokeReturnHandler<P, R> handler) throws SXPluginException {
 
     try {
       InjectedCallback.DELEGATE = this.container.getCallbackDelegate();

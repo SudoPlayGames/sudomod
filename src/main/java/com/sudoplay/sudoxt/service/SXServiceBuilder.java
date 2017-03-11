@@ -27,13 +27,13 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Configures and creates an implementation of the {@link SEService} with the given {@link SEConfig}.
+ * Configures and creates an implementation of the {@link SXService} with the given {@link SXConfig}.
  * <p>
  * Created by codetaylor on 2/20/2017.
  */
-public class SEServiceBuilder {
+public class SXServiceBuilder {
 
-  private SEConfig config;
+  private SXConfig config;
 
   private ICallbackDelegateFactory callbackDelegateFactory;
   private IContainerCacheFactory containerCacheFactory;
@@ -45,7 +45,7 @@ public class SEServiceBuilder {
   private List<StaticInjector<?>> defaultStaticInjectorList;
   private List<StaticInjector<?>> staticInjectorList;
 
-  public SEServiceBuilder(SEConfigBuilder configBuilder) {
+  public SXServiceBuilder(SXConfigBuilder configBuilder) {
     this.config = PreCondition.notNull(configBuilder).getConfig();
 
     // init user-defined lists
@@ -68,45 +68,45 @@ public class SEServiceBuilder {
     this.callbackDelegateFactory = new AccountingCallbackDelegateFactory();
   }
 
-  public SEServiceBuilder addStaticInjector(@NotNull StaticInjector<?> staticInjector) {
+  public SXServiceBuilder addStaticInjector(@NotNull StaticInjector<?> staticInjector) {
     this.staticInjectorList.add(PreCondition.notNull(staticInjector));
     return this;
   }
 
-  public SEServiceBuilder removeAllDefaultStaticInjectors() {
+  public SXServiceBuilder removeAllDefaultStaticInjectors() {
     this.defaultStaticInjectorList.clear();
     return this;
   }
 
-  public SEServiceBuilder removeDefaultStaticInjector(@NotNull Class<? extends StaticInjector<?>> aClass) {
+  public SXServiceBuilder removeDefaultStaticInjector(@NotNull Class<? extends StaticInjector<?>> aClass) {
     return this.removeByClass(PreCondition.notNull(aClass), this.defaultStaticInjectorList);
   }
 
-  public SEServiceBuilder setCallbackDelegateFactory(@NotNull ICallbackDelegateFactory callbackDelegateFactory) {
+  public SXServiceBuilder setCallbackDelegateFactory(@NotNull ICallbackDelegateFactory callbackDelegateFactory) {
     this.callbackDelegateFactory = PreCondition.notNull(callbackDelegateFactory);
     return this;
   }
 
-  public SEServiceBuilder addClassLoaderClassFilter(@NotNull IClassFilter filter) {
+  public SXServiceBuilder addClassLoaderClassFilter(@NotNull IClassFilter filter) {
     this.classLoaderClassFilterList.add(PreCondition.notNull(filter));
     return this;
   }
 
-  public SEServiceBuilder removeAllDefaultClassLoaderClassFilters() {
+  public SXServiceBuilder removeAllDefaultClassLoaderClassFilters() {
     this.defaultClassLoaderClassFilterList.clear();
     return this;
   }
 
-  public SEServiceBuilder removeDefaultClassLoaderClassFilter(@NotNull Class<? extends IClassFilter> aClass) {
+  public SXServiceBuilder removeDefaultClassLoaderClassFilter(@NotNull Class<? extends IClassFilter> aClass) {
     return this.removeByClass(PreCondition.notNull(aClass), this.defaultClassLoaderClassFilterList);
   }
 
-  public SEServiceBuilder setContainerCacheFactory(@NotNull IContainerCacheFactory factory) {
+  public SXServiceBuilder setContainerCacheFactory(@NotNull IContainerCacheFactory factory) {
     this.containerCacheFactory = PreCondition.notNull(factory);
     return this;
   }
 
-  public SEServiceBuilder setByteCodeTransformerBuilder(@NotNull SEByteCodeTransformerBuilder builder) {
+  public SXServiceBuilder setByteCodeTransformerBuilder(@NotNull SEByteCodeTransformerBuilder builder) {
     this.byteCodeTransformerBuilder = PreCondition.notNull(builder);
     return this;
   }
@@ -125,7 +125,7 @@ public class SEServiceBuilder {
     return list.toArray(new StaticInjector<?>[list.size()]);
   }
 
-  public SEService create() throws SEServiceInitializationException {
+  public SXService create() throws SXServiceInitializationException {
 
     RecursiveFileRemovalProcessor recursiveFileRemovalProcessor;
     PluginFinder pluginFinder;
@@ -136,7 +136,7 @@ public class SEServiceBuilder {
         new ZipSearch()
     );
 
-    return new SEServiceFactory().create(
+    return new SXServiceFactory().create(
         new ICandidateProvider[]{
             new FileSystemCandidateProvider(
                 new FolderPathListProvider(
@@ -219,7 +219,7 @@ public class SEServiceBuilder {
     );
   }
 
-  private SEServiceBuilder removeByClass(Class<?> aClass, List<?> list) {
+  private SXServiceBuilder removeByClass(Class<?> aClass, List<?> list) {
 
     for (Iterator<?> it = list.iterator(); it.hasNext(); ) {
 

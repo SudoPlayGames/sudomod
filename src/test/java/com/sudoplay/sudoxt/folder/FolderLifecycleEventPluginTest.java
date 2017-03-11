@@ -1,6 +1,6 @@
 package com.sudoplay.sudoxt.folder;
 
-import com.sudoplay.sudoxt.service.SEServiceInitializationException;
+import com.sudoplay.sudoxt.service.SXServiceInitializationException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class FolderLifecycleEventPluginTest {
 
       verify(mock, times(1)).onInitialize();
 
-    } catch (SEServiceInitializationException e) {
+    } catch (SXServiceInitializationException e) {
       e.printStackTrace();
       Assert.fail();
     }

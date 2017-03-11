@@ -1,6 +1,6 @@
 package com.sudoplay.sudoxt.folder;
 
-import com.sudoplay.sudoxt.service.SEServiceInitializationException;
+import com.sudoplay.sudoxt.service.SXServiceInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public class DefaultFolderLifecycleInitializeEventHandler implements
   }
 
   @Override
-  public void onInitialize() throws SEServiceInitializationException {
+  public void onInitialize() throws SXServiceInitializationException {
 
     try {
       Files.createDirectories(this.folder);
@@ -33,7 +33,7 @@ public class DefaultFolderLifecycleInitializeEventHandler implements
     }
 
     if (!Files.exists(this.folder)) {
-      SEServiceInitializationException e = new SEServiceInitializationException(String.format(
+      SXServiceInitializationException e = new SXServiceInitializationException(String.format(
           "Folder doesn't exist [%s]",
           this.folder
       ));

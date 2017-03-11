@@ -2,7 +2,7 @@ package com.sudoplay.sudoxt.container;
 
 import com.sudoplay.sudoxt.meta.IMetaListProvider;
 import com.sudoplay.sudoxt.meta.Meta;
-import com.sudoplay.sudoxt.service.ResourceLocation;
+import com.sudoplay.sudoxt.service.SXResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -38,8 +38,8 @@ public class OverrideContainerMapProvider implements
 
     for (Meta meta : metaList) {
 
-      for (Map.Entry<ResourceLocation, ResourceLocation> entry : meta.getOverrideMap().entrySet()) {
-        ResourceLocation remoteResourceLocation;
+      for (Map.Entry<SXResourceLocation, SXResourceLocation> entry : meta.getOverrideMap().entrySet()) {
+        SXResourceLocation remoteResourceLocation;
         String remoteContainerId;
 
         remoteResourceLocation = entry.getKey();
@@ -47,7 +47,7 @@ public class OverrideContainerMapProvider implements
 
         // if the container to override exists...
         if (containerMap.containsKey(remoteContainerId)) {
-          ResourceLocation localResourceLocation;
+          SXResourceLocation localResourceLocation;
           String localResource;
           String remoteResource;
           String localContainerId;

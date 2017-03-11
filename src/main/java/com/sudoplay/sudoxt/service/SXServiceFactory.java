@@ -4,7 +4,6 @@ import com.sudoplay.sudoxt.candidate.CandidateListProvider;
 import com.sudoplay.sudoxt.candidate.ICandidateProvider;
 import com.sudoplay.sudoxt.classloader.ClassLoaderFactoryProvider;
 import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegateFactory;
-import com.sudoplay.sudoxt.classloader.asm.transform.IByteCodeTransformer;
 import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
@@ -27,9 +26,9 @@ import java.nio.charset.Charset;
 /**
  * Created by codetaylor on 3/3/2017.
  */
-/* package */ class SEServiceFactory {
+/* package */ class SXServiceFactory {
 
-  /* package */ SEService create(
+  /* package */ SXService create(
       ICandidateProvider[] candidateLocators,
       IMetaAdapter[] metaElementAdapters,
       IMetaValidator[] metaValidators,
@@ -41,7 +40,7 @@ import java.nio.charset.Charset;
       IFolderLifecycleEventHandler[] folderLifecycleEventHandlers,
       Charset charset,
       String metaFilename
-  ) throws SEServiceInitializationException {
+  ) throws SXServiceInitializationException {
 
     IMetaListProvider metaListProvider;
     ChainedMetaListProcessor processor;
@@ -136,7 +135,7 @@ import java.nio.charset.Charset;
     );
 
     // creates the service
-    SEService service = new SEService(
+    SXService service = new SXService(
         new FolderLifecycleEventPlugin(
             folderLifecycleEventHandlers
         ),

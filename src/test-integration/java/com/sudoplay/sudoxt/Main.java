@@ -47,10 +47,10 @@ public class Main {
   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
   @Test
-  public void test() throws SEServiceInitializationException, PluginException {
+  public void test() throws SXServiceInitializationException, SXPluginException {
 
-    SEService service = new SEServiceBuilder(
-        new SEConfigBuilder()
+    SXService service = new SXServiceBuilder(
+        new SXConfigBuilder()
             .setCompressedFileExtension(".lsm")
             .setLocation(Paths.get("../mods"))
             .setDataLocation(Paths.get("mod-data"))
@@ -74,10 +74,10 @@ public class Main {
         )
         .create();
 
-    PluginReference<Plugin> pluginA = service.getPlugin("mod_a:mod.ModPlugin", Plugin.class);
-    PluginReference<Plugin> pluginB = service.getPlugin("mod_b:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginA = service.getPlugin("mod_a:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginB = service.getPlugin("mod_b:mod.ModPlugin", Plugin.class);
 
-    List<PluginReference<AncillaryPlugin>> referenceList = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
+    List<SXPluginReference<AncillaryPlugin>> referenceList = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
 
     System.out.println("--- Preload ---");
     service.preload((containerId, resource, percentage, timeMilliseconds, throwable) -> {
@@ -99,7 +99,7 @@ public class Main {
     System.out.println(pluginB.getReport());
     System.out.println("---");
 
-    for (PluginReference<AncillaryPlugin> reference : referenceList) {
+    for (SXPluginReference<AncillaryPlugin> reference : referenceList) {
       reference.invoke(AncillaryPlugin::doStuff);
     }
 

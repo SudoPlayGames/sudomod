@@ -1,7 +1,7 @@
 package com.sudoplay.sudoxt.meta.adapter.element;
 
 import com.sudoplay.sudoxt.meta.Meta;
-import com.sudoplay.sudoxt.service.ResourceLocation;
+import com.sudoplay.sudoxt.service.SXResourceLocation;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -44,6 +44,6 @@ public class OptionalOverrideAdapterTest {
 
     adapter.adapt(new JSONObject("{ \"override\": { \"mod-id\": { \"script.SomePlugin\": \"script.SomeOtherPlugin\" } } }"), meta);
 
-    verify(meta, times(1)).addOverride(any(ResourceLocation.class), any(ResourceLocation.class));
+    verify(meta, times(1)).addOverride(any(SXResourceLocation.class), any(SXResourceLocation.class));
   }
 }

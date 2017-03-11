@@ -1,6 +1,6 @@
 package com.sudoplay.sudoxt.meta;
 
-import com.sudoplay.sudoxt.service.ResourceLocation;
+import com.sudoplay.sudoxt.service.SXResourceLocation;
 import com.sudoplay.sudoxt.versioning.ArtifactVersion;
 import com.sudoplay.sudoxt.versioning.VersionRange;
 
@@ -31,7 +31,7 @@ public class Meta {
   private Set<Dependency> loadBeforeDependencySet;
   private Map<String, String> registeredPluginMap;
   private Set<String> preloadSet;
-  private Map<ResourceLocation, ResourceLocation> overrideMap;
+  private Map<SXResourceLocation, SXResourceLocation> overrideMap;
 
   public Meta(Path parentPath, Path path) {
     this.parentPath = parentPath;
@@ -45,7 +45,7 @@ public class Meta {
     this.overrideMap = new HashMap<>();
   }
 
-  public void addOverride(ResourceLocation remote, ResourceLocation local) {
+  public void addOverride(SXResourceLocation remote, SXResourceLocation local) {
     this.overrideMap.put(remote, local);
   }
 
@@ -137,7 +137,7 @@ public class Meta {
     return this.website;
   }
 
-  public Map<ResourceLocation, ResourceLocation> getOverrideMap() {
+  public Map<SXResourceLocation, SXResourceLocation> getOverrideMap() {
     return this.overrideMap;
   }
 

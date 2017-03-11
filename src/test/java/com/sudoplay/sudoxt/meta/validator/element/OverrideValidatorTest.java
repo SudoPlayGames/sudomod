@@ -1,15 +1,12 @@
 package com.sudoplay.sudoxt.meta.validator.element;
 
-import com.sudoplay.sudoxt.service.ResourceLocation;
+import com.sudoplay.sudoxt.service.SXResourceLocation;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -25,7 +22,7 @@ public class OverrideValidatorTest {
     OverrideValidator validator = new OverrideValidator(pluginFinder);
 
     boolean result = validator.isValidLocalResourceLocation(null, new ArrayList<>(Arrays.asList(
-        new ResourceLocation("mod-id:scripts.SomePlugin")
+        new SXResourceLocation("mod-id:scripts.SomePlugin")
     )), null);
 
     Assert.assertTrue(result);

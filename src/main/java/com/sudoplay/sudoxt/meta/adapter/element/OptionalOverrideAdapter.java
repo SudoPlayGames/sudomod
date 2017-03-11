@@ -3,8 +3,8 @@ package com.sudoplay.sudoxt.meta.adapter.element;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
-import com.sudoplay.sudoxt.service.ResourceLocation;
-import com.sudoplay.sudoxt.service.ResourceStringParseException;
+import com.sudoplay.sudoxt.service.SXResourceLocation;
+import com.sudoplay.sudoxt.service.SXResourceStringParseException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -46,11 +46,11 @@ public class OptionalOverrideAdapter implements
         }
 
         try {
-          ResourceLocation remoteResourceLocation = new ResourceLocation(key + ":" + remoteResource);
-          ResourceLocation localResourceLocation = new ResourceLocation(meta.getId() + ":" + localResource);
+          SXResourceLocation remoteResourceLocation = new SXResourceLocation(key + ":" + remoteResource);
+          SXResourceLocation localResourceLocation = new SXResourceLocation(meta.getId() + ":" + localResource);
           meta.addOverride(remoteResourceLocation, localResourceLocation);
 
-        } catch (ResourceStringParseException e) {
+        } catch (SXResourceStringParseException e) {
           throw new MetaAdaptException(String.format("Invalid override key [%s]", key), e);
         }
       }

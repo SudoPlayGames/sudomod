@@ -12,24 +12,24 @@ import java.util.stream.Collectors;
 /**
  * Created by codetaylor on 2/20/2017.
  */
-public class SEService {
+public class SXService {
 
   private final IFolderLifecycleEventPlugin folderLifecycleEventPlugin;
   private final PluginPreLoader pluginPreLoader;
   private final Map<String, Container> containerMap;
 
   @SuppressWarnings("WeakerAccess")
-  public SEService(
+  public SXService(
       IFolderLifecycleEventPlugin folderLifecycleEventPlugin,
       PluginPreLoader pluginPreLoader,
       Map<String, Container> containerMap
-  ) throws SEServiceInitializationException {
+  ) throws SXServiceInitializationException {
     this.folderLifecycleEventPlugin = folderLifecycleEventPlugin;
     this.pluginPreLoader = pluginPreLoader;
     this.containerMap = containerMap;
   }
 
-  /* package */ void initializeFolders() throws SEServiceInitializationException {
+  /* package */ void initializeFolders() throws SXServiceInitializationException {
     this.folderLifecycleEventPlugin.initialize();
   }
 
@@ -38,7 +38,7 @@ public class SEService {
   }
 
   public void preload(IPreloadMonitor monitor) {
-    List<ResourceLocation> preloadList = new ArrayList<>();
+    List<SXResourceLocation> preloadList = new ArrayList<>();
 
     for (Container container : this.containerMap.values()) {
       String id = container.getId();
@@ -47,7 +47,7 @@ public class SEService {
       preloadList.addAll(
           preloadSet
               .stream()
-              .map(resource -> new ResourceLocation(id, resource))
+              .map(resource -> new SXResourceLocation(id, resource))
               .collect(Collectors.toList())
       );
     }
@@ -59,12 +59,12 @@ public class SEService {
     this.containerMap.values().forEach(Container::reload);
   }
 
-  public <P> List<PluginReference<P>> getRegisteredPlugins(String name, Class<P> pClass) {
+  public <P> List<SXPluginReference<P>> getRegisteredPlugins(String name, Class<P> pClass) {
     return this.containerMap.values()
         .stream()
         .filter(container -> container.hasRegisteredPlugin(name))
         .map(container ->
-            new PluginReference<>(
+            new SXPluginReference<>(
                 pClass,
                 container.getRegisteredPluginResourceString(name),
                 container
@@ -72,22 +72,22 @@ public class SEService {
         .collect(Collectors.toList());
   }
 
-  public <P> PluginReference<P> getPlugin(String resourceString, Class<P> tClass) {
+  public <P> SXPluginReference<P> getPlugin(String resourceString, Class<P> tClass) {
     return this.getPlugin(this.createResourceLocation(resourceString), tClass);
   }
 
-  public <P> PluginReference<P> getPlugin(ResourceLocation resourceLocation, Class<P> tClass) {
+  public <P> SXPluginReference<P> getPlugin(SXResourceLocation resourceLocation, Class<P> tClass) {
     Container container = this.getContainer(resourceLocation.getId());
-    return new PluginReference<>(tClass, resourceLocation.getResource(), container);
+    return new SXPluginReference<>(tClass, resourceLocation.getResource(), container);
   }
 
-  private ResourceLocation createResourceLocation(String resourceString) {
-    ResourceLocation resourceLocation;
+  private SXResourceLocation createResourceLocation(String resourceString) {
+    SXResourceLocation resourceLocation;
 
     try {
-      resourceLocation = new ResourceLocation(resourceString);
+      resourceLocation = new SXResourceLocation(resourceString);
 
-    } catch (ResourceStringParseException e) {
+    } catch (SXResourceStringParseException e) {
       throw new IllegalArgumentException(String.format("Invalid resource string: %s", resourceString));
     }
     return resourceLocation;
