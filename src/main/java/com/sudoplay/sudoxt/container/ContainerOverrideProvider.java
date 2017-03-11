@@ -9,9 +9,9 @@ import java.util.Map;
  */
 public class ContainerOverrideProvider {
 
-  private Map<String, Container> containerMap;
+  private Map<String, ContainerOverride> containerMap;
 
-  public ContainerOverrideProvider(Map<String, Container> containerMap) {
+  public ContainerOverrideProvider(Map<String, ContainerOverride> containerMap) {
     this.containerMap = containerMap;
   }
 
@@ -19,10 +19,10 @@ public class ContainerOverrideProvider {
   public <P> P getPlugin(String resource, Class<P> pClass) throws
       ClassNotFoundException, IllegalAccessException, InstantiationException {
 
-    Container container = this.containerMap.get(resource);
+    ContainerOverride containerOverride = this.containerMap.get(resource);
 
-    if (container != null) {
-      return container.getPlugin(resource, pClass);
+    if (containerOverride != null) {
+      return containerOverride.getContainer().getPlugin(containerOverride.getResource(), pClass);
     }
 
     return null;

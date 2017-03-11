@@ -5,7 +5,6 @@ import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
 import com.sudoplay.sudoxt.service.ResourceLocation;
 import com.sudoplay.sudoxt.service.ResourceStringParseException;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -28,20 +27,27 @@ public class OptionalOverrideAdapter implements
     for (Iterator<String> it = override.keys(); it.hasNext(); ) {
 
       String key = it.next();
-      JSONArray value = override.getJSONArray(key);
+      JSONObject modOverride = override.getJSONObject(key);
 
-      for (int i = 0; i < value.length(); i++) {
-        String resource = value.getString(i);
+      for (Iterator<String> itt = modOverride.keys(); itt.hasNext(); ) {
+        String remoteResource = itt.next();
+        String localResource = modOverride.getString(remoteResource);
 
-        if (resource == null || resource.isEmpty()) {
+        if (remoteResource == null || remoteResource.isEmpty()) {
           throw new MetaAdaptException(String.format(
-              "Array [%s] must contain non-empty strings only, got: '%s'", key, resource
+              "Override keys must be non-empty strings, got: '%s'", remoteResource
+          ));
+        }
+
+        if (localResource == null || localResource.isEmpty()) {
+          throw new MetaAdaptException(String.format(
+              "Override values must be non-empty strings, got: '%s'", localResource
           ));
         }
 
         try {
-          ResourceLocation remoteResourceLocation = new ResourceLocation(key + ":" + resource);
-          ResourceLocation localResourceLocation = new ResourceLocation(meta.getId() + ":" + resource);
+          ResourceLocation remoteResourceLocation = new ResourceLocation(key + ":" + remoteResource);
+          ResourceLocation localResourceLocation = new ResourceLocation(meta.getId() + ":" + localResource);
           meta.addOverride(remoteResourceLocation, localResourceLocation);
 
         } catch (ResourceStringParseException e) {

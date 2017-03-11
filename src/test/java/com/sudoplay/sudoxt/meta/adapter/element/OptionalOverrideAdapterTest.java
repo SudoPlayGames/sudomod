@@ -30,11 +30,11 @@ public class OptionalOverrideAdapterTest {
   }
 
   @Test
-  public void adaptShouldNotThrowWhenEmptyArray() throws Exception {
+  public void adaptShouldNotThrowWhenEmptySubObject() throws Exception {
     Meta meta = mock(Meta.class);
     OptionalOverrideAdapter adapter = new OptionalOverrideAdapter();
 
-    adapter.adapt(new JSONObject("{ \"override\": { \"mod-id\": [] } }"), meta);
+    adapter.adapt(new JSONObject("{ \"override\": { \"mod-id\": {} } }"), meta);
   }
 
   @Test
@@ -42,7 +42,7 @@ public class OptionalOverrideAdapterTest {
     Meta meta = mock(Meta.class);
     OptionalOverrideAdapter adapter = new OptionalOverrideAdapter();
 
-    adapter.adapt(new JSONObject("{ \"override\": { \"mod-id\": [ \"script.SomePlugin\" ] } }"), meta);
+    adapter.adapt(new JSONObject("{ \"override\": { \"mod-id\": { \"script.SomePlugin\": \"script.SomeOtherPlugin\" } } }"), meta);
 
     verify(meta, times(1)).addOverride(any(ResourceLocation.class), any(ResourceLocation.class));
   }

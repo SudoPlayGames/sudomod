@@ -28,7 +28,7 @@ public class OverrideContainerMapProvider implements
   @Override
   public Map<String, Container> getContainerMap() {
 
-    Map<String, Map<String, Container>> overrideMap;
+    Map<String, Map<String, ContainerOverride>> overrideMap;
     List<Meta> metaList;
     Map<String, Container> containerMap;
 
@@ -39,22 +39,30 @@ public class OverrideContainerMapProvider implements
     for (Meta meta : metaList) {
 
       for (Map.Entry<ResourceLocation, ResourceLocation> entry : meta.getOverrideMap().entrySet()) {
-        String remoteContainerId = entry.getKey().getId();
+        ResourceLocation remoteResourceLocation;
+        String remoteContainerId;
+
+        remoteResourceLocation = entry.getKey();
+        remoteContainerId = remoteResourceLocation.getId();
 
         // if the container to override exists...
         if (containerMap.containsKey(remoteContainerId)) {
           ResourceLocation localResourceLocation;
           String localResource;
+          String remoteResource;
           String localContainerId;
-          Map<String, Container> map;
+          Map<String, ContainerOverride> map;
           Container localContainer;
 
           localResourceLocation = entry.getValue();
+
           localResource = localResourceLocation.getResource();
+          remoteResource = remoteResourceLocation.getResource();
+
           localContainerId = localResourceLocation.getId();
           map = this.getSafe(overrideMap, remoteContainerId);
           localContainer = containerMap.get(localContainerId);
-          map.put(localResource, localContainer);
+          map.put(remoteResource, new ContainerOverride(localResource, localContainer));
         }
       }
     }
@@ -69,11 +77,11 @@ public class OverrideContainerMapProvider implements
   }
 
   @NotNull
-  private Map<String, Container> getSafe(
-      Map<String, Map<String, Container>> overrideMap,
+  private Map<String, ContainerOverride> getSafe(
+      Map<String, Map<String, ContainerOverride>> overrideMap,
       String remoteContainerId
   ) {
-    Map<String, Container> map = overrideMap.get(remoteContainerId);
+    Map<String, ContainerOverride> map = overrideMap.get(remoteContainerId);
 
     if (map == null) {
       map = new HashMap<>();
