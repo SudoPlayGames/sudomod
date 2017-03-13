@@ -1,19 +1,17 @@
 package com.sudoplay.sudoxt;
 
-import com.sudoplay.sudoxt.api.AncillaryPlugin;
-import com.sudoplay.sudoxt.api.LoggerStaticInjector;
-import com.sudoplay.sudoxt.classloader.asm.callback.NoOpCallbackDelegateFactory;
+import com.sudoplay.sudoxt.api.*;
 import com.sudoplay.sudoxt.classloader.asm.filter.AllowedJavaUtilClassFilter;
 import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.AllowAllClassFilter;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
+import com.sudoplay.sudoxt.classloader.intercept.StaticInjector;
 import com.sudoplay.sudoxt.classloader.security.SEServicePolicy;
 import com.sudoplay.sudoxt.service.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.sudoplay.sudoxt.api.Plugin;
 
 import java.io.FilePermission;
 import java.nio.file.Paths;
@@ -59,6 +57,10 @@ public class Main {
             .setMetaFilename("mod-info.json")
             .setApiVersion("1.0"))
         .addStaticInjector(new LoggerStaticInjector())
+        .addStaticInjector(new StaticInjector<>(
+            IJsonObjectAPIProvider.class,
+            container -> new JsonObjectAPIProvider()
+        ))
         .addClassLoaderClassFilter(new AllowAllClassFilter())
         //.setCallbackDelegateFactory(NoOpCallbackDelegateFactory.INSTANCE) // testing
         .setByteCodeTransformerBuilder(new SEByteCodeTransformerBuilder()

@@ -38,10 +38,10 @@ File Access:
   ✔ Sandbox mod file access into the data folder @done (17-03-09 09:41)
     Should grant extensions read-only access to certain files in the mod's home folder: json, csv (any others?).
     Should grant the mod read/write access to a NBT data file in the data folder, albeit via API.
-  ☐ Json api wrapper
+  ✔ Json api wrapper @done (17-03-12 19:44)
 
 Configuration:
-  ☐ Provide simple configuration file framework
+  ✔ Provide simple configuration file framework @done (17-03-12 19:44)
     We're going to go with json. Using the modified org.json classes, json config files can support comments.
     Where should the config files be stored?
       We'll do a read-only json file access api targeted at the containers path. Mods can ship with a config file that can be edited by the end-user.

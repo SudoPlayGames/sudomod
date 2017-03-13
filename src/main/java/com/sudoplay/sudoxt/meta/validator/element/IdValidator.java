@@ -26,8 +26,8 @@ public class IdValidator implements
       return false;
     }
 
-    if (id.replaceAll("[a-z0-9_]", "").length() > 0) {
-      LOG.error("Meta [id] is invalid: [{}]; must not be empty or null, valid characters are: a-z 0-9 _", id);
+    if (id.replaceAll("[a-z0-9_-]", "").length() > 0) {
+      LOG.error("Meta [id] is invalid: [{}]; must not be empty or null, valid characters are: a-z 0-9 _ -", id);
       return false;
     }
 
