@@ -1,0 +1,21 @@
+{
+  "id": "mod_c",
+  "name": "Test Mod C",
+  "author": "codetaylor",
+  "version": "1.0.0",
+  "description": "My third mod!",
+  "api-version": "1.0",
+  "website": "https://github.com/sudoplaygames/sudomod",
+  "depends-on": [
+    "required-after:mod_b"
+  ],
+  "jars": [],
+  "preload": [
+    "mod.ModPlugin"
+  ],
+  "override": {
+    "mod_b": {
+      "mod.BlueAncillaryPlugin": "mod.override.BlueAncillaryPlugin"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": "mod_d",
+  "name": "Test Mod D",
+  "author": "codetaylor",
+  "version": "1.0.0",
+  "description": "My fourth mod!",
+  "api-version": "1.0",
+  "website": "https://github.com/sudoplaygames/sudomod",
+  "depends-on": ["required-after:mod_a","required-after:mod_b"],
+  "jars": ["mod.jar","mod-lib.jar"],
+  "preload": [
+    "mod.ModPlugin"
+  ]
+}

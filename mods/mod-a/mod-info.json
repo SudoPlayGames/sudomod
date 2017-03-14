@@ -1,0 +1,16 @@
+{
+  "id": "mod_a",
+  "name": "Test Mod A",
+  "author": "codetaylor",
+  "version": "1.0.0",
+  "description": "My first mod!",
+  "api-version": "1.0",
+  "website": "https://github.com/sudoplaygames/sudomod",
+  "depends-on": [],
+  "jars": [
+    "sudomath.jar"
+  ],
+  "preload": [
+    "mod.ModPlugin"
+  ]
+}

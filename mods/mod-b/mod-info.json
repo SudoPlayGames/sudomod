@@ -1,0 +1,19 @@
+{
+  "id": "mod_b",
+  "name": "Test Mod B",
+  "author": "codetaylor",
+  "version": "1.0.0",
+  "description": "My second mod!",
+  "api-version": "1.0",
+  "website": "https://github.com/sudoplaygames/sudomod",
+  "depends-on": [
+    "required-after:mod_a"
+  ],
+  "jars": [],
+  "register": {
+    "blue": "mod.BlueAncillaryPlugin"
+  },
+  "preload": [
+    "mod.ModPlugin"
+  ]
+}
