@@ -5,6 +5,8 @@ import org.codehaus.janino.IClass;
 import org.codehaus.janino.IClassLoader;
 
 import java.lang.reflect.Constructor;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 
 import static com.sudoplay.sudoxt.classloader.SXClassLoader.DEPENDENCY;
 import static com.sudoplay.sudoxt.classloader.SXClassLoader.JAR;
@@ -26,6 +28,7 @@ public class SXIClassLoader extends
   @Override
   protected IClass findIClass(String descriptor) throws ClassNotFoundException {
     Class<?> clazz;
+
     try {
       clazz = this.classLoader.loadClass(Descriptor.toClassName(descriptor), (JAR | DEPENDENCY));
 
@@ -44,8 +47,14 @@ public class SXIClassLoader extends
     try {
       Class<?> c = Class.forName("org.codehaus.janino.ReflectionIClass");
       Constructor<?> declaredConstructor = c.getDeclaredConstructor(Class.class, IClassLoader.class);
-      declaredConstructor.setAccessible(true);
+
+      AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+        declaredConstructor.setAccessible(true);
+        return null;
+      });
+
       result = (IClass) declaredConstructor.newInstance(clazz, this);
+
 
     } catch (Exception e) {
       throw new ClassNotFoundException(descriptor, e);

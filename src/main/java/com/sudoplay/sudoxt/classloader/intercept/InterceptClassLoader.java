@@ -9,6 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * Created by codetaylor on 2/23/2017.
@@ -87,16 +89,13 @@ public class InterceptClassLoader extends
       throw new ClassNotFoundException(name);
     }
 
-    /*final Class<?> cc = c;
+    final Class<?> cc = c;
     AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-      // this is privileged because the static callbacks injected via asm are
-      // loaded within the context of the sandbox and consequently fail
-      // interception due to the reflection involved
       this.classInterceptor.intercept(cc);
       return null;
     });
-    c = cc;*/
-    this.classInterceptor.intercept(c);
+
+    c = cc;
 
     return c;
   }
@@ -105,13 +104,9 @@ public class InterceptClassLoader extends
 
     String path = name.replace(".", "/").concat(".class");
 
-    /*InputStream inputStream = AccessController.doPrivileged((PrivilegedAction<InputStream>) () -> {
-      // this is privileged because the static callbacks injected via asm are
-      // loaded within the context of the sandbox and consequently fail
-      // to read the filesystem
-      return InterceptClassLoader.this.getResourceAsStream(path);
-    });*/
-    InputStream inputStream = this.getResourceAsStream(path);
+    InputStream inputStream = AccessController.doPrivileged(
+        (PrivilegedAction<InputStream>) () -> InterceptClassLoader.this.getResourceAsStream(path)
+    );
 
     if (inputStream == null) {
       throw new ClassNotFoundException(name);

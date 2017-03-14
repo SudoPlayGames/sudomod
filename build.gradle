@@ -12,20 +12,43 @@ repositories {
 sourceSets {
     api {
         java {
-            srcDir file('src/api/java/')
             compileClasspath += sourceSets.main.runtimeClasspath
             runtimeClasspath += sourceSets.main.runtimeClasspath
+
+            srcDir file('src/api/java/')
         }
     }
     testIntegration {
         java {
             compileClasspath += sourceSets.test.runtimeClasspath
             compileClasspath += sourceSets.api.runtimeClasspath
+
             runtimeClasspath += sourceSets.test.runtimeClasspath
             runtimeClasspath += sourceSets.api.runtimeClasspath
+
             srcDir file('src/test-integration/java')
         }
         resources.srcDir file('src/test-integration/resources')
+    }
+    modA {
+        java {
+            srcDir file('mods/mod-a')
+        }
+    }
+    modB {
+        java {
+            srcDir file('mods/mod-b')
+        }
+    }
+    modC {
+        java {
+            srcDir file('mods/mod-c')
+        }
+    }
+    modD {
+        java {
+            srcDir file('mods/mod-d')
+        }
     }
 }
 
@@ -35,6 +58,10 @@ configurations {
     }
     testIntegrationCompile.extendsFrom testCompile
     testIntegrationRuntime.extendsFrom testRuntime
+    modA
+    modB
+    modC
+    modD
 }
 
 dependencies {
@@ -47,6 +74,21 @@ dependencies {
     compile 'org.codehaus.janino:commons-compiler:3.0.6'
     compile 'org.ow2.asm:asm-all:5.2'
     compile 'org.jetbrains:annotations:15.0'
+
+    modACompile sourceSets.api.output
+    modACompile files('mods/mod-a/sudomath.jar')
+
+    modBCompile sourceSets.api.output
+    modBCompile sourceSets.modA.output
+    modBCompile files('mods/mod-a/sudomath.jar')
+
+    modCCompile sourceSets.api.output
+    modCCompile sourceSets.modB.output
+
+    modDCompile sourceSets.api.output
+    modDCompile sourceSets.modA.output
+    modDCompile files('mods/mod-a/sudomath.jar')
+    modDCompile sourceSets.modB.output
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2+'

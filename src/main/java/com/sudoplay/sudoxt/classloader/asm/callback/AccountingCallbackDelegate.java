@@ -10,6 +10,7 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Field;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -238,7 +239,10 @@ public class AccountingCallbackDelegate implements
       });
 
     } catch (Exception e) {
-      LOG.debug("Error loading class [{}] for allocation", type, e);
+      AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+        LOG.trace("Error loading class [{}] for allocation", type, e);
+        return null;
+      });
     }
 
     return 8;

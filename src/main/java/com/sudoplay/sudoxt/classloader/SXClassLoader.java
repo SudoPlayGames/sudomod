@@ -177,7 +177,7 @@ public class SXClassLoader extends
           this.inputStreamByteArrayConverter.convert(inputStream)
       );
 
-      return defineClass(name, bytecode, 0, bytecode.length);
+      return this.defineClass(name, bytecode, 0, bytecode.length);
 
     } catch (Exception e) {
 

@@ -12,11 +12,22 @@ Test:
   ✔ Test that extension can't have dependency on itself @done (17-03-04 11:04)
   ✔ Class can implement or extend non-whitelisted class...? @done (17-03-09 09:40)
     Fixed by checking class superclass and implemented interfaces against the same class filters used in the method visitor.
+    Unit:
+      ☐ Multiple mod paths should work as intended
+    Integration:
+      ☐ Compressed mod should work as intended
+      ✔ Mod compiled as jar should work as intended @done (17-03-14 11:17)
+      ✔ Can a compiled mod jar use code that depends on uncompiled source? Yes. @done (17-03-14 11:17)
+      ✔ Can a compiled mod jar use code that depends on uncompiled source in dependency? Yes. @done (17-03-14 12:08)
+      ✔ Can a compiled mod jar use code that depends on compiled mod jar code? Yes. @done (17-03-14 12:08)
+      ✔ Can a compiled mod jar use code that depends on compiled mod jar code in dependency? Yes. @done (17-03-14 12:08)
 
 Bugs:
   ✔ Source classloader can't be made parent-last @done (17-03-11 11:54)
     The loadIClass method in abstract class IClassLoader is final and controls the parent-first behavior.
     Fix: I've solved this by replacing the IClassLoader in the janino jar file with my own IClassLoader.
+  ✔ Loading a plugin from a jar file that has a static reference to LoggingAPI fails with ACE. @done (17-03-14 11:06)
+    LoggingAPI has the InterceptClass annotation that flags it for intercept. The InterceptClassloader will use getResourceAsStream() which fails when the security context does not give permission to read the requested file. When loading a source java file through the source bit of the classloader, the static reference to LoggingAPI causes the SXJavaSourceIClassLoader to load the LoggingAPI class without the no-permission restriction of classes loaded with an ISandboxClassloader implementation. This is why source files with a static LoggingAPI reference do not fail the security check. However, when loading a pre-compiled class file from the jar, the static reference is processed later, when the loaded class file is initialized. This means that when the LoggingAPI class is intercepted and getResourceAsStream() is called, the security check will fail because the no-permission restriction from the classloader that loaded the pre-compiled class, an ISandboxClassloader implementation, will be in the security context. Wrapping the call to getResourceAsStream() in a privileged block will fix this.
 
 Meta:
   ✔ Should we switch to a more mature json lib that allows comments? @done (17-02-26 12:15)
@@ -27,6 +38,7 @@ Meta:
     Optionally allow extensions to register plugins with a name. These plugins can later be retrieved by the system developer; ie. retrieving all 'main-plugin' from each extension which would act as an entry point.
   ✔ Overrides @done (17-03-11 12:54)
   ✔ Preload @done (17-03-06 13:29)
+  ☐ Should registered plugins also be preloaded?
 
 Security:
   ✔ Should we attempt bytecode transformation to further sandbox the plugin code? Yes. @done (17-03-03 15:25)
@@ -53,7 +65,7 @@ Configuration:
     Fixed with the two-stage builder process, one builder for the config and one builder for the service
   ✔ Add single remove methods to remove listed defaults by class @done (17-02-24 11:33)
   ✔ Change remove default methods to say removeAll... @done (17-02-24 11:33)
-  ☐ Add multiple path option to config
+  ✔ Add multiple path option to config @done (17-03-14 07:52)
     This will require an IPathlistProvider that can handle multiple paths and an alteration to the Config and ConfigBuilder to allow setting mutliple candidate search paths. Adding this feature will let the end-user specify more than one mod path in the launcher config, making it easier to develop mods in different paths.
 
 Events:

@@ -21,18 +21,18 @@ public class JarValidator implements
 
   @Override
   public boolean isValid(Meta meta, Path path, List<Meta> metaList) {
-    return this.validateJarFileSet(path, meta.getJarFileSet());
+    return this.isValidSet(path, meta.getJarFileSet());
   }
 
-  /* package */ boolean validateJarFileSet(Path path, Set<String> jarFileSet) {
+  /* package */ boolean isValidSet(Path path, Set<String> jarFileSet) {
 
     boolean isValid = true;
 
     for (String jarFileString : jarFileSet) {
-      path = path.resolve(jarFileString);
+      Path jarPath = path.resolve(jarFileString);
 
-      if (!Files.exists(path)) {
-        LOG.error("Missing declared jar file [{}]", path);
+      if (!Files.exists(jarPath)) {
+        LOG.error("Missing declared jar file [{}]", jarPath);
         isValid = false;
       }
 
@@ -40,10 +40,10 @@ public class JarValidator implements
 
         try {
           //noinspection ResultOfMethodCallIgnored
-          path.toUri().toURL();
+          jarPath.toUri().toURL();
 
         } catch (MalformedURLException e) {
-          LOG.error("Error converting path [{}] to URL", path, e);
+          LOG.error("Error converting path [{}] to URL", jarPath, e);
           isValid = false;
         }
       }
