@@ -17,11 +17,11 @@ public class FileExtensionPathListProvider implements
 
   private static final Logger LOG = LoggerFactory.getLogger(FileExtensionPathListProvider.class);
 
-  private Path path;
+  private Path[] paths;
   private String compressedFileExtension;
 
-  public FileExtensionPathListProvider(Path path, String compressedFileExtension) {
-    this.path = path;
+  public FileExtensionPathListProvider(Path[] paths, String compressedFileExtension) {
+    this.paths = paths;
     this.compressedFileExtension = compressedFileExtension;
   }
 
@@ -33,25 +33,28 @@ public class FileExtensionPathListProvider implements
     directoryStream = null;
     result = new ArrayList<>();
 
-    try {
-      // find all compressed files
-      PathMatcher matcher = FileSystems.getDefault()
-          .getPathMatcher("glob:**." + this.compressedFileExtension);
+    for (Path path : this.paths) {
 
-      directoryStream = Files.newDirectoryStream(
-          this.path,
-          entry -> Files.isRegularFile(entry) && matcher.matches(entry)
-      );
+      try {
+        // find all compressed files
+        PathMatcher matcher = FileSystems.getDefault()
+            .getPathMatcher("glob:**." + this.compressedFileExtension);
 
-      for (Path path : directoryStream) {
-        result.add(path);
+        directoryStream = Files.newDirectoryStream(
+            path,
+            entry -> Files.isRegularFile(entry) && matcher.matches(entry)
+        );
+
+        for (Path p : directoryStream) {
+          result.add(p);
+        }
+
+      } catch (IOException e) {
+        LOG.error("Error getting file extension [{}] path list for [{}]", this.compressedFileExtension, this.paths);
+
+      } finally {
+        CloseUtil.close(directoryStream, LOG);
       }
-
-    } catch (IOException e) {
-      LOG.error("Error getting compressed file path list for [{}]", this.path);
-
-    } finally {
-      CloseUtil.close(directoryStream, LOG);
     }
 
     return result;

@@ -19,12 +19,12 @@ public class FolderPathListProvider implements
 
   private static final Logger LOG = LoggerFactory.getLogger(FolderPathListProvider.class);
 
-  private Path path;
+  private Path[] paths;
 
   public FolderPathListProvider(
-      Path path
+      Path[] paths
   ) {
-    this.path = path;
+    this.paths = paths;
   }
 
   @Override
@@ -35,21 +35,24 @@ public class FolderPathListProvider implements
     directoryStream = null;
     result = new ArrayList<>();
 
-    try {
-      directoryStream = Files.newDirectoryStream(
-          this.path,
-          entry -> Files.isDirectory(entry)
-      );
+    for (Path path : this.paths) {
 
-      for (Path path : directoryStream) {
-        result.add(path);
+      try {
+        directoryStream = Files.newDirectoryStream(
+            path,
+            entry -> Files.isDirectory(entry)
+        );
+
+        for (Path p : directoryStream) {
+          result.add(p);
+        }
+
+      } catch (IOException e) {
+        LOG.error("Error getting file path list for [{}]", this.paths, e);
+
+      } finally {
+        CloseUtil.close(directoryStream, LOG);
       }
-
-    } catch (IOException e) {
-      LOG.error("Error getting compressed file path list for [{}]", this.path, e);
-
-    } finally {
-      CloseUtil.close(directoryStream, LOG);
     }
 
     return result;

@@ -27,7 +27,7 @@ public class FolderPathListProviderTest {
     Files.createDirectories(path.resolve("folder-a"));
     Files.newOutputStream(path.resolve("file-a.txt")).close();
 
-    FolderPathListProvider folderPathListProvider = new FolderPathListProvider(path);
+    FolderPathListProvider folderPathListProvider = new FolderPathListProvider(new Path[]{path});
 
     List<Path> pathList = folderPathListProvider.getPathList();
 

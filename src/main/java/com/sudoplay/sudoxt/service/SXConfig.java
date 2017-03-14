@@ -14,8 +14,7 @@ import java.nio.file.Paths;
  */
 public class SXConfig {
 
-  /* package */ Path dataLocation;
-  /* package */ Path location;
+  /* package */ Path[] locations;
   /* package */ Path tempLocation;
 
   /* package */ String metaFilename;
@@ -28,8 +27,7 @@ public class SXConfig {
   /* package */ SXConfig() {
 
     // init default paths
-    this.dataLocation = Paths.get("plugins-data");
-    this.location = Paths.get("plugins");
+    this.locations = new Path[0];
     this.tempLocation = Paths.get("plugins-temp");
 
     // init default strings
@@ -42,12 +40,8 @@ public class SXConfig {
     this.charset = Charset.forName("UTF-8");
   }
 
-  /* package */ Path getDataLocation() {
-    return this.dataLocation;
-  }
-
-  /* package */ Path getLocation() {
-    return this.location;
+  /* package */ Path[] getLocations() {
+    return this.locations;
   }
 
   /* package */ String getMetaFilename() {

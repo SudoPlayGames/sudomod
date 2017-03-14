@@ -20,13 +20,8 @@ public class SXConfigBuilder {
     this.config = new SXConfig();
   }
 
-  public SXConfigBuilder setDataLocation(@NotNull Path dataLocation) {
-    this.config.dataLocation = PreCondition.notNull(dataLocation);
-    return this;
-  }
-
-  public SXConfigBuilder setLocation(@NotNull Path location) {
-    this.config.location = PreCondition.notNull(location);
+  public SXConfigBuilder setLocations(@NotNull Path[] locations) {
+    this.config.locations = PreCondition.notNull(locations);
     return this;
   }
 

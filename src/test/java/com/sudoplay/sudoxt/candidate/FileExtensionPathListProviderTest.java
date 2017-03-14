@@ -29,7 +29,7 @@ public class FileExtensionPathListProviderTest {
     Files.createDirectories(target.resolve("directory-a"));
 
     FileExtensionPathListProvider provider = new FileExtensionPathListProvider(
-        target,
+        new Path[]{target},
         "zip"
     );
 

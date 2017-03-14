@@ -11,7 +11,6 @@ import com.sudoplay.sudoxt.classloader.intercept.SandboxPathProviderStaticInject
 import com.sudoplay.sudoxt.classloader.intercept.StaticInjector;
 import com.sudoplay.sudoxt.container.IContainerCacheFactory;
 import com.sudoplay.sudoxt.container.LRUContainerCacheFactory;
-import com.sudoplay.sudoxt.folder.DefaultFolderLifecycleInitializeEventHandler;
 import com.sudoplay.sudoxt.folder.IFolderLifecycleEventHandler;
 import com.sudoplay.sudoxt.folder.TempFolderLifecycleEventHandler;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
@@ -140,7 +139,7 @@ public class SXServiceBuilder {
         new ICandidateProvider[]{
             new FileSystemCandidateProvider(
                 new FolderPathListProvider(
-                    this.config.getLocation()
+                    this.config.getLocations()
                 ),
                 new FolderPathValidator(
                     this.config.getMetaFilename()
@@ -150,7 +149,7 @@ public class SXServiceBuilder {
             ),
             new FileSystemCandidateProvider(
                 new FileExtensionPathListProvider(
-                    this.config.getLocation(),
+                    this.config.getLocations(),
                     this.config.getCompressedFileExtension()
                 ),
                 new CompressedFilePathValidator(
@@ -203,12 +202,6 @@ public class SXServiceBuilder {
         this.callbackDelegateFactory,
         this.byteCodeTransformerBuilder,
         new IFolderLifecycleEventHandler[]{
-            new DefaultFolderLifecycleInitializeEventHandler(
-                this.config.getLocation()
-            ),
-            new DefaultFolderLifecycleInitializeEventHandler(
-                this.config.getDataLocation()
-            ),
             new TempFolderLifecycleEventHandler(
                 this.config.getTempLocation(),
                 recursiveFileRemovalProcessor

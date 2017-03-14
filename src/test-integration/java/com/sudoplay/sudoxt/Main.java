@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FilePermission;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AllPermission;
 import java.security.Permissions;
@@ -51,8 +52,7 @@ public class Main {
     SXService service = new SXServiceBuilder(
         new SXConfigBuilder()
             .setCompressedFileExtension(".lsm")
-            .setLocation(Paths.get("../mods"))
-            .setDataLocation(Paths.get("mod-data"))
+            .setLocations(new Path[]{Paths.get("../mods")})
             .setTempLocation(Paths.get("mods-temp"))
             .setMetaFilename("mod-info.json")
             .setApiVersion("1.0"))
