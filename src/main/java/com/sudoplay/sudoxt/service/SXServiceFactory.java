@@ -108,9 +108,6 @@ import java.nio.charset.Charset;
         )
     );
 
-    // TODO: add transformer class filters based on meta ids
-    // maybe...
-
     // assigns container classloader factories
     containerMapProvider = new InitializedContainerMapProvider(
         metaListProvider,

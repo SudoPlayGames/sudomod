@@ -12,6 +12,12 @@ import java.util.Iterator;
 public class OptionalRegisterAdapter implements
     IMetaAdapter {
 
+  private boolean autoPreloadRegisteredPlugins;
+
+  public OptionalRegisterAdapter(boolean autoPreloadRegisteredPlugins) {
+    this.autoPreloadRegisteredPlugins = autoPreloadRegisteredPlugins;
+  }
+
   @Override
   public void adapt(JSONObject jsonObject, Meta meta) throws Exception {
 
@@ -24,7 +30,12 @@ public class OptionalRegisterAdapter implements
     for (Iterator<String> it = registerObject.keys(); it.hasNext(); ) {
       String key = it.next();
 
-      meta.registerPlugin(key, registerObject.getString(key));
+      String registerObjectString = registerObject.getString(key);
+      meta.registerPlugin(key, registerObjectString);
+
+      if (this.autoPreloadRegisteredPlugins) {
+        meta.addPreload(registerObjectString);
+      }
     }
   }
 }

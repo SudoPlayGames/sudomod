@@ -16,7 +16,7 @@ public class OptionalRegisterAdapterTest {
 
     JSONObject jsonObject = new JSONObject("{}");
     Meta meta = new Meta(null, null);
-    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter();
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(false);
 
     adapter.adapt(jsonObject, meta);
 
@@ -28,7 +28,7 @@ public class OptionalRegisterAdapterTest {
 
     JSONObject jsonObject = new JSONObject("{ \"register\": {} }");
     Meta meta = new Meta(null, null);
-    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter();
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(false);
 
     adapter.adapt(jsonObject, meta);
 
@@ -40,7 +40,7 @@ public class OptionalRegisterAdapterTest {
 
     JSONObject jsonObject = new JSONObject("{ \"register\": [] }");
     Meta meta = new Meta(null, null);
-    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter();
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(false);
 
     adapter.adapt(jsonObject, meta);
   }
@@ -50,7 +50,7 @@ public class OptionalRegisterAdapterTest {
 
     JSONObject jsonObject = new JSONObject("{ \"register\": { \"key\": 123 } }");
     Meta meta = new Meta(null, null);
-    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter();
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(false);
 
     adapter.adapt(jsonObject, meta);
 
@@ -62,7 +62,7 @@ public class OptionalRegisterAdapterTest {
 
     JSONObject jsonObject = new JSONObject("{ \"register\": { \"key1\": \"value1\", \"key2\": \"value2\" } }");
     Meta meta = new Meta(null, null);
-    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter();
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(false);
 
     adapter.adapt(jsonObject, meta);
 
@@ -71,6 +71,31 @@ public class OptionalRegisterAdapterTest {
     Assert.assertEquals("value2", meta.getRegisteredPluginMap().get("key2"));
   }
 
+  @Test
+  public void adaptShouldAddToAutoPreloadSetWhenParameterIsTrue() throws Exception {
 
+    JSONObject jsonObject = new JSONObject("{ \"register\": { \"key1\": \"value1\", \"key2\": \"value2\" } }");
+    Meta meta = new Meta(null, null);
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(true);
 
+    adapter.adapt(jsonObject, meta);
+
+    Assert.assertEquals(2, meta.getPreloadSet().size());
+    Assert.assertTrue(meta.getPreloadSet().contains("value1"));
+    Assert.assertTrue(meta.getPreloadSet().contains("value2"));
+  }
+
+  @Test
+  public void adaptShouldNotAddToAutoPreloadSetWhenParameterIsFalse() throws Exception {
+
+    JSONObject jsonObject = new JSONObject("{ \"register\": { \"key1\": \"value1\", \"key2\": \"value2\" } }");
+    Meta meta = new Meta(null, null);
+    OptionalRegisterAdapter adapter = new OptionalRegisterAdapter(false);
+
+    adapter.adapt(jsonObject, meta);
+
+    Assert.assertEquals(0, meta.getPreloadSet().size());
+    Assert.assertFalse(meta.getPreloadSet().contains("value1"));
+    Assert.assertFalse(meta.getPreloadSet().contains("value2"));
+  }
 }

@@ -19,6 +19,7 @@ public class SXConfig {
 
   /* package */ String metaFilename;
   /* package */ String compressedFileExtension;
+  /* package */ boolean autoPreloadRegisteredPlugins;
 
   /* package */ ArtifactVersion apiVersion;
 
@@ -64,4 +65,7 @@ public class SXConfig {
     return this.charset;
   }
 
+  /* package */ boolean isAutoPreloadRegisteredPlugins() {
+    return this.autoPreloadRegisteredPlugins;
+  }
 }

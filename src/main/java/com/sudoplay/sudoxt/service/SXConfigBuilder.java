@@ -50,6 +50,11 @@ public class SXConfigBuilder {
     return this;
   }
 
+  public SXConfigBuilder setAutoPreloadRegisteredPlugins(boolean autoPreload) {
+    this.config.autoPreloadRegisteredPlugins = autoPreload;
+    return this;
+  }
+
   @NotNull/* package */ SXConfig getConfig() {
     return this.config;
   }

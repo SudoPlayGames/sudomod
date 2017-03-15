@@ -177,13 +177,17 @@ public class SXServiceBuilder {
             new OptionalApiVersionAdapter(),
             new OptionalDependsOnAdapter(),
             new OptionalJarAdapter(),
-            new OptionalRegisterAdapter(),
+            new OptionalRegisterAdapter(
+                this.config.isAutoPreloadRegisteredPlugins()
+            ),
             new OptionalPreloadAdapter(),
             new OptionalOverrideAdapter()
         },
         new IMetaValidator[]{
             new IdValidator(),
-            new ApiVersionValidator(this.config.getApiVersion()),
+            new ApiVersionValidator(
+                this.config.getApiVersion()
+            ),
             new DependsOnValidator(),
             new JarValidator(),
             new RegisterValidator(
