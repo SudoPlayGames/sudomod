@@ -38,7 +38,8 @@ Meta:
     Optionally allow extensions to register plugins with a name. These plugins can later be retrieved by the system developer; ie. retrieving all 'main-plugin' from each extension which would act as an entry point.
   ✔ Overrides @done (17-03-11 12:54)
   ✔ Preload @done (17-03-06 13:29)
-  ☐ Should registered plugins also be preloaded?
+  ✔ Should registered plugins also be preloaded? @done (17-03-15 08:31)
+    Yes. A config option has been added.
 
 Security:
   ✔ Should we attempt bytecode transformation to further sandbox the plugin code? Yes. @done (17-03-03 15:25)

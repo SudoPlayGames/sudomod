@@ -140,9 +140,6 @@ import java.nio.charset.Charset;
         containerMapProvider.getContainerMap()
     );
 
-    // initializes folders
-    service.initializeFolders();
-
     // initializes each container's cache and classloader
     service.reload();
 

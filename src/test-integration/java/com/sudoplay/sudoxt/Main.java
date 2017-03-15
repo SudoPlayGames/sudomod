@@ -116,7 +116,7 @@ public class Main {
     System.out.println(pluginD.getReport());
     System.out.println("---");
 
-    service.disposeFolders();
+    service.dispose();
   }
 
   private interface RunnableException {

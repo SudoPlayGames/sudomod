@@ -5,12 +5,14 @@ import java.util.List;
 /**
  * Created by codetaylor on 3/6/2017.
  */
-/* package */ class PluginPreLoader {
+/* package */ class PluginPreLoader implements
+    IPluginPreloader {
 
-  /* package */ void preload(
+  @Override
+  public void preload(
       IPreloadMonitor monitor,
       List<SXResourceLocation> preloadList,
-      SXService service
+      IPluginProvider service
   ) {
 
     int listSize = preloadList.size();

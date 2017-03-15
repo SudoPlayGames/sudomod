@@ -12,31 +12,30 @@ import java.util.stream.Collectors;
 /**
  * Created by codetaylor on 2/20/2017.
  */
-public class SXService {
+public class SXService implements
+    IPluginProvider,
+    IRegisteredPluginListProvider,
+    IPluginLifecycleService {
 
   private final IFolderLifecycleEventPlugin folderLifecycleEventPlugin;
-  private final PluginPreLoader pluginPreLoader;
+  private final IPluginPreloader pluginPreLoader;
   private final Map<String, Container> containerMap;
 
   @SuppressWarnings("WeakerAccess")
   public SXService(
       IFolderLifecycleEventPlugin folderLifecycleEventPlugin,
-      PluginPreLoader pluginPreLoader,
+      IPluginPreloader pluginPreLoader,
       Map<String, Container> containerMap
   ) throws SXServiceInitializationException {
     this.folderLifecycleEventPlugin = folderLifecycleEventPlugin;
     this.pluginPreLoader = pluginPreLoader;
     this.containerMap = containerMap;
-  }
 
-  /* package */ void initializeFolders() throws SXServiceInitializationException {
     this.folderLifecycleEventPlugin.initialize();
+    this.reload();
   }
 
-  public void disposeFolders() {
-    this.folderLifecycleEventPlugin.dispose();
-  }
-
+  @Override
   public void preload(IPreloadMonitor monitor) {
     List<SXResourceLocation> preloadList = new ArrayList<>();
 
@@ -55,10 +54,17 @@ public class SXService {
     this.pluginPreLoader.preload(monitor, preloadList, this);
   }
 
+  @Override
   public void reload() {
     this.containerMap.values().forEach(Container::reload);
   }
 
+  @Override
+  public void dispose() {
+    this.folderLifecycleEventPlugin.dispose();
+  }
+
+  @Override
   public <P> List<SXPluginReference<P>> getRegisteredPlugins(String name, Class<P> pClass) {
     return this.containerMap.values()
         .stream()
@@ -72,10 +78,12 @@ public class SXService {
         .collect(Collectors.toList());
   }
 
+  @Override
   public <P> SXPluginReference<P> getPlugin(String resourceString, Class<P> tClass) {
     return this.getPlugin(this.createResourceLocation(resourceString), tClass);
   }
 
+  @Override
   public <P> SXPluginReference<P> getPlugin(SXResourceLocation resourceLocation, Class<P> tClass) {
     Container container = this.getContainer(resourceLocation.getId());
     return new SXPluginReference<>(tClass, resourceLocation.getResource(), container);
