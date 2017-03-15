@@ -14,8 +14,10 @@ Test:
     Fixed by checking class superclass and implemented interfaces against the same class filters used in the method visitor.
     Unit:
       ☐ Multiple mod paths should work as intended
+      ☐ Compressed filename should match extension id - meta validator
+      ☐ Folder name should match extension id - meta validator
     Integration:
-      ☐ Compressed mod should work as intended
+      ✔ Compressed mod should work as intended @done (17-03-15 10:42)
       ✔ Mod compiled as jar should work as intended @done (17-03-14 11:17)
       ✔ Can a compiled mod jar use code that depends on uncompiled source? Yes. @done (17-03-14 11:17)
       ✔ Can a compiled mod jar use code that depends on uncompiled source in dependency? Yes. @done (17-03-14 12:08)
@@ -28,6 +30,8 @@ Bugs:
     Fix: I've solved this by replacing the IClassLoader in the janino jar file with my own IClassLoader.
   ✔ Loading a plugin from a jar file that has a static reference to LoggingAPI fails with ACE. @done (17-03-14 11:06)
     LoggingAPI has the InterceptClass annotation that flags it for intercept. The InterceptClassloader will use getResourceAsStream() which fails when the security context does not give permission to read the requested file. When loading a source java file through the source bit of the classloader, the static reference to LoggingAPI causes the SXJavaSourceIClassLoader to load the LoggingAPI class without the no-permission restriction of classes loaded with an ISandboxClassloader implementation. This is why source files with a static LoggingAPI reference do not fail the security check. However, when loading a pre-compiled class file from the jar, the static reference is processed later, when the loaded class file is initialized. This means that when the LoggingAPI class is intercepted and getResourceAsStream() is called, the security check will fail because the no-permission restriction from the classloader that loaded the pre-compiled class, an ISandboxClassloader implementation, will be in the security context. Wrapping the call to getResourceAsStream() in a privileged block will fix this.
+  ✔ When a compressed extension is loaded, it uses the wrong plugin. Specifically, when mod-e is loaded from a compressed file and ModPlugin is invoked, it instead invokes ModPlugin from mod-a. However, when mod-e is loaded from a folder, it behaves as expected. @done (17-03-15 10:42)
+    Looks like SXClassLoader#findSourceClass is not finding the source, forcing to load the same named class from the only dependency: mod_a. So, it looks like 'mod_e' gets a no-op resource finder during factory construction because the mods-temp folder is being re-made after the compressed extensions are extracted. Fixed by moving the folder initialization to before the extensions are extracted.
 
 Meta:
   ✔ Should we switch to a more mature json lib that allows comments? @done (17-02-26 12:15)

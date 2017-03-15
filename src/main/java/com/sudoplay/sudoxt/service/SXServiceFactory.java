@@ -42,9 +42,17 @@ import java.nio.charset.Charset;
       String metaFilename
   ) throws SXServiceInitializationException {
 
+    FolderLifecycleEventPlugin folderLifecycleEventPlugin;
     IMetaListProvider metaListProvider;
     ChainedMetaListProcessor processor;
     IContainerMapProvider containerMapProvider;
+
+    // initializes required folders (ie. mods-temp)
+    folderLifecycleEventPlugin = new FolderLifecycleEventPlugin(
+        folderLifecycleEventHandlers
+    );
+
+    folderLifecycleEventPlugin.initialize();
 
     // adapts meta
     processor = new AdaptedMetaListProcessor(
@@ -132,17 +140,10 @@ import java.nio.charset.Charset;
     );
 
     // creates the service
-    SXService service = new SXService(
-        new FolderLifecycleEventPlugin(
-            folderLifecycleEventHandlers
-        ),
+    return new SXService(
+        folderLifecycleEventPlugin,
         new PluginPreLoader(),
         containerMapProvider.getContainerMap()
     );
-
-    // initializes each container's cache and classloader
-    service.reload();
-
-    return service;
   }
 }

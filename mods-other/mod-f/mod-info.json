@@ -1,0 +1,14 @@
+{
+  "id": "mod_f",
+  "name": "Test Mod F",
+  "author": "codetaylor",
+  "version": "1.0.0",
+  "description": "My sixth mod!",
+  "api-version": "1.0",
+  "website": "https://github.com/sudoplaygames/sudomod",
+  "depends-on": ["required-after:mod_a"],
+  "jars": [],
+  "preload": [
+    "mod.ModPlugin"
+  ]
+}

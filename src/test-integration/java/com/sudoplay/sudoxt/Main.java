@@ -51,7 +51,7 @@ public class Main {
 
     SXService service = new SXServiceBuilder(
         new SXConfigBuilder()
-            .setCompressedFileExtension(".lsm")
+            .setCompressedFileExtension("lsm")
             .setLocations(new Path[]{Paths.get("mods")})
             .setTempLocation(Paths.get("mods-temp"))
             .setMetaFilename("mod-info.json")
@@ -81,6 +81,7 @@ public class Main {
     SXPluginReference<Plugin> pluginB = service.getPlugin("mod_b:mod.ModPlugin", Plugin.class);
     SXPluginReference<Plugin> pluginC = service.getPlugin("mod_c:mod.ModPlugin", Plugin.class);
     SXPluginReference<Plugin> pluginD = service.getPlugin("mod_d:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginE = service.getPlugin("mod_e:mod.ModPlugin", Plugin.class);
 
     List<SXPluginReference<AncillaryPlugin>> referenceList = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
 
@@ -114,6 +115,10 @@ public class Main {
 
     pluginD.invoke(Plugin::onGreeting);
     System.out.println(pluginD.getReport());
+    System.out.println("---");
+
+    pluginE.invoke(Plugin::onGreeting);
+    System.out.println(pluginE.getReport());
     System.out.println("---");
 
     service.dispose();

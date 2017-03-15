@@ -83,9 +83,11 @@ import java.util.Set;
         true
     );
 
+    PathResourceFinder sourceFinder = new PathResourceFinder(this.sourcePath);
+
     classLoader.setJavaSourceIClassLoader(
         new SXJavaSourceIClassLoader(
-            new PathResourceFinder(this.sourcePath),
+            sourceFinder,
             null,
             new SXIClassLoader(classLoader)
         )

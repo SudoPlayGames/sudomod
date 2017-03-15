@@ -50,6 +50,12 @@ sourceSets {
             srcDir file('mods/mod-d')
         }
     }
+    // skip compressed e
+    modF {
+        java {
+            srcDir file('mods-other/mod-f')
+        }
+    }
 }
 
 configurations {
@@ -89,6 +95,9 @@ dependencies {
     modDCompile sourceSets.modA.output
     modDCompile files('mods/mod-a/sudomath.jar')
     modDCompile sourceSets.modB.output
+
+    modFCompile sourceSets.api.output
+    modFCompile sourceSets.modA.output
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2+'

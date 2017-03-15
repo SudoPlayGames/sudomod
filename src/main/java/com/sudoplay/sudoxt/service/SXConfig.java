@@ -33,7 +33,8 @@ public class SXConfig {
 
     // init default strings
     this.metaFilename = "meta.json";
-    this.compressedFileExtension = ".zip";
+    this.compressedFileExtension = "zip";
+    this.autoPreloadRegisteredPlugins = true;
 
     // init default objects
     this.apiVersion = new DefaultArtifactVersion("0");

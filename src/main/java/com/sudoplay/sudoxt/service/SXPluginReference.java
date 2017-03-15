@@ -20,7 +20,11 @@ public class SXPluginReference<P> {
   private String resourceString;
   private Container container;
 
-  /* package */ SXPluginReference(Class<P> pClass, String resourceString, Container container) {
+  /* package */ SXPluginReference(
+      Class<P> pClass,
+      String resourceString,
+      Container container
+  ) {
     this.pClass = pClass;
     this.resourceString = resourceString;
     this.container = container;

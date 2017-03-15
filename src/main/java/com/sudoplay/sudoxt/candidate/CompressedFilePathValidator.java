@@ -49,7 +49,7 @@ public class CompressedFilePathValidator implements
     if (!containsMetaFile) {
       LOG.warn(
           "File [{}] does appear to be a valid zip file, but doesn't contain the meta file [{}]",
-          path,
+          file,
           this.metaFilename
       );
     }

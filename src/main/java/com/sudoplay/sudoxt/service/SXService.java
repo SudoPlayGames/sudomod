@@ -30,8 +30,6 @@ public class SXService implements
     this.folderLifecycleEventPlugin = folderLifecycleEventPlugin;
     this.pluginPreLoader = pluginPreLoader;
     this.containerMap = containerMap;
-
-    this.folderLifecycleEventPlugin.initialize();
     this.reload();
   }
 
