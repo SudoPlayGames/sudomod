@@ -1,5 +1,7 @@
 http://misko.hevery.com/code-reviewers-guide/
 
+"color_scheme": "Packages/PlainTasks/ tasks-monokai.hidden-tmTheme ",
+
 Naming Conventions:
   * Extension - a group of plugins, like a 'mod'
   * Plugin - an abstract class in the API, extended by a class in the extension

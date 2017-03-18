@@ -10,6 +10,7 @@ import java.security.PrivilegedExceptionAction;
 
 import static com.sudoplay.sudoxt.classloader.SXClassLoader.DEPENDENCY;
 import static com.sudoplay.sudoxt.classloader.SXClassLoader.JAR;
+import static com.sudoplay.sudoxt.classloader.SXClassLoader.PARENT;
 
 /**
  * Created by codetaylor on 3/10/2017.
@@ -30,7 +31,7 @@ public class SXIClassLoader extends
     Class<?> clazz;
 
     try {
-      clazz = this.classLoader.loadClass(Descriptor.toClassName(descriptor), (JAR | DEPENDENCY));
+      clazz = this.classLoader.loadClass(Descriptor.toClassName(descriptor), (PARENT | JAR | DEPENDENCY));
 
     } catch (ClassNotFoundException e) {
 

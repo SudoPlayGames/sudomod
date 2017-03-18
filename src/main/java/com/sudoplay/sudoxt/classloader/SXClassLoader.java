@@ -34,6 +34,7 @@ public class SXClassLoader extends
   public static final int JAR = 1;
   public static final int SOURCE = 2;
   public static final int DEPENDENCY = 4;
+  public static final int PARENT = 8;
 
   private static final Logger LOG = LoggerFactory.getLogger(SXClassLoader.class);
 
@@ -79,7 +80,7 @@ public class SXClassLoader extends
 
   @Override
   public Class<?> loadClass(String name) throws ClassNotFoundException {
-    return this.loadClass(name, (JAR | SOURCE | DEPENDENCY));
+    return this.loadClass(name, (PARENT | JAR | SOURCE | DEPENDENCY));
   }
 
   @Override
@@ -104,7 +105,7 @@ public class SXClassLoader extends
 
       try {
 
-        if (parent != null) {
+        if ((flags & PARENT) == PARENT && parent != null) {
           c = parent.loadClass(name);
 
           // check class filters

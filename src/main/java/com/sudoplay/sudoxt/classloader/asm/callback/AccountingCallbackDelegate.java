@@ -232,7 +232,7 @@ public class AccountingCallbackDelegate implements
 
       AccessController.doPrivileged((PrivilegedExceptionAction<Long>) () -> {
         String name = type.replace("/", ".");
-        Class<?> aClass = this.classLoader.loadClass(name, (JAR | SOURCE | DEPENDENCY));
+        Class<?> aClass = this.classLoader.loadClass(name, (PARENT | JAR | SOURCE | DEPENDENCY));
         Field[] declaredFields = aClass.getDeclaredFields();
         ClassAllocation.put(type, declaredFields.length);
         return (long) (8 * declaredFields.length);

@@ -109,11 +109,11 @@ public class Container {
 
       if (useDependencyCheck) {
         //noinspection unchecked
-        aClass = (Class<P>) this.classLoader.loadClass(resourceString, (JAR | SOURCE | DEPENDENCY));
+        aClass = (Class<P>) this.classLoader.loadClass(resourceString, (PARENT | JAR | SOURCE | DEPENDENCY));
 
       } else {
         //noinspection unchecked
-        aClass = (Class<P>) this.classLoader.loadClass(resourceString, (JAR | SOURCE));
+        aClass = (Class<P>) this.classLoader.loadClass(resourceString, (PARENT | JAR | SOURCE));
       }
 
       Object obj;
