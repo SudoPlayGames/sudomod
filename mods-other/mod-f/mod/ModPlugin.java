@@ -14,6 +14,6 @@ public class ModPlugin implements
 
   @Override
   public void onGreeting() {
-    LOG.info(new CompressedGreeting().getGreeting());
+    LOG.info(new FenceGreeting().getGreeting());
   }
 }
