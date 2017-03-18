@@ -4,6 +4,7 @@ import com.sudoplay.sudoxt.meta.Meta;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,6 +68,38 @@ public class IdValidatorTest {
     when(metaA.getId()).thenReturn("duplicate-id");
     when(metaB.getId()).thenReturn("duplicate-id");
     Assert.assertFalse(validator.isValid(metaA, null, metaList));
+  }
+
+  @Test
+  public void isValidShouldReturnFalseWhenIdDoesNotMatchPath() {
+
+    Meta meta = mock(Meta.class);
+    IdValidator validator = new IdValidator();
+
+    // requires list to check for duplicate ids
+    List<Meta> metaList = new ArrayList<>();
+    metaList.add(meta);
+
+    when(meta.getId()).thenReturn("meta-id");
+
+    boolean result = validator.isValid(meta, Paths.get("folder/mods/not-meta-id"), metaList);
+    Assert.assertFalse(result);
+  }
+
+  @Test
+  public void isValidShouldReturnTrueWhenIdMatchesPath() {
+
+    Meta meta = mock(Meta.class);
+    IdValidator validator = new IdValidator();
+
+    // requires list to check for duplicate ids
+    List<Meta> metaList = new ArrayList<>();
+    metaList.add(meta);
+
+    when(meta.getId()).thenReturn("meta-id");
+
+    Assert.assertTrue(validator.isValid(meta, Paths.get("folder/mods/meta-id"), metaList));
+    Assert.assertTrue(validator.isValid(meta, Paths.get("folder/mods/meta-id/"), metaList));
   }
 
 }

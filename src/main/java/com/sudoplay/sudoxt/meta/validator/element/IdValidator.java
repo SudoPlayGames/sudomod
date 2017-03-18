@@ -31,6 +31,12 @@ public class IdValidator implements
       return false;
     }
 
+    // path is only null during testing
+    if (path != null && !path.endsWith(id)) {
+      LOG.error("Meta [id] is invalid: [{}]; must match folder [{}]", id, path);
+      return false;
+    }
+
     int idCount = 0;
 
     for (Meta m : metaList) {
