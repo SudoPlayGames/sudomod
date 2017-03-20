@@ -1,6 +1,6 @@
-http://misko.hevery.com/code-reviewers-guide/
-
-"color_scheme": "Packages/PlainTasks/ tasks-monokai.hidden-tmTheme ",
+Misc: 
+  http://misko.hevery.com/code-reviewers-guide/
+  "color_scheme": "Packages/PlainTasks/ tasks-monokai.hidden-tmTheme "
 
 Naming Conventions:
   * Extension - a group of plugins, like a 'mod'
@@ -16,8 +16,8 @@ Test:
     Fixed by checking class superclass and implemented interfaces against the same class filters used in the method visitor.
     Unit:
       ✔ Multiple mod paths should work as intended @done (17-03-18 11:38)
-      ☐ Compressed filename should match extension id - meta validator
-      ☐ Folder name should match extension id - meta validator
+      ✔ Compressed filename should match extension id - meta validator @done (17-03-18 12:20)
+      ✔ Folder name should match extension id - meta validator @done (17-03-18 12:20)
     Integration:
       ✔ Compressed mod should work as intended @done (17-03-15 10:42)
       ✔ Mod compiled as jar should work as intended @done (17-03-14 11:17)

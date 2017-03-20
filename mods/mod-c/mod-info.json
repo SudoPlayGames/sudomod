@@ -1,5 +1,5 @@
 {
-  "id": "mod_c",
+  "id": "mod-c",
   "name": "Test Mod C",
   "author": "codetaylor",
   "version": "1.0.0",
@@ -7,7 +7,7 @@
   "api-version": "1.0",
   "website": "https://github.com/sudoplaygames/sudomod",
   "depends-on": [
-    "required-after:mod_b"
+    "required-after:mod-b"
   ],
   "jars": [],
   "preload": [

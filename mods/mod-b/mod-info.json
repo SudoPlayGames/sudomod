@@ -1,5 +1,5 @@
 {
-  "id": "mod_b",
+  "id": "mod-b",
   "name": "Test Mod B",
   "author": "codetaylor",
   "version": "1.0.0",
@@ -7,7 +7,7 @@
   "api-version": "1.0",
   "website": "https://github.com/sudoplaygames/sudomod",
   "depends-on": [
-    "required-after:mod_a"
+    "required-after:mod-a"
   ],
   "jars": [],
   "register": {

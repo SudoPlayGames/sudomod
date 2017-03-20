@@ -77,12 +77,12 @@ public class Main {
         )
         .create();
 
-    SXPluginReference<Plugin> pluginA = service.getPlugin("mod_a:mod.ModPlugin", Plugin.class);
-    SXPluginReference<Plugin> pluginB = service.getPlugin("mod_b:mod.ModPlugin", Plugin.class);
-    SXPluginReference<Plugin> pluginC = service.getPlugin("mod_c:mod.ModPlugin", Plugin.class);
-    SXPluginReference<Plugin> pluginD = service.getPlugin("mod_d:mod.ModPlugin", Plugin.class);
-    SXPluginReference<Plugin> pluginE = service.getPlugin("mod_e:mod.ModPlugin", Plugin.class);
-    SXPluginReference<Plugin> pluginF = service.getPlugin("mod_f:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginA = service.getPlugin("mod-a:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginB = service.getPlugin("mod-b:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginC = service.getPlugin("mod-c:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginD = service.getPlugin("mod-d:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginE = service.getPlugin("mod-e:mod.ModPlugin", Plugin.class);
+    SXPluginReference<Plugin> pluginF = service.getPlugin("mod-f:mod.ModPlugin", Plugin.class);
 
     List<SXPluginReference<AncillaryPlugin>> referenceList = service.getRegisteredPlugins("blue", AncillaryPlugin.class);
 
@@ -127,6 +127,14 @@ public class Main {
     System.out.println("---");
 
     service.dispose();
+
+    int x = 5;
+    System.out.println(x);
+    System.out.println(-x);
+
+    x = -5;
+    System.out.println(x);
+    System.out.println(-x);
   }
 
   private interface RunnableException {
