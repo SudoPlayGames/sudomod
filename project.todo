@@ -27,6 +27,7 @@ Test:
       ✔ Can a compiled mod jar use code that depends on compiled mod jar code in dependency? Yes. @done (17-03-14 12:08)
 
 Bugs:
+  ✔ The ASMClassFilterPredicate fails on [Lapi/activemission/MapEntityApi; @done (17-04-07 08:34)
   ✔ Source classloader can't be made parent-last @done (17-03-11 11:54)
     The loadIClass method in abstract class IClassLoader is final and controls the parent-first behavior.
     Fix: I've solved this by replacing the IClassLoader in the janino jar file with my own IClassLoader.

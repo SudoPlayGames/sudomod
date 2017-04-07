@@ -16,13 +16,13 @@ public class ASMClassFilterPredicate extends
 
   @Override
   public boolean isAllowed(String name) {
-    name = parseClassName(name);
+    name = stripClassName(name);
     name = name.replaceAll("/", ".");
     return super.isAllowed(name);
   }
 
   @NotNull
-  private String parseClassName(String name) {
+  /* package */ String stripClassName(String name) {
     char[] chars = name.toCharArray();
     int index;
 
@@ -34,8 +34,10 @@ public class ASMClassFilterPredicate extends
       break;
     }
 
+    name = name.substring(index);
+
     if (name.startsWith("L") && name.endsWith(";")) {
-      name = name.substring(index + 1, name.length() - 1);
+      name = name.substring(1, name.length() - 1);
 
     } else {
       name = name.substring(index);

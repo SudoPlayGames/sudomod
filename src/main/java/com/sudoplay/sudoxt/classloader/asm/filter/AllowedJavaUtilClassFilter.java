@@ -19,6 +19,7 @@ public class AllowedJavaUtilClassFilter implements
 
         // classes
         ArrayList.class.getName(),
+        Collections.class.getName(),
 
         // interfaces
         List.class.getName()
