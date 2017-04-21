@@ -1,12 +1,17 @@
 package com.sudoplay.sudoxt.service;
 
+import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegate;
 import com.sudoplay.sudoxt.classloader.asm.callback.InjectedCallback;
+import com.sudoplay.sudoxt.classloader.asm.callback.NoOpCallbackDelegate;
 import com.sudoplay.sudoxt.container.Container;
 
 /**
  * Created by codetaylor on 2/22/2017.
  */
 public class SXPluginReference<P> {
+
+  private String report;
+  private ICallbackDelegate callbackDelegate;
 
   public interface InvokeVoidHandler<P> {
     void invoke(P plugin);
@@ -43,11 +48,24 @@ public class SXPluginReference<P> {
   public void invoke(InvokeVoidHandler<P> handler) throws SXPluginException {
 
     try {
-      InjectedCallback.DELEGATE = this.container.getCallbackDelegate();
+
+      if (InjectedCallback.DELEGATE == NoOpCallbackDelegate.INSTANCE) {
+        this.callbackDelegate = this.container.getCallbackDelegate();
+        InjectedCallback.DELEGATE = this.callbackDelegate;
+      }
+
       handler.invoke(this.get());
 
     } catch (Exception e) {
       throw this.getException(e);
+
+    } finally {
+
+      if (this.callbackDelegate == InjectedCallback.DELEGATE) {
+        this.report = this.callbackDelegate.getReport();
+        this.callbackDelegate = null;
+        InjectedCallback.DELEGATE = NoOpCallbackDelegate.INSTANCE;
+      }
     }
   }
 
@@ -65,16 +83,28 @@ public class SXPluginReference<P> {
   public <R> R invoke(Class<R> rClass, InvokeReturnHandler<P, R> handler) throws SXPluginException {
 
     try {
-      InjectedCallback.DELEGATE = this.container.getCallbackDelegate();
+      if (InjectedCallback.DELEGATE == null) {
+        this.callbackDelegate = this.container.getCallbackDelegate();
+        InjectedCallback.DELEGATE = this.callbackDelegate;
+      }
+
       return handler.invoke(this.get());
 
     } catch (Exception e) {
       throw this.getException(e);
+
+    } finally {
+
+      if (this.callbackDelegate == InjectedCallback.DELEGATE) {
+        this.report = this.callbackDelegate.getReport();
+        this.callbackDelegate = null;
+        InjectedCallback.DELEGATE = null;
+      }
     }
   }
 
   public String getReport() {
-    return InjectedCallback.DELEGATE.getReport();
+    return this.report;
   }
 
   private P get() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
