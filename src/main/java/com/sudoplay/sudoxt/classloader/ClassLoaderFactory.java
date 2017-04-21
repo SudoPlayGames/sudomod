@@ -6,7 +6,6 @@ import com.sudoplay.sudoxt.classloader.intercept.IClassInterceptor;
 import com.sudoplay.sudoxt.classloader.intercept.InterceptClassLoader;
 import com.sudoplay.sudoxt.container.Container;
 import com.sudoplay.sudoxt.util.InputStreamByteArrayConverter;
-import org.codehaus.janino.util.resource.PathResourceFinder;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -21,6 +20,8 @@ import java.util.Set;
 /* package */ class ClassLoaderFactory implements
     IClassLoaderFactory {
 
+  private static final boolean DEBUG = true;
+
   private final URL[] urls;
   private File[] sourcePath;
   private final Path path;
@@ -29,6 +30,7 @@ import java.util.Set;
   private IClassInterceptor classInterceptor;
   private IByteCodeTransformer byteCodeTransformer;
   private InputStreamByteArrayConverter inputStreamByteArrayConverter;
+  private ICompilerFactory compilerFactory;
 
   /* package */ ClassLoaderFactory(
       Path path,
@@ -37,7 +39,8 @@ import java.util.Set;
       IClassFilterPredicate classFilterPredicate,
       IClassInterceptor classInterceptor,
       IByteCodeTransformer byteCodeTransformer,
-      InputStreamByteArrayConverter inputStreamByteArrayConverter
+      InputStreamByteArrayConverter inputStreamByteArrayConverter,
+      ICompilerFactory compilerFactory
   ) {
     this.path = path;
     this.dependencyList = dependencyList;
@@ -45,6 +48,7 @@ import java.util.Set;
     this.classInterceptor = classInterceptor;
     this.byteCodeTransformer = byteCodeTransformer;
     this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
+    this.compilerFactory = compilerFactory;
     int size = jarFileSet.size();
     this.urls = new URL[size];
 
@@ -72,6 +76,8 @@ import java.util.Set;
         this.classInterceptor
     );
 
+    ICompiler compiler = this.compilerFactory.create(DEBUG);
+
     SXClassLoader classLoader = new SXClassLoader(
         this.path,
         this.urls,
@@ -80,18 +86,11 @@ import java.util.Set;
         this.byteCodeTransformer,
         this.inputStreamByteArrayConverter,
         this.classFilterPredicate,
+        compiler,
         true
     );
 
-    PathResourceFinder sourceFinder = new PathResourceFinder(this.sourcePath);
-
-    classLoader.setJavaSourceIClassLoader(
-        new SXJavaSourceIClassLoader(
-            sourceFinder,
-            null,
-            new SXIClassLoader(classLoader)
-        )
-    );
+    compiler.onClassLoaderInit(classLoader, this.sourcePath);
 
     return classLoader;
   }

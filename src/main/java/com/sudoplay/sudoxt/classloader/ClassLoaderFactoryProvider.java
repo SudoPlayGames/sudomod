@@ -20,17 +20,20 @@ public class ClassLoaderFactoryProvider implements
   private IClassInterceptorFactory classInterceptorFactory;
   private IByteCodeTransformer byteCodeTransformer;
   private InputStreamByteArrayConverter inputStreamByteArrayConverter;
+  private ICompilerFactory compilerFactory;
 
   public ClassLoaderFactoryProvider(
       IClassFilterPredicate filteredClassLoaderPredicate,
       IClassInterceptorFactory classInterceptorFactory,
       IByteCodeTransformer byteCodeTransformer,
-      InputStreamByteArrayConverter inputStreamByteArrayConverter
+      InputStreamByteArrayConverter inputStreamByteArrayConverter,
+      ICompilerFactory compilerFactory
   ) {
     this.filteredClassLoaderPredicate = filteredClassLoaderPredicate;
     this.classInterceptorFactory = classInterceptorFactory;
     this.byteCodeTransformer = byteCodeTransformer;
     this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
+    this.compilerFactory = compilerFactory;
   }
 
   @Override
@@ -47,7 +50,8 @@ public class ClassLoaderFactoryProvider implements
         this.filteredClassLoaderPredicate,
         this.classInterceptorFactory.create(container),
         this.byteCodeTransformer,
-        this.inputStreamByteArrayConverter
+        this.inputStreamByteArrayConverter,
+        this.compilerFactory
     );
   }
 }

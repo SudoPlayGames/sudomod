@@ -2,7 +2,7 @@ package com.sudoplay.sudoxt;
 
 import com.sudoplay.sudoxt.api.*;
 import com.sudoplay.sudoxt.classloader.asm.filter.AllowedJavaUtilClassFilter;
-import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
+import com.sudoplay.sudoxt.classloader.asm.transform.SXByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.AllowAllClassFilter;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.intercept.StaticInjector;
@@ -56,6 +56,7 @@ public class Main {
             .setTempLocation(Paths.get("mods-temp"))
             .setMetaFilename("mod-info.json")
             .setApiVersion("1.0"))
+
         .addStaticInjector(new LoggerStaticInjector())
         .addStaticInjector(new StaticInjector<>(
             IJsonObjectAPIProvider.class,
@@ -63,7 +64,7 @@ public class Main {
         ))
         .addClassLoaderClassFilter(new AllowAllClassFilter())
         //.setCallbackDelegateFactory(NoOpCallbackDelegateFactory.INSTANCE) // testing
-        .setByteCodeTransformerBuilder(new SEByteCodeTransformerBuilder()
+        .setByteCodeTransformerBuilder(new SXByteCodeTransformerBuilder()
             //.setByteCodePrinter(new StdOutByteCodePrinter())
             .addClassFilter(new AllowedJavaUtilClassFilter())
             .addClassFilter(new IClassFilter() {
@@ -75,6 +76,7 @@ public class Main {
               }
             })
         )
+        //.setCompilerFactory(ECJCompiler::new)
         .create();
 
     SXPluginReference<Plugin> pluginA = service.getPlugin("mod-a:mod.ModPlugin", Plugin.class);
@@ -127,14 +129,6 @@ public class Main {
     System.out.println("---");
 
     service.dispose();
-
-    int x = 5;
-    System.out.println(x);
-    System.out.println(-x);
-
-    x = -5;
-    System.out.println(x);
-    System.out.println(-x);
   }
 
   private interface RunnableException {

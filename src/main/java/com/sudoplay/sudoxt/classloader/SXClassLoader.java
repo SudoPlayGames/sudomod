@@ -7,10 +7,6 @@ import com.sudoplay.sudoxt.classloader.security.ISandboxClassLoader;
 import com.sudoplay.sudoxt.container.Container;
 import com.sudoplay.sudoxt.util.CloseUtil;
 import com.sudoplay.sudoxt.util.InputStreamByteArrayConverter;
-import org.codehaus.commons.compiler.CompileException;
-import org.codehaus.janino.Descriptor;
-import org.codehaus.janino.UnitCompiler;
-import org.codehaus.janino.util.ClassFile;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +17,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.security.AccessControlException;
-import java.util.*;
+import java.util.List;
 
 /**
  * Created by codetaylor on 3/10/2017.
@@ -42,11 +38,9 @@ public class SXClassLoader extends
   private final List<Container> containerList;
   private final IByteCodeTransformer byteCodeTransformer;
   private final InputStreamByteArrayConverter inputStreamByteArrayConverter;
-  private SXJavaSourceIClassLoader javaSourceIClassLoader;
   private final IClassFilterPredicate classFilterPredicate;
+  private final ICompiler compiler;
   private final boolean debug;
-
-  private final Map<String, byte[]> preCompiledClasses;
 
   public SXClassLoader(
       Path path,
@@ -56,6 +50,7 @@ public class SXClassLoader extends
       IByteCodeTransformer byteCodeTransformer,
       InputStreamByteArrayConverter inputStreamByteArrayConverter,
       IClassFilterPredicate classFilterPredicate,
+      ICompiler compiler,
       boolean debug
   ) {
     super(jarUrls, parent);
@@ -64,13 +59,8 @@ public class SXClassLoader extends
     this.byteCodeTransformer = byteCodeTransformer;
     this.inputStreamByteArrayConverter = inputStreamByteArrayConverter;
     this.classFilterPredicate = classFilterPredicate;
+    this.compiler = compiler;
     this.debug = debug;
-
-    this.preCompiledClasses = new HashMap<>();
-  }
-
-  public void setJavaSourceIClassLoader(SXJavaSourceIClassLoader iClassLoader) {
-    this.javaSourceIClassLoader = iClassLoader;
   }
 
   @Override
@@ -218,27 +208,12 @@ public class SXClassLoader extends
   private Class<?> findSourceClass(String name) throws ClassNotFoundException {
     assert name != null;
 
-    // Check if the bytecode for that class was generated already.
-    byte[] bytecode = this.preCompiledClasses.remove(name);
+    byte[] bytecode;
+
+    bytecode = this.compiler.compile(name);
 
     if (bytecode == null) {
-
-      // Read, scan, parse and compile the right compilation unit.
-      {
-        Map<String, byte[]> generatedBytecodeMap = this.generateByteCodes(name);
-
-        if (generatedBytecodeMap == null) {
-          throw new ClassNotFoundException(name);
-        }
-        this.preCompiledClasses.putAll(generatedBytecodeMap);
-      }
-
-      // Now the bytecode for our class should be available.
-      bytecode = this.preCompiledClasses.remove(name);
-
-      if (bytecode == null) {
-        return null;
-      }
+      return null;
     }
 
     try {
@@ -273,38 +248,4 @@ public class SXClassLoader extends
     }
   }
 
-  private Map<String, byte[]> generateByteCodes(String name) throws ClassNotFoundException {
-
-    if (this.javaSourceIClassLoader.loadIClass(Descriptor.fromClassName(name)) == null) {
-      return null;
-    }
-
-    Map<String, byte[]> byteCodes = new HashMap<>();
-    Set<UnitCompiler> compiledUnitCompilers = new HashSet<>();
-
-    COMPILE_UNITS:
-    for (; ; ) {
-
-      for (UnitCompiler uc : this.javaSourceIClassLoader.getUnitCompilers()) {
-
-        if (!compiledUnitCompilers.contains(uc)) {
-          ClassFile[] cfs;
-
-          try {
-            cfs = uc.compileUnit(this.debug, this.debug, this.debug);
-
-          } catch (CompileException ex) {
-            throw new ClassNotFoundException(ex.getMessage(), ex);
-          }
-
-          for (ClassFile cf : cfs) {
-            byteCodes.put(cf.getThisClassName(), cf.toByteArray());
-          }
-          compiledUnitCompilers.add(uc);
-          continue COMPILE_UNITS;
-        }
-      }
-      return byteCodes;
-    }
-  }
 }

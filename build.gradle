@@ -102,6 +102,7 @@ dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2+'
     testIntegrationCompile 'org.assertj:assertj-core:3.6.2'
+    testIntegrationCompile 'org.eclipse.jdt.core.compiler:ecj:4.6.1'
 }
 
 task testIntegration(type: Test) {

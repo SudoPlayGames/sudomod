@@ -40,5 +40,16 @@ public class ASMClassFilterPredicateTest {
     Assert.assertEquals("api/activemission/MapEntityApi", s);
 
   }
+  @Test
+  public void stripClassNameShouldStripArraysPrimitiveClassName() throws Exception {
+
+    ASMClassFilterPredicate predicate = new ASMClassFilterPredicate(null);
+
+    String s = predicate.stripClassName("[F");
+
+    Assert.assertEquals("F", s);
+
+  }
+
 
 }

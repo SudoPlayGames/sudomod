@@ -3,8 +3,9 @@ package com.sudoplay.sudoxt.service;
 import com.sudoplay.sudoxt.candidate.CandidateListProvider;
 import com.sudoplay.sudoxt.candidate.ICandidateProvider;
 import com.sudoplay.sudoxt.classloader.ClassLoaderFactoryProvider;
+import com.sudoplay.sudoxt.classloader.ICompilerFactory;
 import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegateFactory;
-import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
+import com.sudoplay.sudoxt.classloader.asm.transform.SXByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.ClassFilterPredicate;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.intercept.DefaultClassInterceptorFactory;
@@ -36,10 +37,11 @@ import java.nio.charset.Charset;
       IClassFilter[] classLoaderClassFilters,
       StaticInjector<?>[] staticInjectors,
       ICallbackDelegateFactory callbackDelegateFactory,
-      SEByteCodeTransformerBuilder byteCodeTransformerBuilder,
+      SXByteCodeTransformerBuilder byteCodeTransformerBuilder,
       IFolderLifecycleEventHandler[] folderLifecycleEventHandlers,
       Charset charset,
-      String metaFilename
+      String metaFilename,
+      ICompilerFactory compilerFactory
   ) throws SXServiceInitializationException {
 
     FolderLifecycleEventPlugin folderLifecycleEventPlugin;
@@ -128,7 +130,8 @@ import java.nio.charset.Charset;
                 staticInjectors
             ),
             byteCodeTransformerBuilder.create(),
-            new InputStreamByteArrayConverter()
+            new InputStreamByteArrayConverter(),
+            compilerFactory
         ),
         new DependencyContainerListMapper()
     );

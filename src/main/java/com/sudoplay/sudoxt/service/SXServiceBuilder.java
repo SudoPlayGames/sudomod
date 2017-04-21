@@ -3,9 +3,11 @@ package com.sudoplay.sudoxt.service;
 import com.sudoplay.sudoxt.candidate.*;
 import com.sudoplay.sudoxt.candidate.extractor.ZipFileExtractionPathProvider;
 import com.sudoplay.sudoxt.candidate.extractor.ZipFileExtractor;
+import com.sudoplay.sudoxt.classloader.ICompilerFactory;
+import com.sudoplay.sudoxt.classloader.JaninoCompiler;
 import com.sudoplay.sudoxt.classloader.asm.callback.AccountingCallbackDelegateFactory;
 import com.sudoplay.sudoxt.classloader.asm.callback.ICallbackDelegateFactory;
-import com.sudoplay.sudoxt.classloader.asm.transform.SEByteCodeTransformerBuilder;
+import com.sudoplay.sudoxt.classloader.asm.transform.SXByteCodeTransformerBuilder;
 import com.sudoplay.sudoxt.classloader.filter.IClassFilter;
 import com.sudoplay.sudoxt.classloader.intercept.SandboxPathProviderStaticInjector;
 import com.sudoplay.sudoxt.classloader.intercept.StaticInjector;
@@ -36,13 +38,14 @@ public class SXServiceBuilder {
 
   private ICallbackDelegateFactory callbackDelegateFactory;
   private IContainerCacheFactory containerCacheFactory;
-  private SEByteCodeTransformerBuilder byteCodeTransformerBuilder;
+  private SXByteCodeTransformerBuilder byteCodeTransformerBuilder;
 
   private List<IClassFilter> defaultClassLoaderClassFilterList;
   private List<IClassFilter> classLoaderClassFilterList;
 
   private List<StaticInjector<?>> defaultStaticInjectorList;
   private List<StaticInjector<?>> staticInjectorList;
+  private ICompilerFactory compilerFactory;
 
   public SXServiceBuilder(SXConfigBuilder configBuilder) {
     this.config = PreCondition.notNull(configBuilder).getConfig();
@@ -55,7 +58,7 @@ public class SXServiceBuilder {
     this.containerCacheFactory = new LRUContainerCacheFactory(64);
 
     // init the bytecode transformer
-    this.byteCodeTransformerBuilder = new SEByteCodeTransformerBuilder();
+    this.byteCodeTransformerBuilder = new SXByteCodeTransformerBuilder();
 
     // adds the default class filters
     this.defaultClassLoaderClassFilterList = new ArrayList<>();
@@ -65,6 +68,8 @@ public class SXServiceBuilder {
     this.defaultStaticInjectorList.add(new SandboxPathProviderStaticInjector());
 
     this.callbackDelegateFactory = new AccountingCallbackDelegateFactory();
+
+    this.compilerFactory = JaninoCompiler::new;
   }
 
   public SXServiceBuilder addStaticInjector(@NotNull StaticInjector<?> staticInjector) {
@@ -105,8 +110,13 @@ public class SXServiceBuilder {
     return this;
   }
 
-  public SXServiceBuilder setByteCodeTransformerBuilder(@NotNull SEByteCodeTransformerBuilder builder) {
+  public SXServiceBuilder setByteCodeTransformerBuilder(@NotNull SXByteCodeTransformerBuilder builder) {
     this.byteCodeTransformerBuilder = PreCondition.notNull(builder);
+    return this;
+  }
+
+  public SXServiceBuilder setCompilerFactory(@NotNull ICompilerFactory compilerFactory) {
+    this.compilerFactory = PreCondition.notNull(compilerFactory);
     return this;
   }
 
@@ -212,7 +222,8 @@ public class SXServiceBuilder {
             )
         },
         this.config.getCharset(),
-        this.config.getMetaFilename()
+        this.config.getMetaFilename(),
+        this.compilerFactory
     );
   }
 

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by codetaylor on 3/1/2017.
  */
-public class SEByteCodeTransformerBuilder {
+public class SXByteCodeTransformerBuilder {
 
   private IClassReaderFactory classReaderFactory;
   private IClassWriterFactory classWriterFactory;
@@ -27,7 +27,7 @@ public class SEByteCodeTransformerBuilder {
   private List<IClassFilter> classFilterList;
   private List<IClassFilter> catchExceptionClassFilterList;
 
-  public SEByteCodeTransformerBuilder() {
+  public SXByteCodeTransformerBuilder() {
     this.classFilterList = new ArrayList<>();
     this.catchExceptionClassFilterList = new ArrayList<>();
 
@@ -48,52 +48,52 @@ public class SEByteCodeTransformerBuilder {
     ));
   }
 
-  public SEByteCodeTransformerBuilder setClassReaderFactory(IClassReaderFactory factory) {
+  public SXByteCodeTransformerBuilder setClassReaderFactory(IClassReaderFactory factory) {
     this.classReaderFactory = factory;
     return this;
   }
 
-  public SEByteCodeTransformerBuilder setClassWriterFactory(IClassWriterFactory factory) {
+  public SXByteCodeTransformerBuilder setClassWriterFactory(IClassWriterFactory factory) {
     this.classWriterFactory = factory;
     return this;
   }
 
-  public SEByteCodeTransformerBuilder setClassReaderAcceptor(IClassReaderAcceptor acceptor) {
+  public SXByteCodeTransformerBuilder setClassReaderAcceptor(IClassReaderAcceptor acceptor) {
     this.classReaderAcceptor = acceptor;
     return this;
   }
 
-  public SEByteCodeTransformerBuilder setByteCodePrinter(IByteCodePrinter printer) {
+  public SXByteCodeTransformerBuilder setByteCodePrinter(IByteCodePrinter printer) {
     this.byteCodePrinter = printer;
     return this;
   }
 
-  public SEByteCodeTransformerBuilder addClassFilter(IClassFilter filter) {
+  public SXByteCodeTransformerBuilder addClassFilter(IClassFilter filter) {
     this.classFilterList.add(filter);
     return this;
   }
 
-  public SEByteCodeTransformerBuilder removeAllDefaultClassFilters() {
+  public SXByteCodeTransformerBuilder removeAllDefaultClassFilters() {
     this.defaultClassFilterList.clear();
     return this;
   }
 
-  public SEByteCodeTransformerBuilder removeDefaultClassFilter(Class<? extends IClassFilter> aClass) {
+  public SXByteCodeTransformerBuilder removeDefaultClassFilter(Class<? extends IClassFilter> aClass) {
     this.removeByClass(aClass, this.defaultClassFilterList);
     return this;
   }
 
-  public SEByteCodeTransformerBuilder addCatchExceptionClassFilter(IClassFilter filter) {
+  public SXByteCodeTransformerBuilder addCatchExceptionClassFilter(IClassFilter filter) {
     this.catchExceptionClassFilterList.add(filter);
     return this;
   }
 
-  public SEByteCodeTransformerBuilder removeAllDefaultCatchExceptionClassFilters() {
+  public SXByteCodeTransformerBuilder removeAllDefaultCatchExceptionClassFilters() {
     this.defaultCatchExceptionClassFilterList.clear();
     return this;
   }
 
-  public SEByteCodeTransformerBuilder removeDefaultCatchExceptionClassFilter(Class<? extends IClassFilter> aClass) {
+  public SXByteCodeTransformerBuilder removeDefaultCatchExceptionClassFilter(Class<? extends IClassFilter> aClass) {
     this.removeByClass(aClass, this.defaultCatchExceptionClassFilterList);
     return this;
   }
@@ -151,7 +151,7 @@ public class SEByteCodeTransformerBuilder {
     );
   }
 
-  private SEByteCodeTransformerBuilder removeByClass(Class<?> aClass, List<?> list) {
+  private SXByteCodeTransformerBuilder removeByClass(Class<?> aClass, List<?> list) {
 
     for (Iterator<?> it = list.iterator(); it.hasNext(); ) {
 

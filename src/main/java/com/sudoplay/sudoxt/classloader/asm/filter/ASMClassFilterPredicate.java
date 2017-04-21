@@ -38,9 +38,6 @@ public class ASMClassFilterPredicate extends
 
     if (name.startsWith("L") && name.endsWith(";")) {
       name = name.substring(1, name.length() - 1);
-
-    } else {
-      name = name.substring(index);
     }
 
     return name;
