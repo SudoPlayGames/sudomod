@@ -49,6 +49,7 @@ public class AllowedJavaLangClassFilter implements
 
         // interfaces
         Cloneable.class.getName(),
+        Iterable.class.getName(),
 
         // annotation
         Deprecated.class.getName(),

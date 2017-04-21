@@ -39,5 +39,15 @@ public class ModPlugin implements
     LOG.info("s=[{}]", list.size());
 
     LOG.info("{}", TextIO.loadText("../test-mod-b/file.txt"));
+
+    List<String> stringList = new ArrayList<String>();
+
+    stringList.add("Hello");
+    stringList.add("world!");
+
+    for (String s : stringList) {
+      LOG.info(s.substring(1));
+    }
+
   }
 }

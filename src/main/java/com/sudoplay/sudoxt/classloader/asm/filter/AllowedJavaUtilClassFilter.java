@@ -22,6 +22,7 @@ public class AllowedJavaUtilClassFilter implements
         Collections.class.getName(),
 
         // interfaces
+        Iterator.class.getName(),
         List.class.getName()
     ));
   }
