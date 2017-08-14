@@ -4,6 +4,14 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 sourceCompatibility = 1.8
 
 group = 'com.sudoplay.sudoxt'
@@ -157,7 +165,7 @@ signing {
 }
 
 def isReleaseBuild() {
-    return VERSION_NAME.contains("SNAPSHOT") == false;
+    return project.version.contains("SNAPSHOT") == false;
 }
 
 def getReleaseRepositoryUrl() {
