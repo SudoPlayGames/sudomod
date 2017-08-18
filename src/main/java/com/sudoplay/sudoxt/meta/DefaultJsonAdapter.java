@@ -1,7 +1,7 @@
 package com.sudoplay.sudoxt.meta;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONException;
+import com.sudoplay.json.JSONObject;
 
 /**
  * Created by codetaylor on 3/1/2017.

@@ -1,7 +1,7 @@
 package com.sudoplay.sudoxt.meta.adapter;
 
 import com.sudoplay.sudoxt.meta.Meta;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONObject;
 
 /**
  * Adapts individual elements to the provided meta object.

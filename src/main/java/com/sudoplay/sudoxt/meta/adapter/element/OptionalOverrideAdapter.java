@@ -5,7 +5,7 @@ import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
 import com.sudoplay.sudoxt.service.SXResourceLocation;
 import com.sudoplay.sudoxt.service.SXResourceStringParseException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONObject;
 
 import java.util.Iterator;
 

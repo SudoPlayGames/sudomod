@@ -1,8 +1,8 @@
 package com.sudoplay.sudoxt.meta.adapter.element;
 
 import com.sudoplay.sudoxt.meta.Meta;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONException;
+import com.sudoplay.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 

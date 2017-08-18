@@ -93,6 +93,7 @@ dependencies {
     compile 'org.codehaus.janino:commons-compiler:3.0.6'
     compile 'org.ow2.asm:asm-all:5.2'
     compile 'org.jetbrains:annotations:15.0'
+    compile 'com.sudoplay.json:SudoJson:1.0.0'
 
     modACompile sourceSets.api.output
     modACompile files('mods/mod-a/sudomath.jar')

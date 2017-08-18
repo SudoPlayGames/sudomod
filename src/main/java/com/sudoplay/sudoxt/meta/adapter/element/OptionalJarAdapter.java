@@ -3,9 +3,9 @@ package com.sudoplay.sudoxt.meta.adapter.element;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONArray;
+import com.sudoplay.json.JSONException;
+import com.sudoplay.json.JSONObject;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
