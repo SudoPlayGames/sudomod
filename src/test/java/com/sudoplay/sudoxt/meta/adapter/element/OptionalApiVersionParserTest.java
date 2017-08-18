@@ -3,7 +3,7 @@ package com.sudoplay.sudoxt.meta.adapter.element;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONObject;
 import org.junit.Test;
 
 import static org.mockito.Mockito.*;

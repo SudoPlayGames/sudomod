@@ -9,9 +9,9 @@ import com.sudoplay.sudoxt.util.StringUtil;
 import com.sudoplay.sudoxt.versioning.InvalidVersionSpecificationException;
 import com.sudoplay.sudoxt.versioning.VersionRange;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONArray;
+import com.sudoplay.json.JSONException;
+import com.sudoplay.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;

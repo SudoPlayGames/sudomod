@@ -3,8 +3,8 @@ package com.sudoplay.sudoxt.meta.adapter.element;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONArray;
+import com.sudoplay.json.JSONObject;
 
 /**
  * Created by codetaylor on 3/6/2017.

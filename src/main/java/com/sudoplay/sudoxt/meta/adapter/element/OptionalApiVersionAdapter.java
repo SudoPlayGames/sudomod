@@ -1,11 +1,11 @@
 package com.sudoplay.sudoxt.meta.adapter.element;
 
+import com.sudoplay.json.JSONObject;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
 import com.sudoplay.sudoxt.versioning.InvalidVersionSpecificationException;
 import com.sudoplay.sudoxt.versioning.VersionRange;
-import org.json.JSONObject;
 
 /**
  * Reads api version from meta file.

@@ -4,7 +4,7 @@ import com.sudoplay.sudoxt.meta.IMetaJsonLoader;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
-import org.json.JSONException;
+import com.sudoplay.json.JSONException;
 import org.junit.Test;
 
 import java.io.IOException;

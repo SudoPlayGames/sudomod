@@ -4,8 +4,8 @@ import com.sudoplay.sudoxt.meta.ChainedMetaListProcessor;
 import com.sudoplay.sudoxt.meta.IMetaJsonLoader;
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.adapter.IMetaAdapter;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONException;
+import com.sudoplay.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

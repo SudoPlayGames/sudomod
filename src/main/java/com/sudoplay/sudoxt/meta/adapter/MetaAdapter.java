@@ -2,7 +2,7 @@ package com.sudoplay.sudoxt.meta.adapter;
 
 import com.sudoplay.sudoxt.meta.Meta;
 import com.sudoplay.sudoxt.meta.MetaAdaptException;
-import org.json.JSONObject;
+import com.sudoplay.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
